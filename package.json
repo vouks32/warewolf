@@ -1,0 +1,17 @@
+{
+  "name": "warewolf",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "baileys": "^6.7.18",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {}
+}
