@@ -7,11 +7,15 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "patch-package"
   },
   "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.18",
     "baileys": "^6.7.18",
     "qrcode": "^1.5.4"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "patch-package": "^8.0.0"
+  }
 }

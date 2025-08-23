@@ -1,0 +1,331 @@
+{
+  "120363418769455206@g.us": {
+    "state": "ANSWERING",
+    "creator": "237676073559@s.whatsapp.net",
+    "players": [],
+    "questions": [
+      {
+        "type": "multiple",
+        "difficulty": "medium",
+        "category": "Entertainment: Japanese Anime &amp; Manga",
+        "question": "What is the name of the final villain in the manga series &quot;Bleach&quot;?",
+        "correct_answer": "Yhwach",
+        "incorrect_answers": [
+          "Juha Bach",
+          "Yuhabah",
+          "Juhabach"
+        ],
+        "answers": [
+          {
+            "correct": false,
+            "answer": "Juha Bach"
+          },
+          {
+            "correct": true,
+            "answer": [
+              "Yhwach"
+            ]
+          },
+          {
+            "correct": false,
+            "answer": "Juhabach"
+          },
+          {
+            "correct": false,
+            "answer": "Yuhabah"
+          }
+        ]
+      },
+      {
+        "type": "multiple",
+        "difficulty": "medium",
+        "category": "Entertainment: Japanese Anime &amp; Manga",
+        "question": "Who was the first Legendary Pokemon to be defeated by Ash Ketchum in the Pok&eacute;mon anime?",
+        "correct_answer": "Articuno",
+        "incorrect_answers": [
+          "Darkrai",
+          "Latios",
+          "Regice"
+        ],
+        "answers": [
+          {
+            "correct": false,
+            "answer": "Regice"
+          },
+          {
+            "correct": false,
+            "answer": "Latios"
+          },
+          {
+            "correct": true,
+            "answer": [
+              "Articuno"
+            ]
+          },
+          {
+            "correct": false,
+            "answer": "Darkrai"
+          }
+        ]
+      },
+      {
+        "type": "multiple",
+        "difficulty": "hard",
+        "category": "Entertainment: Japanese Anime &amp; Manga",
+        "question": "What is the last line muttered in the anime film &quot;The End of Evangelion&quot;?",
+        "correct_answer": "&quot;How disgusting.&quot;",
+        "incorrect_answers": [
+          "&quot;Idiot, I won&#039;t let you kill me!&quot;",
+          "&quot;Nothing.&quot;",
+          "&quot;Goddammit, Shinji.&quot;"
+        ],
+        "answers": [
+          {
+            "correct": false,
+            "answer": "&quot;Goddammit, Shinji.&quot;"
+          },
+          {
+            "correct": false,
+            "answer": "&quot;Nothing.&quot;"
+          },
+          {
+            "correct": false,
+            "answer": "&quot;Idiot, I won&#039;t let you kill me!&quot;"
+          },
+          {
+            "correct": true,
+            "answer": [
+              "&quot;How disgusting.&quot;"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "multiple",
+        "difficulty": "hard",
+        "category": "Entertainment: Japanese Anime &amp; Manga",
+        "question": "In the anime, Full Metal Panic!, who is Kaname&#039;s best friend?",
+        "correct_answer": "Kyoko Tokiwa",
+        "incorrect_answers": [
+          "Melissa Mao",
+          "Ren Mikihara",
+          "Teletha &quot;Tessa&quot; Testarossa"
+        ],
+        "answers": [
+          {
+            "correct": false,
+            "answer": "Teletha &quot;Tessa&quot; Testarossa"
+          },
+          {
+            "correct": false,
+            "answer": "Melissa Mao"
+          },
+          {
+            "correct": false,
+            "answer": "Ren Mikihara"
+          },
+          {
+            "correct": true,
+            "answer": [
+              "Kyoko Tokiwa"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "boolean",
+        "difficulty": "easy",
+        "category": "Entertainment: Japanese Anime &amp; Manga",
+        "question": "In Pok&eacute;mon, Ash&#039;s Pikachu refuses to go into a pokeball.",
+        "correct_answer": "True",
+        "incorrect_answers": [
+          "False"
+        ],
+        "answers": [
+          {
+            "correct": true,
+            "answer": [
+              "True"
+            ]
+          },
+          {
+            "correct": false,
+            "answer": "False"
+          }
+        ]
+      },
+      {
+        "type": "multiple",
+        "difficulty": "easy",
+        "category": "Entertainment: Japanese Anime &amp; Manga",
+        "question": "Which of the following originated as a manga?",
+        "correct_answer": "Akira",
+        "incorrect_answers": [
+          "Cowboy Bebop",
+          "High School DxD",
+          "Gurren Lagann"
+        ],
+        "answers": [
+          {
+            "correct": false,
+            "answer": "Gurren Lagann"
+          },
+          {
+            "correct": false,
+            "answer": "High School DxD"
+          },
+          {
+            "correct": true,
+            "answer": [
+              "Akira"
+            ]
+          },
+          {
+            "correct": false,
+            "answer": "Cowboy Bebop"
+          }
+        ]
+      },
+      {
+        "type": "multiple",
+        "difficulty": "easy",
+        "category": "Entertainment: Japanese Anime &amp; Manga",
+        "question": "In &quot;A Certain Scientific Railgun&quot;, how many &quot;sisters&quot; did Accelerator have to kill to achieve the rumored level 6?",
+        "correct_answer": "20,000",
+        "incorrect_answers": [
+          "128",
+          "10,000",
+          "5,000"
+        ],
+        "answers": [
+          {
+            "correct": false,
+            "answer": "10,000"
+          },
+          {
+            "correct": false,
+            "answer": "5,000"
+          },
+          {
+            "correct": false,
+            "answer": "128"
+          },
+          {
+            "correct": true,
+            "answer": [
+              "20,000"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "multiple",
+        "difficulty": "hard",
+        "category": "Entertainment: Japanese Anime &amp; Manga",
+        "question": "In the first episode of Yu-Gi-Oh: Duel Monsters, what book is Seto Kaiba seen reading at Domino High School?",
+        "correct_answer": "Thus Spoke Zarathustra",
+        "incorrect_answers": [
+          "Beyond Good and Evil",
+          "The Republic",
+          "Meditations"
+        ],
+        "answers": [
+          {
+            "correct": false,
+            "answer": "The Republic"
+          },
+          {
+            "correct": true,
+            "answer": [
+              "Thus Spoke Zarathustra"
+            ]
+          },
+          {
+            "correct": false,
+            "answer": "Meditations"
+          },
+          {
+            "correct": false,
+            "answer": "Beyond Good and Evil"
+          }
+        ]
+      },
+      {
+        "type": "multiple",
+        "difficulty": "hard",
+        "category": "Entertainment: Japanese Anime &amp; Manga",
+        "question": "In &quot;Hunter x Hunter&quot;, which of the following is NOT a type of Nen aura?",
+        "correct_answer": "Restoration",
+        "incorrect_answers": [
+          "Emission",
+          "Transmutation",
+          "Specialization"
+        ],
+        "answers": [
+          {
+            "correct": false,
+            "answer": "Specialization"
+          },
+          {
+            "correct": true,
+            "answer": [
+              "Restoration"
+            ]
+          },
+          {
+            "correct": false,
+            "answer": "Transmutation"
+          },
+          {
+            "correct": false,
+            "answer": "Emission"
+          }
+        ]
+      },
+      {
+        "type": "multiple",
+        "difficulty": "medium",
+        "category": "Entertainment: Japanese Anime &amp; Manga",
+        "question": "In &quot;Toriko&quot;, which of the following foods is knowingly compatible with Toriko?",
+        "correct_answer": "Poison Potato",
+        "incorrect_answers": [
+          "Mors Oil",
+          "Alpacookie",
+          "Parmesansho Fruit"
+        ],
+        "answers": [
+          {
+            "correct": false,
+            "answer": "Alpacookie"
+          },
+          {
+            "correct": true,
+            "answer": [
+              "Poison Potato"
+            ]
+          },
+          {
+            "correct": false,
+            "answer": "Mors Oil"
+          },
+          {
+            "correct": false,
+            "answer": "Parmesansho Fruit"
+          }
+        ]
+      }
+    ],
+    "categoryVotes": {
+      "237676073559@s.whatsapp.net": {
+        "id": "31",
+        "name": "Anime & Manga "
+      }
+    },
+    "rounds": 1,
+    "timer": [
+      null,
+      null,
+      null
+    ]
+  }
+}

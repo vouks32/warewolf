@@ -1,12 +1,21 @@
 // gameManager.js
 import fs from "fs"
 import path from "path"
-import RoleManager from "./roleManager.js"
+import RoleManager from "./werewolve-utils/roleManager.js"
+import { getUser, saveUser } from "../userStorage.js";
 
 
-const DATA_FILE = path.join(process.cwd(), "games.json")
+const DATA_FILE = path.join(process.cwd(), "games/werewolves.json")
 
 // --- Utilities ---
+function delay(ms) {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve();
+        }, ms);
+    });
+}
+
 function loadGames() {
     return {}
     if (!fs.existsSync(DATA_FILE)) return {}
@@ -52,9 +61,15 @@ function checkWin(game) {
 }
 
 // --- Main Manager ---
-export class GameManager {
+export class WereWolvesManager {
     constructor() {
         this.games = loadGames()
+    }
+
+    isPlaying(groupId) {
+        const game = this.games[groupId]
+        if (game) return true
+        return false
     }
 
     getPlayerGroupJid(playerJid) {
@@ -69,7 +84,7 @@ export class GameManager {
 
     async createGame(groupId, whatsapp) {
         if (this.games[groupId]) {
-            await whatsapp.reply("⚠️ A game is already running in this group.")
+            await whatsapp.reply("Une partie est déjà en cours wesh!")
             return
         }
 
@@ -87,43 +102,56 @@ export class GameManager {
         }
 
         saveGames(this.games)
-        await whatsapp.reply("🎮 New Werewolf game created! \nSend *!play _pseudo_* to join (5 minutes).")
+        await whatsapp.reply("🎮 Nouvelle partie de loup garou, *Awoooo!😭* \nEnvoie *!play _pseudo_* pour rejoindre (3 minutes restantes).")
 
-        this.games[groupId].timer = setTimeout( async() => {
+        this.games[groupId].timer = setTimeout(async () => {
             await this.startGame(groupId, whatsapp)
-        }, 5 * 60 * 1000)
-        setTimeout( async () => {
-            await whatsapp.reply("🎮 3 Minutes Left to join! \nSend *!play _pseudo_*.")
+        }, 3 * 60 * 1000)
+        setTimeout(async () => {
+            await whatsapp.sendMessage(groupId, "🎮 1 Minutes restantes pour rejoindre la partie! \nEnvoie *!play _pseudo_*")
         }, 2 * 60 * 1000)
-        setTimeout( async () => {
-            await whatsapp.reply("🎮 1 Minute Left to join! \nSend *!play _pseudo_*.")
-        }, 4 * 60 * 1000)
+        setTimeout(async () => {
+            await whatsapp.sendMessage(groupId, "🎮 30 secondes restantes pour rejoindre la partie! \nEnvoie *!play _pseudo_*.")
+        }, 30000 + (2 * 60 * 1000))
+        setTimeout(async () => {
+            await whatsapp.sendMessage(groupId, "🎮 15 secs restantes pour rejoindre la partie! \nEnvoie *!play _pseudo_*.")
+        }, 45000 + (2 * 60 * 1000))
     }
 
     async joinGame(groupId, playerJid, name, whatsapp) {
         const game = this.games[groupId]
         if (!game || game.state !== "WAITING_PLAYERS") {
-            await whatsapp.reply("⚠️ No joinable game in progress.")
+            await whatsapp.reply("⚠️ Aucune partie dans laquelle tu peux entrer pour l'instant frangin.")
             return
         }
 
         if (game.players.find(p => p.jid === playerJid)) {
-            await whatsapp.reply("⚠️ You already joined.")
+            await whatsapp.reply("😐 Tu es déjà dans la partie nor?")
             return
         }
 
         if (this.getPlayerGroupJid(playerJid)) {
-            await whatsapp.reply("⚠️ You are in a game in another group.")
+            await whatsapp.reply("⚠️ Tu es dans une partie dans un autre groupe, Infidèle!")
             return
         }
 
-        game.players.push({ jid: playerJid, name, isPlaying: true, isDead: false, role: null })
+        game.players.push({ ids: whatsapp.ids, jid: playerJid, name, isPlaying: true, isDead: false, role: null })
         saveGames(this.games)
 
-        const names = game.players.map((p, i) => `[${i + 1}] - ${p.name} (${p.jid})`).join("\n")
+        const names = game.players.map((p, i) => `[${i}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`)).join("\n")
         const mentions = game.players.map((p, i) => p.jid)
 
-        await whatsapp.reply(`✅ You joined!\n\nCurrent players:\n\n${names}`, mentions)
+        await whatsapp.reply(`✅ Tu as rejoins!\n\nListe des joueurs:\n\n${names}`, mentions)
+
+        const user = getUser(playerJid)
+        if (!user) {
+            saveUser({ id: playerJid, groups: [groupId], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName })
+        } else {
+            if (!user.groups.some(g => g === groupId)) {
+                user.groups.push(groupId)
+                saveUser(user)
+            }
+        }
     }
 
     async startGame(groupId, whatsapp) {
@@ -131,8 +159,8 @@ export class GameManager {
         if (!game || game.state !== "WAITING_PLAYERS") return
 
         if (game.players.length < 4) {
-            await whatsapp.sendMessage(groupId, "⚠️ Not enough players (min 4). \n*Game cancelled.*")
-            await whatsapp.sendMessage(groupId, `send *"!startgame"* to play again`)
+            await whatsapp.sendMessage(groupId, "⚠️ Pas assez de joueurs (faut au moins 4).\nC'est quoi? vous avez pas assez d'amis? \n*Jeu annulé.*")
+            await whatsapp.sendMessage(groupId, `Envoyez *"!werewolve"* pour réessayer`)
             delete this.games[groupId]
             saveGames(this.games)
             return
@@ -144,8 +172,8 @@ export class GameManager {
         const roles = RoleManager.generateRoles(game.players.length);
 
         if (!RoleManager.validateRoleDistribution(roles)) {
-            await whatsapp.sendMessage(groupId, "⚠️ Error assigning roles. Game cancelled.");
-            await whatsapp.sendMessage(groupId, `send *"!startgame"* to play again`)
+            await whatsapp.sendMessage(groupId, "⚠️ Une érreur lors de l'assignation des rôles, my bad ✋😐🤚. Jeu annulé.");
+            await whatsapp.sendMessage(groupId, `envoyez encore *"!werewolve"* pour voir si je donne bien cette fois`)
             delete this.games[groupId]
             saveGames(this.games)
             return;
@@ -156,10 +184,10 @@ export class GameManager {
 
         // DM role to each player
         for (const p of game.players) {
-            await whatsapp.sendMessage(p.jid, `🎭 Your role is: *${p.role}*`)
+            await whatsapp.sendMessage(p.jid, `🎭 Ton rôle est: *${p.role}*`)
         }
 
-        await whatsapp.sendMessage(groupId, "🌙 Night falls... Roles assigned.")
+        await whatsapp.sendMessage(groupId, "🌙 La nuit est tombé... \nSeul les prostitués rodent.... Du moin... c'est ce qu'elles pensent, \n\nVous avez 3 minutes")
         this.startNight(groupId, whatsapp)
     }
 
@@ -178,37 +206,45 @@ export class GameManager {
         // DM prompts
         for (const p of game.players) {
             if (!p.isDead) {
+                console.log("sending role to", p.name)
+                await delay(1500)
                 if (p.role === "WEREWOLF") {
-                    await whatsapp.sendMessage(p.jid, "🐺 Night: \nreply with *!kill _victim number_* to choose a victim.")
+                    await whatsapp.sendMessage(p.jid, "🐺 Nuit: \nEnvoie *!kill _<victim number>_* Pour voter qui vous allez dévorer.")
                 } else if (p.role === "SEER") {
-                    await whatsapp.sendMessage(p.jid, "🔮 Night: \nreply with *!see _victim number_* to inspect if they are a werewolf.")
+                    await whatsapp.sendMessage(p.jid, "🔮 Nuit: \nEnvoie *!see _<victim number>_* pour voir si il est un loup.")
                 } else if (p.role === "DOCTOR") {
-                    await whatsapp.sendMessage(p.jid, "💉 Night: \nreply with *!save _victim number_* to protect someone.")
+                    await whatsapp.sendMessage(p.jid, "💉 Nuit: \nEnvoie *!save _<victim number>_* pour protéger quelqu'un.")
                 } else if (p.role === "WITCH" && (game.witchHealAvailable && game.witchPoisonAvailable)) {
-                    await whatsapp.sendMessage(p.jid, "🧪 Night: \nYou may *!heal* (save tonight’s victim) or *!poison _victim number_* (kill someone). Each once per game.")
+                    await whatsapp.sendMessage(p.jid, "🧪 Nuit: \nEnvoie \n- *!heal* (et sauve la victime des loups pour ce soir) ou \n- *!poison _<victim number>_* (pour tuer quelqu'un).\n Tu ne peux le faire qu'une fois durant tout le jeu.")
                 } else if (p.role === "CUPID" && game.nights == 1) {
-                    await whatsapp.sendMessage(p.jid, "❤️ Night: \nChoose two lovers: !love _1st Victim number_ _2nd Victime number_ (This is the only chance you get to link, after this occation you are a simple villager)")
+                    await whatsapp.sendMessage(p.jid, "❤️ Nuit: \nChoose two lovers: *!love _<1st victim number>_ _<2nd Victime number>_* (This is the only chance you get to link, after this occation you are a simple villager)")
                 } else {
-                    await whatsapp.sendMessage(p.jid, "😴 Night: \n sleep peacefully.")
+                    await whatsapp.sendMessage(p.jid, "😴 Nuit: \n sleep peacefully.")
                 }
-                if (p.role !== "VILLAGER") {
-                    if (!(p.role === "WITCH" && (game.witchHealAvailable || game.witchPoisonAvailable))) return
-                    if (!(p.role === "CUPID" && game.nights == 1)) return
-                    await whatsapp.sendMessage(p.jid, "Players :\n\n" + game.players.map((_p, i) => `[${i}] - ${_p.name}\n`))
+                if (p.role !== "VILLAGER" && p.role !== "HUNTER") {
+                    if ((p.role === "WITCH" && (!game.witchHealAvailable && !game.witchPoisonAvailable))) return
+                    if ((p.role === "CUPID" && game.nights !== 1)) return
+                    await delay(1000)
+                    const names = game.players.map((p, i) => `[${i}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`)).join("\n")
+                    const mentions = game.players.map((p, i) => p.jid)
+                    await whatsapp.sendMessage(p.jid, "Players :\n\n" + names, mentions)
                 }
             }
         }
 
         // Timer ends night
-        game.timer = setTimeout( async() => {
+        game.timer = setTimeout(async () => {
             await this.resolveNight(groupId, whatsapp)
-        }, 5 * 60 * 1000)
-         setTimeout( async () => {
-            await whatsapp.reply("🎮 3 Minutes Left before sunrise!")
+        }, 3 * 60 * 1000)
+        setTimeout(async () => {
+            await whatsapp.reply("🎮 1 Minutes Left before sunrise!")
         }, 2 * 60 * 1000)
-        setTimeout( async () => {
-            await whatsapp.reply("🎮 1 Minute Left before sunrise!")
-        }, 4 * 60 * 1000)
+        setTimeout(async () => {
+            await whatsapp.reply("🎮 30 secs Left before sunrise!")
+        }, 30000 + (2 * 60 * 1000))
+        setTimeout(async () => {
+            await whatsapp.reply("🎮 15 secs Left before sunrise!")
+        }, 45000 + (2 * 60 * 1000))
     }
 
     async wolfKill(groupId, wolfJid, targetJid, whatsapp) {
@@ -230,7 +266,8 @@ export class GameManager {
         game.wolfChoices[wolfJid] = targetJid
         saveGames(this.games)
 
-        await whatsapp.sendMessage(wolfJid, `✅ You selected ${target.name} as your victim.`)
+        await whatsapp.sendMessage(groupId, `🐺 The werewolves are shouting at the moon.`)
+        await whatsapp.sendMessage(wolfJid, `✅ You selected *${target.name}* (@${target.jid.split('@')[0]})  as your victim.`, [target.jid])
     }
 
     async seerInspect(groupId, targetJid, whatsapp) {
@@ -258,7 +295,7 @@ export class GameManager {
         saveGames(this.games)
 
         const result = target.role === "WEREWOLF" ? "a 🐺 Werewolf" : "not a Werewolf"
-        await whatsapp.sendMessage(seer.jid, `🔮 Result: \n${target.name} is ${result}.`)
+        await whatsapp.sendMessage(seer.jid, `🔮 Result: \n*${target.name}* (@${target.jid.split('@')[0]})  is ${result}.`, [target.jid])
     }
 
     async doctorSave(groupId, targetJid, whatsapp) {
@@ -284,7 +321,7 @@ export class GameManager {
 
         game.doctorChoice = targetJid
         saveGames(this.games)
-        await whatsapp.sendMessage(doctor.jid, `💉 You chose to protect ${target.name} tonight.`)
+        await whatsapp.sendMessage(doctor.jid, `💉 You chose to protect *${target.name}* (@${target.jid.split('@')[0]}) tonight.`, [target.jid])
     }
 
     async hunterShoot(groupId, targetJid, whatsapp) {
@@ -323,7 +360,7 @@ export class GameManager {
         target.isDead = true
         game.witchPoisonAvailable = false
         saveGames(this.games)
-        await whatsapp.sendMessage(groupId, `🧪 The Witch poisoned ${target.name} during the night!`)
+        await whatsapp.sendMessage(groupId, `🧪 The Witch poisoned *${target.name}* (@${target.jid.split('@')[0]}) during the night!`, [targetJid])
     }
 
     async cupidPair(groupId, jid1, jid2, whatsapp) {
@@ -376,17 +413,19 @@ export class GameManager {
                     game.pendingHunter = victim.jid;
                     game.hunterTimeout = Date.now();
 
-                    await whatsapp.sendMessage(victim.jid, "🏹 You are dying. \nReply with *!shoot  _victim number_* within 2 minutes to take someone down with you!");
-                    await whatsapp.sendMessage(victim.jid, "Players :\n\n " + game.players.map((_p, i) => `[${i}] - ${_p.name}\n`))
+                    await whatsapp.sendMessage(victim.jid, "☠️ You are dying. \nEnvoie *!shoot  _<victim number>_* within 45 seconds to take someone down with you!");
+                    const names = game.players.map((p, i) => `[${i}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`)).join("\n")
+                    const mentions = game.players.map((p, i) => p.jid)
+                    await whatsapp.sendMessage(victim.jid, "Players :\n\n " + names, mentions)
 
                     // Set hunter timeout
-                    game.timer = setTimeout( async() => {
-                        await whatsapp.sendMessage(groupId, `☀️ Day breaks... \n${victimId} was killed during the night!\n\nBut... he was a Hunter 🏹`)
+                    game.timer = setTimeout(async () => {
+                        await whatsapp.sendMessage(groupId, `☀️ Day breaks... \n@${victimId.split('@')[0]} was killed during the night!\n\nBut... he was a Hunter 🏹`, [victimId])
 
                         if (!game.hunterTarget)
                             await whatsapp.sendMessage(groupId, "🏹 Hunter didn't shoot anyone before dying.");
                         else
-                            await whatsapp.sendMessage(groupId, `🏹 Hunter shot ${game.hunterTarget.name} as they died!`)
+                            await whatsapp.sendMessage(groupId, `🏹 Hunter shot *${game.hunterTarget.name}* (@${game.hunterTarget.jid.split('@')[0]}) as they died!`, [game.hunterTarget.jid])
 
                         game.hunterTarget = null;
 
@@ -394,33 +433,33 @@ export class GameManager {
                             const partner = game.players.find(p => p.jid === victim.lover)
                             if (partner && !partner.isDead) {
                                 partner.isDead = true
-                                await whatsapp.sendMessage(groupId, `💔 ${partner.name} died of heartbreak as their lover perished.`)
+                                await whatsapp.sendMessage(groupId, `💔 *${partner.name}* (@${partner.jid.split('@')[0]}) died of heartbreak as their lover perished.`, [partner.jid])
                             }
                         }
                         saveGames(this.games)
 
                         const result = checkWin(game)
                         if (result) {
-                            await whatsapp.sendMessage(groupId, `🏆 Game over! \n${result} win!`)
-                            await whatsapp.sendMessage(groupId, `send *"!startgame"* to play again`)
+                            await whatsapp.sendMessage(groupId, `🏆 Game over! \n*${result}* win!`)
+                            await whatsapp.sendMessage(groupId, `send *"!werewolve"* to play again`)
                             delete this.games[groupId]
                             saveGames(this.games)
                             return
                         }
 
                         this.startDay(groupId, whatsapp)
-                    }, 2 * 60 * 1000);
+                    }, 45 * 1000);
 
                     saveGames(this.games)
                     return; // Don't check win condition yet
                 }
 
-                await whatsapp.sendMessage(groupId, `☀️ Day breaks... \n${victimId} was killed during the night!`)
+                await whatsapp.sendMessage(groupId, `☀️ Day breaks... \n@${victimId.split('@')[0]} was killed during the night!`, [victimId])
                 if (victim.lover) {
                     const partner = game.players.find(p => p.jid === victim.lover)
                     if (partner && !partner.isDead) {
                         partner.isDead = true
-                        await whatsapp.sendMessage(groupId, `💔 ${partner.name} died of heartbreak as their lover perished.`)
+                        await whatsapp.sendMessage(groupId, `💔 *${partner.name}* (@${partner.jid.split('@')[0]}) died of heartbreak as their lover perished.`, [partner.jid])
                     }
                 }
 
@@ -433,8 +472,8 @@ export class GameManager {
 
         const result = checkWin(game)
         if (result) {
-            await whatsapp.sendMessage(groupId, `🏆 Game over! \n${result} win!`)
-            await whatsapp.sendMessage(groupId, `send *"!startgame"* to play again`)
+            await whatsapp.sendMessage(groupId, `🏆 Game over! \n*${result}* win!`)
+            await whatsapp.sendMessage(groupId, `send *"!werewolve"* to play again`)
             delete this.games[groupId]
             saveGames(this.games)
             return
@@ -450,18 +489,23 @@ export class GameManager {
         game.votes = {}
         saveGames(this.games)
 
-        await whatsapp.sendMessage(groupId, "🌞 Daytime: Discuss and vote with *!vote  _victim number_*")
-        await whatsapp.sendMessage(groupId, "Players :\n\n " + game.players.map((_p, i) => `[${i}] - ${_p.name}\n`))
+        await whatsapp.sendMessage(groupId, "🌞 Daytime: Discuss and vote with *!vote  _<victim number>_*\nYou have 3 minutes")
+        const names = game.players.map((p, i) => `[${i}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`)).join("\n")
+        const mentions = game.players.map((p, i) => p.jid)
+        await whatsapp.sendMessage(groupId, "Players :\n\n " + names, mentions)
 
-        game.timer = setTimeout( async() => {
+        game.timer = setTimeout(async () => {
             this.resolveVotes(groupId, whatsapp)
-        }, 5 * 60 * 1000)
-         setTimeout( async () => {
-            await whatsapp.reply("🎮 3 Minutes Left before nightfall!")
+        }, 3 * 60 * 1000)
+        setTimeout(async () => {
+            await whatsapp.reply("🎮 1 Minutes Left before sunrise!")
         }, 2 * 60 * 1000)
-        setTimeout( async () => {
-            await whatsapp.reply("🎮 1 Minute Left before nightfall!")
-        }, 4 * 60 * 1000)
+        setTimeout(async () => {
+            await whatsapp.reply("🎮 30 secs Left before sunrise!")
+        }, 30000 + (2 * 60 * 1000))
+        setTimeout(async () => {
+            await whatsapp.reply("🎮 15 secs Left before sunrise!")
+        }, 45000 + (2 * 60 * 1000))
     }
 
     async castVote(groupId, voterJid, targetJid, whatsapp) {
@@ -483,7 +527,7 @@ export class GameManager {
         game.votes[voterJid] = targetJid
         saveGames(this.games)
 
-        await whatsapp.sendMessage(groupId, `✅ ${voter.name} voted against ${target.name}.`)
+        await whatsapp.sendMessage(groupId, `✅ *${voter.name}* (@${voter.jid.split('@')[0]}) voted against *${target.name}* (@${target.jid.split('@')[0]}).`, [voter.jid, target.jid])
     }
 
     async resolveVotes(groupId, whatsapp) {
@@ -508,10 +552,12 @@ export class GameManager {
         if (victimId) {
             const victim = game.players.find(p => p.jid === victimId)
             victim.isDead = true
-            await whatsapp.sendMessage(groupId, `⚖️ The village executed ${victimId}. They were *${victim.role}*.`)
+            await whatsapp.sendMessage(groupId, `⚖️ The village executed @${victimId.split('@')[0]}. They were *${victim.role}*.`, [victimId])
             if (victim.role === "HUNTER") {
-                await whatsapp.sendMessage(victim.jid, "🏹 You are dying. Reply with *!shoot  _victim number_* to take someone down with you!")
-                await whatsapp.sendMessage(victim.jid, "Players :\n\n " + game.players.map((_p, i) => `[${i}] - ${_p.name}\n`))
+                await whatsapp.sendMessage(victim.jid, "🏹 You are dying. Envoie *!shoot  _<victim number>_* to take someone down with you!")
+                const names = game.players.map((p, i) => `[${i}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`)).join("\n")
+                const mentions = game.players.map((p, i) => p.jid)
+                await whatsapp.sendMessage(victim.jid, "Players :\n\n " + names, mentions)
                 game.pendingHunter = victim.jid
             }
 
@@ -523,14 +569,27 @@ export class GameManager {
 
         const result = checkWin(game)
         if (result) {
-            await whatsapp.sendMessage(groupId, `🏆 Game over! ${result} win!`)
-            await whatsapp.sendMessage(groupId, `send *"!startgame"* to play again`)
+            await whatsapp.sendMessage(groupId, `🏆 Game over! \n*${result}* win!`)
+            await whatsapp.sendMessage(groupId, `send *"!werewolve"* to play again`)
             delete this.games[groupId]
             saveGames(this.games)
             return
         }
 
         this.startNight(groupId, whatsapp)
+    }
+
+
+
+    async stopGame(groupId, whatsapp) {
+        const game = this.games[groupId]
+        if (!game) return
+
+        await whatsapp.sendMessage(groupId, `*Game Stopped!*`)
+        await whatsapp.sendMessage(groupId, `send *"!werewolve"* to play again`)
+        delete this.games[groupId]
+        saveGames(this.games)
+        return
     }
 
 }
