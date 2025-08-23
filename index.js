@@ -3,15 +3,21 @@ import QRCode from 'qrcode'
 import { WereWolvesManager } from "./GamesManagers/werewolve.js"
 import { makeRetryHandler } from "./handler.js";
 import { QuizManager } from "./GamesManagers/quiz.js";
+import { Insult1 } from "./apis/insult.js";
 const wwm = new WereWolvesManager()
 const qm = new QuizManager()
 const handler = makeRetryHandler();
 
-function htmlDecode(input) {
-    var e = document.createElement('textarea');
-    e.innerHTML = input;
-    // handle case of empty input
-    return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+function htmlDecode(text) {
+    if (typeof text !== 'string') return text;
+    return text
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'")
+        .replace(/&apos;/g, "'")
+        .replace(/&nbsp;/g, ' ');
 }
 
 function parseMessage(msg) {
@@ -231,7 +237,7 @@ async function startBot() {
 
     })
 
-
+    //////////////////////////// UTILITIES //////////////////////////////////////////////////
     handlers.commands.set("!info", async (whatsapp) => {
         return await whatsapp.reply('Je suis un bot créé par Vouks - (676073559)\n' +
             'Mon but? Jouer avec vous pour vous distraire du fait que le monde va bientôt sombrer entre les mains des intélligences artificiels tel que moi... lors :\n\n' +
@@ -241,7 +247,6 @@ async function startBot() {
             "\nℹ️ *!info* - Pour tout savoir sur moi"
         )
     })
-
 
     handlers.commands.set("!startgame", async (whatsapp) => {
         return await whatsapp.reply('Pour jouer à un jeu, écris:\n\n' +
@@ -265,11 +270,35 @@ async function startBot() {
         }
     })
 
+    // MENTION
+    handlers.text.push({
+        regex: /^!mention/,
+        fn: async (whatsapp) => {
+            if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
+            if (whatsapp.text.split(" ").length == 1 || whatsapp.text.split(" ")[1].trim().length == 0) return await whatsapp.reply('tu n\'as pas fournis la personne que je dois mentionner... envoie *!mention _@pseudo_* pour mentioner !')
+
+            const name = whatsapp.text.split(" ")[1]
+            whatsapp.reply("I mention : " + name, [name.replace('@', '') + "@lid"])
+        }
+    })
+
+    // MENTION
+    handlers.text.push({
+        regex: /!bot insulte/,
+        fn: async (whatsapp) => {
+            if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
+            if (whatsapp.text.split("!bot insulte").length == 1 || whatsapp.text.split("!bot insulte")[1].trim().length == 0) return await whatsapp.reply('Moi je vois pas celui que tu veux que j\'insulte 🤷‍♂️')
+
+            const name = whatsapp.text.split("!bot insulte")[1].trim().split(' ')[0]
+            const user = whatsapp.ids.lid ? name.replace('@', '') + "@lid" : name.replace('@', '') + "@s.whatsapp.net"
+            Insult1(whatsapp.groupJid, user, whatsapp)
+        }
+    })
 
 
 
 
-
+    //////////////////////////// QUIZ //////////////////////////////////////////////////
     handlers.commands.set("!quiz", async (whatsapp) => {
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
         if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
@@ -302,6 +331,29 @@ async function startBot() {
 
 
 
+    // SHORT HAND NUMBER WHEN IN GAME
+    handlers.any.push(async (whatsapp) => {
+        const t = whatsapp.text;
+        if (t.length > 2 || !Number.isInteger(parseInt(t))) return
+
+        const werewolfGroupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
+        const quizGroupJid = qm.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
+        const target = parseInt(t) - 1
+
+        console.log(" group jids of bollosses", werewolfGroupJid, quizGroupJid)
+        if (werewolfGroupJid) {
+            const targetJid = wwm.getPlayerJidFromNumber(werewolfGroupJid, target)
+            await wwm.handleShortHand(werewolfGroupJid, whatsapp.sender, targetJid, whatsapp)
+        }
+
+        if (quizGroupJid) {
+            await qm.handleShortHand(quizGroupJid, whatsapp.sender, target, whatsapp)
+        }
+    }
+    )
+
+
+
     ////////////////////////////////////////////        WEREWOLVES         ////////////////////////////////////////////////// 
     // Start game in group
     handlers.commands.set("!werewolve", async (whatsapp) => {
@@ -310,6 +362,7 @@ async function startBot() {
         await wwm.createGame(whatsapp.groupJid, whatsapp)
     })
 
+    // join
     handlers.text.push({
         regex: /^!play/,
         fn: async (whatsapp) => {
@@ -321,18 +374,6 @@ async function startBot() {
         }
     })
 
-
-    handlers.text.push({
-        regex: /^!mention/,
-        fn: async (whatsapp) => {
-            if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
-            if (whatsapp.text.split(" ").length == 1 || whatsapp.text.split(" ")[1].trim().length == 0) return await whatsapp.reply('tu n\'as pas fournis la personne que je dois mentionner... envoie *!mention _@pseudo_* pour mentioner !')
-
-            const name = whatsapp.text.split(" ")[1]
-            whatsapp.reply("I mention : " + name, [name.replace('@', '') + "@lid"])
-        }
-    })
-
     // Wolves kill (private DM only)
     handlers.text.push({
         regex: /^!kill\s+(\S+)/,
@@ -340,20 +381,20 @@ async function startBot() {
             if (whatsapp.isGroup) return await whatsapp.reply("Cette action en peut être éffectué que dans l'intimité de notre conversation")
             const groupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
             if (!groupJid) return await whatsapp.reply("Tu n'es dans aucune partie dont j'ai connaissance")
-            const target = whatsapp.text.split(" ")[1]
+            const target = parseInt(whatsapp.text.split(" ")[1]) - 1
             const targetJid = wwm.getPlayerJidFromNumber(groupJid, target)
             console.log("wolf ---- ", groupJid, whatsapp.sender, targetJid, whatsapp)
             await wwm.wolfKill(groupJid, whatsapp.sender, targetJid, whatsapp)
         }
     })
 
-    // Village vote (group)
+    // Village vote (group) [DAY]
     handlers.text.push({
         regex: /^!vote\s+(\S+)/,
         fn: async (whatsapp) => {
             if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
 
-            const target = whatsapp.text.split(" ")[1]
+            const target = parseInt(whatsapp.text.split(" ")[1]) - 1
             const targetJid = wwm.getPlayerJidFromNumber(whatsapp.groupJid, target)
 
             console.log("vote ---- ", whatsapp.groupJid, targetJid, whatsapp)
@@ -368,7 +409,7 @@ async function startBot() {
             if (whatsapp.isGroup) return await whatsapp.reply("Cette action en peut être éffectué que dans l'intimité de notre conversation")
             const groupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
             if (!groupJid) return await whatsapp.reply("Tu n'es dans aucune partie dont j'ai connaissance")
-            const target = whatsapp.text.split(" ")[1]
+            const target = parseInt(whatsapp.text.split(" ")[1]) - 1
             const targetJid = wwm.getPlayerJidFromNumber(groupJid, target)
             console.log("see ---- ", groupJid, targetJid, whatsapp)
             await wwm.seerInspect(groupJid, targetJid, whatsapp)
@@ -383,7 +424,7 @@ async function startBot() {
             const groupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
             if (!groupJid) return await whatsapp.reply("Tu n'es dans aucune partie dont j'ai connaissance")
 
-            const target = whatsapp.text.split(" ")[1]
+            const target = parseInt(whatsapp.text.split(" ")[1]) - 1
             const targetJid = wwm.getPlayerJidFromNumber(groupJid, target)
             await wwm.doctorSave(groupJid, targetJid, whatsapp)
         }
@@ -391,18 +432,19 @@ async function startBot() {
 
     // hunter
     handlers.text.push({
-        regex: /^!shoot\s+(\S+)/,
+        regex: /^!shoot/,
         fn: async (whatsapp) => {
             if (whatsapp.isGroup) return await whatsapp.reply("Cette action en peut être éffectué que dans l'intimité de notre conversation")
             const groupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
             if (!groupJid) return await whatsapp.reply("Tu n'es dans aucune partie dont j'ai connaissance")
 
-            const target = whatsapp.text.split(" ")[1]
+            const target = parseInt(whatsapp.text.split(" ")[1]) - 1
             const targetJid = wwm.getPlayerJidFromNumber(groupJid, target)
             await wwm.hunterShoot(groupJid, targetJid, whatsapp)
         }
     })
 
+    // witch heal
     handlers.text.push({
         regex: /^!heal$/,
         fn: async (whatsapp) => {
@@ -413,6 +455,7 @@ async function startBot() {
             await wwm.witchHeal(groupJid, whatsapp)
         }
     })
+    // witch poison
     handlers.text.push({
         regex: /^!poison\s+(\S+)/,
         fn: async (whatsapp) => {
@@ -420,12 +463,12 @@ async function startBot() {
             const groupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
             if (!groupJid) return await whatsapp.reply("Tu n'es dans aucune partie dont j'ai connaissance")
 
-            const target = whatsapp.text.split(" ")[1]
+            const target = parseInt(whatsapp.text.split(" ")[1]) - 1
             const targetJid = wwm.getPlayerJidFromNumber(groupJid, target)
             await wwm.witchPoison(groupJid, targetJid, whatsapp)
         }
     })
-
+    // love cupid
     handlers.text.push({
         regex: /^!love\s+(\S+)\s+(\S+)/,
         fn: async (whatsapp) => {
@@ -433,8 +476,8 @@ async function startBot() {
             const groupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
             if (!groupJid) return await whatsapp.reply("Tu n'es dans aucune partie dont j'ai connaissance")
 
-            const target1 = whatsapp.text.split(" ")[1]
-            const target2 = whatsapp.text.split(" ")[2]
+            const target1 = parseInt(whatsapp.text.split(" ")[1]) - 1
+            const target2 = parseInt(whatsapp.text.split(" ")[2]) - 1
 
             const targetJid1 = wwm.getPlayerJidFromNumber(groupJid, target1)
             const targetJid2 = wwm.getPlayerJidFromNumber(groupJid, target2)

@@ -16,7 +16,7 @@ const categories = [
     { id: '20', name: "Mythology" },
     { id: '21', name: "Sports" },
     { id: '26', name: "Celebrities" },
-    { id: '31', name: "Anime & Manga " },
+    { id: '31', name: "Anime & Manga" },
     { id: '32', name: "Cartoon & Animations" },
 ]
 
@@ -70,6 +70,15 @@ export class QuizManager {
         return grouparr ? grouparr[0] : null
     }
 
+    getPlayerGroupData(playerJid) {
+        const grouparr = Object.entries(this.games).find(arr => arr[1].players.some(_p => _p.jid === playerJid))
+        return grouparr ? grouparr : null
+    }
+
+    getGroupData(groupJid) {
+        return this.games[groupJid]
+    }
+
     getPlayerJidFromNumber(groupId, number) {
         const game = this.games[groupId]
         return game?.players[parseInt(number)]?.jid
@@ -92,7 +101,7 @@ export class QuizManager {
         }
 
         saveGames(this.games)
-        await whatsapp.reply("🎮 New Quiz game created! \nSend *!cat <number of category>* to vote for a category (1 minutes).")
+        await whatsapp.reply("🎮 New Quiz game created! \nSend *!cat <number of category>* or *<number>* to vote for a category (1 minutes).")
         await whatsapp.sendMessage(groupId, "🎮 Choose a category: \n\n" + categories.map((c, i) => `[${i + 1}] - *${c.name}*`).join('\n'))
 
 
@@ -100,10 +109,10 @@ export class QuizManager {
             await this.startGame(groupId, whatsapp)
         }, 60 * 1000)
         this.games[groupId].timer[1] = setTimeout(async () => {
-            await whatsapp.sendMessage(groupId, "🎮 30 secs Left to vote! \nSend *!cat <number of category>*.")
+            await whatsapp.sendMessage(groupId, "🎮 30 secs Left to vote! \nSend *!cat <number of category>* or *<number>*.")
         }, 30 * 1000)
         this.games[groupId].timer[2] = setTimeout(async () => {
-            await whatsapp.sendMessage(groupId, "🎮 15 secs Left before start of game! \nSend *!cat <number of category>*")
+            await whatsapp.sendMessage(groupId, "🎮 15 secs Left before start of game! \nSend *!cat <number of category>* or *<number>*")
             await whatsapp.sendMessage(groupId, "🎮 Choose a category: \n\n" + categories.map((c, i) => `[${i + 1}] - *${c.name}*`).join('\n'))
         }, 45 * 1000)
     }
@@ -114,14 +123,14 @@ export class QuizManager {
         if (!game || game.state !== "WAITING_CATEGORY") return
 
         if (categoryIndex > categories.length - 1 || categoryIndex < 0 || !categories[parseInt(categoryIndex)]) {
-            await whatsapp.reply("⚠️ What number is even this shit?\nPlease send *!cat <number of category>*")
+            await whatsapp.reply("⚠️ What number is even this shit?\nPlease send *!cat <number of category>* or *<number>*")
             return
         }
 
         game.categoryVotes[voterJid] = categories[parseInt(categoryIndex)]
         saveGames(this.games)
 
-        await whatsapp.reply( `✅ (@${voterJid.split('@')[0]}) voted For *${categories[parseInt(categoryIndex)].name}* `, [voterJid])
+        await whatsapp.reply(`✅ (@${voterJid.split('@')[0]}) voted For *${categories[parseInt(categoryIndex)].name}* `, [voterJid])
     }
 
     async startGame(groupId, whatsapp) {
@@ -136,7 +145,7 @@ export class QuizManager {
             counts[target.id] = (counts[target.id] || 0) + 1
         }
 
-        let categoryId = null
+        let categoryId = Math.floor(Math.random() * categories.length)
         let maxVotes = 0
         for (const targetid in counts) {
             if (counts[targetid] > maxVotes) {
@@ -180,9 +189,9 @@ export class QuizManager {
         let RoundAnswers = game.questions[game.rounds].answers
 
         // DM prompts
-        await whatsapp.sendMessage(groupId, "*Round: " + game.rounds + '*\n\n' +
+        await whatsapp.sendMessage(groupId, "*Round: " + (game.rounds + 1) + '*\n\n' +
             '*' + RoundQuestion + "*\n" +
-            RoundAnswers.map((r, i) => `*[${i + 1}]* - ${r.answer}`).join('\n') + "\n\nAnswer by sending *!ans <number>*"
+            RoundAnswers.map((r, i) => `*[${i + 1}]* - ${r.answer}`).join('\n') + "\n\nAnswer by sending *!ans <number> or <number>*"
         )
         await whatsapp.sendMessage(groupId, "🎮 60 secs Left before next question!")
 
@@ -191,17 +200,17 @@ export class QuizManager {
             await this.resolveQuiz(groupId, whatsapp)
         }, 1 * 60 * 1000)
         game.timer[1] = setTimeout(async () => {
-            await whatsapp.sendMessage(groupId,"🎮 30 secs Left before next question!")
-            await whatsapp.sendMessage(groupId, "*Round: " + game.rounds + '*\n\n' +
+            await whatsapp.sendMessage(groupId, "🎮 30 secs Left before next question!")
+            await whatsapp.sendMessage(groupId, "*Round: " + (game.rounds + 1) + '*\n\n' +
                 '*' + RoundQuestion + "*\n" +
-                RoundAnswers.map((r, i) => `*[${i + 1}]* - ${r.answer}`).join('\n') + "\n\nAnswer by sending *!ans <number>*"
+                RoundAnswers.map((r, i) => `*[${i + 1}]* - ${r.answer}`).join('\n') + "\n\nAnswer by sending *!ans <number> or <number>*"
             )
         }, 30 * 1000)
         game.timer[2] = setTimeout(async () => {
             await whatsapp.sendMessage(groupId, "🎮 15 secs Left before next question!")
-            await whatsapp.sendMessage(groupId, "*Round: " + game.rounds + '*\n\n' +
+            await whatsapp.sendMessage(groupId, "*Round: " + (game.rounds + 1) + '*\n\n' +
                 '*' + RoundQuestion + "*\n" +
-                RoundAnswers.map((r, i) => `*[${i + 1}]* - ${r.answer}`).join('\n') + "\n\nAnswer by sending *!ans <number>*"
+                RoundAnswers.map((r, i) => `*[${i + 1}]* - ${r.answer}`).join('\n') + "\n\nAnswer by sending *!ans <number> or <number>*"
             )
         }, 45 * 1000)
     }
@@ -209,7 +218,7 @@ export class QuizManager {
     async resolveQuiz(groupId, whatsapp) {
         const game = this.games[groupId]
         if (!game) return
-
+        game.state = "RESOLVING"
         const _question = game.questions[game.rounds]
 
         // Tally wolf votes
@@ -226,8 +235,8 @@ export class QuizManager {
         saveGames(this.games)
 
 
-        if (game.rounds >= 10) {
-            await this.stopGame(groupId)
+        if (game.rounds >= 2) { // FOR TESTING !!!
+            await this.stopGame(groupId, whatsapp)
             return
         }
 
@@ -242,14 +251,14 @@ export class QuizManager {
 
         if (!player) {
             await whatsapp.sendMessage(groupId, `Youpiii @${voterJid.split('@')[0]} joined the game`, [voterJid])
-            game.players.push({ jid: voterJid, answers: [{ questionIndex: game.rounds, answerIndex: answerIndex }] })
+            game.players.push({ jid: voterJid, answers: [{ questionIndex: game.rounds, answerIndex: answerIndex, correct: game.questions[game.rounds].answers[answerIndex].correct }] })
         } else {
             player.answers.push({ questionIndex: game.rounds, answerIndex: answerIndex, correct: game.questions[game.rounds].answers[answerIndex].correct })
         }
 
         saveGames(this.games)
 
-        await whatsapp.sendMessage(groupId, `✅ @${voterJid.split('@')[0]} voted for *${game.questions[game.rounds].answers[answerIndex].answer}*`, [voterJid])
+        await whatsapp.sendMessage(groupId, `👉 @${voterJid.split('@')[0]} voted for *${game.questions[game.rounds].answers[answerIndex].answer}*`, [voterJid])
     }
 
     async stopGame(groupId, whatsapp) {
@@ -261,6 +270,21 @@ export class QuizManager {
         delete this.games[groupId]
         saveGames(this.games)
         return
+    }
+
+    async handleShortHand(groupId, playerJid, choice, whatsapp) {
+        const game = this.games[groupId]
+        if (!game) return
+
+        if (game.state === "ANSWERING") {
+            console.log("SC to answer")
+            await this.answerQuestion(groupId, playerJid, choice, whatsapp)
+        } else if (game.state === "WAITING_CATEGORY") {
+            console.log("SC to choose cat")
+            await this.castVoteCategory(groupId, playerJid, choice, whatsapp)
+
+        }
+
     }
 
 }
