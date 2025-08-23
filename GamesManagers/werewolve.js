@@ -263,6 +263,11 @@ export class WereWolvesManager {
             return
         }
 
+        if (target.jid === wolf.jid) {
+            await whatsapp.sendMessage(wolfJid, "⚠️ Tu ne peux pas te tuer😑.")
+            return
+        }
+
         game.wolfChoices[wolfJid] = targetJid
         saveGames(this.games)
 

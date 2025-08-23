@@ -236,8 +236,8 @@ async function startBot() {
                 console.log("------------------------------")
             }
         } catch (error) {
-            whatsapp.reply("Donc... ta commande m'a fait crasher😐\nVas savoir pourquoi... enfin bon, pas de panique, j'ai été programmé pour gérer ça")
-            whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur négro \n\n" + error.toString())
+           //await whatsapp.reply("Donc... ta commande m'a fait crasher😐\nVas savoir pourquoi... enfin bon, pas de panique, j'ai été programmé pour gérer ça")
+            await whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur négro \n\n" + error.toString())
         }
 
     })
