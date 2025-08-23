@@ -199,40 +199,45 @@ async function startBot() {
         // Dispatch logic
         let handled = false
 
-        // Command match (exact)
-        if (handlers.commands.has(text.toLowerCase())) {
-            await handlers.commands.get(text.toLowerCase())(whatsapp)
-            handled = true
-        }
-
-        // Regex/text match
-        for (const { regex, fn } of handlers.text) {
-            if (regex.test(text)) {
-                await fn(whatsapp)
+        try {
+            // Command match (exact)
+            if (handlers.commands.has(text.toLowerCase())) {
+                await handlers.commands.get(text.toLowerCase())(whatsapp)
                 handled = true
             }
-        }
 
-        // Fallback "any" handlers
-        if (!handled) {
-            for (const fn of handlers.any) {
-                await fn(whatsapp)
-                handled = true
+            // Regex/text match
+            for (const { regex, fn } of handlers.text) {
+                if (regex.test(text)) {
+                    await fn(whatsapp)
+                    handled = true
+                }
             }
-        }
 
-        if (handled) {
+            // Fallback "any" handlers
+            if (!handled) {
+                for (const fn of handlers.any) {
+                    await fn(whatsapp)
+                    handled = true
+                }
+            }
+
+            if (handled) {
 
             /**/console.log(whatsapp.raw)
             /**/console.log("Sender : ", whatsapp.senderJid)
-            console.log("private : ", whatsapp.privateJid)
-            console.log("group : ", whatsapp.groupJid)
-            console.log("Text : ", whatsapp.text)
+                console.log("private : ", whatsapp.privateJid)
+                console.log("group : ", whatsapp.groupJid)
+                console.log("Text : ", whatsapp.text)
 
 
-            //console.log("Text : ", whatsapp.raw)
-            //console.log("Text : ", await whatsapp.getParticipants(whatsapp.groupJid))
-            console.log("------------------------------")
+                //console.log("Text : ", whatsapp.raw)
+                //console.log("Text : ", await whatsapp.getParticipants(whatsapp.groupJid))
+                console.log("------------------------------")
+            }
+        } catch (error) {
+            whatsapp.reply("Donc... ta commande m'a fait crasher😐\nVas savoir pourquoi... enfin bon, pas de panique, j'ai été programmé pour gérer ça")
+            whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur négro \n\n" + error.toString())
         }
 
     })
