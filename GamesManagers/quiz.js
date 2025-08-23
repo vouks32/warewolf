@@ -235,7 +235,7 @@ export class QuizManager {
         saveGames(this.games)
 
 
-        if (game.rounds >= 2) { // FOR TESTING !!!
+        if (game.rounds >= 9) { // FOR TESTING !!!
             await this.stopGame(groupId, whatsapp)
             return
         }
