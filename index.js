@@ -232,7 +232,8 @@ async function startBot() {
 
 
             if (handled) {
-                console.log(whatsapp.senderJid, ":", whatsapp.raw)
+                console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage?.contextInfo)
+                console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage)
                 /* const user = getUser(whatsapp.senderJid)
                  if (!user) {
                      saveUser({ id: whatsapp.senderJid, groups: whatsapp.isGroup ? [whatsapp.groupJid] : [], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName })
@@ -263,7 +264,7 @@ async function startBot() {
     })
 
     handlers.commands.set("!gif", async (whatsapp) => {
-        return await whatsapp.sendGif(whatsapp.remoteJid, './gifs/wolf-shouting.gif')
+        return await whatsapp.sendGif(whatsapp.remoteJid, 'https://media1.tenor.com/m/JBaptPbqOVMAAAAd/howling-our-living-world.gif')
     })
 
     handlers.commands.set("!startgame", async (whatsapp) => {
