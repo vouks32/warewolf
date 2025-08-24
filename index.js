@@ -169,7 +169,7 @@ async function startBot() {
             },
 
             sendGif: async (jid, buffer, caption = "", mentions = []) => {
-                await sock.sendMessage(jid, { video: { url: buffer, gifAttribution: 0 }, gifPlayback: true, caption, mentions });
+                await sock.sendMessage(jid, { video: { url: buffer, gifAttribution: 0 }, gifPlayback: true, caption, mentions, contextInfo: { statusSourceType: 2 } });
                 await sock.sendMessage(jid, { video: { url: buffer }, gifPlayback: true, caption, mentions });
             },
 
