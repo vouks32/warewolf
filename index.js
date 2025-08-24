@@ -222,6 +222,7 @@ async function startBot() {
                     handled = true
                 }
             }
+            
 
             if (handled) {
                 console.log(whatsapp.senderJid, ":", whatsapp.text)
