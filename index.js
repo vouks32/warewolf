@@ -3,8 +3,10 @@ import QRCode from 'qrcode'
 import { WereWolvesManager } from "./GamesManagers/werewolve.js"
 import { makeRetryHandler } from "./handler.js";
 import { QuizManager } from "./GamesManagers/quiz.js";
+import fs from "fs"
+import ffmpeg from "fluent-ffmpeg"
 import { Insult1 } from "./apis/insult.js";
-import { getUser, saveUser } from "./userStorage.js";
+
 const wwm = new WereWolvesManager()
 const qm = new QuizManager()
 const handler = makeRetryHandler();
