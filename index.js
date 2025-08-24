@@ -225,7 +225,7 @@ async function startBot() {
             
 
             if (handled) {
-                console.log(whatsapp.senderJid, ":", whatsapp.text)
+                console.log(whatsapp.senderJid, ":", whatsapp.raw)
                /* const user = getUser(whatsapp.senderJid)
                 if (!user) {
                     saveUser({ id: whatsapp.senderJid, groups: whatsapp.isGroup ? [whatsapp.groupJid] : [], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName })
