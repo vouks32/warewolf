@@ -139,6 +139,7 @@ async function startBot() {
                 jid: senderJid,
             },
             isGroup,
+            remoteJid,
             groupJid: isGroup ? remoteJid : null,
             privateJid: isGroup ? null : remoteJid,
             senderJid,
@@ -166,6 +167,12 @@ async function startBot() {
             sendVideo: async (jid, buffer, caption = "") => {
                 await sock.sendMessage(jid, { video: buffer, caption: htmlDecode(caption) })
             },
+
+            sendGif: async (jid, buffer, caption = "", mentions = []) => {
+                await sock.sendMessage(jid, { video: { url: buffer, gifAttribution: 0 }, gifPlayback: true, caption, mentions });
+                await sock.sendMessage(jid, { video: { url: buffer }, gifPlayback: true, caption, mentions });
+            },
+
             getParticipants: async (groupJid) => {
                 try {
                     // Fetch group metadata
@@ -222,19 +229,19 @@ async function startBot() {
                     handled = true
                 }
             }
-            
+
 
             if (handled) {
                 console.log(whatsapp.senderJid, ":", whatsapp.raw)
-               /* const user = getUser(whatsapp.senderJid)
-                if (!user) {
-                    saveUser({ id: whatsapp.senderJid, groups: whatsapp.isGroup ? [whatsapp.groupJid] : [], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName })
-                } else {
-                    if (whatsapp.isGroup && !user.groups.some(g => g === whatsapp.groupJid)) {
-                        user.groups.push(whatsapp.groupJid)
-                        saveUser(user)
-                    }
-                }*/
+                /* const user = getUser(whatsapp.senderJid)
+                 if (!user) {
+                     saveUser({ id: whatsapp.senderJid, groups: whatsapp.isGroup ? [whatsapp.groupJid] : [], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName })
+                 } else {
+                     if (whatsapp.isGroup && !user.groups.some(g => g === whatsapp.groupJid)) {
+                         user.groups.push(whatsapp.groupJid)
+                         saveUser(user)
+                     }
+                 }*/
                 /*console.log("------------------------------")*/
             }
         } catch (error) {
@@ -253,6 +260,10 @@ async function startBot() {
             "📝 *!quiz* - pour jouer à un quiz (en Anglais)\n" +
             "\nℹ️ *!info* - Pour tout savoir sur moi"
         )
+    })
+
+    handlers.commands.set("!gif", async (whatsapp) => {
+        return await whatsapp.sendGif(whatsapp.remoteJid, './gifs/wolf-shouting.gif')
     })
 
     handlers.commands.set("!startgame", async (whatsapp) => {
