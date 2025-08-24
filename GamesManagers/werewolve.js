@@ -225,16 +225,16 @@ export class WereWolvesManager {
         // Timer ends night
         game.timer = setTimeout(async () => {
             await this.resolveNight(groupId, whatsapp)
-        }, 3 * 60 * 1000)
+        }, 90 * 1000)
         setTimeout(async () => {
-            await whatsapp.reply("🎮 1 minute restante avant le lever du soleil!")
-        }, 2 * 60 * 1000)
+            await whatsapp.reply("🎮 60 secondes restante avant le lever du soleil!")
+        }, 30 * 1000)
         setTimeout(async () => {
             await whatsapp.reply("🎮 30 secondes restantes avant le lever du soleil!")
-        }, 30000 + (2 * 60 * 1000))
+        }, 60 * 1000)
         setTimeout(async () => {
             await whatsapp.reply("🎮 15 secondes restantes avant le lever du soleil!")
-        }, 45000 + (2 * 60 * 1000))
+        }, 75 * 1000)
     }
 
     async wolfKill(groupId, wolfJid, targetJid, whatsapp) {
@@ -449,7 +449,7 @@ export class WereWolvesManager {
                             await whatsapp.sendMessage(groupId, `🏆 Partie terminée! \n*${result}* gagnent!`)
                             const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`) + ' [' + p.role + "]").join("\n")
                             const mentions = game.players.map((p, i) => p.jid)
-                            await whatsapp.sendMessage(victim.jid, "Joueurs :\n\n " + names, mentions)
+                            await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
                             await whatsapp.sendMessage(groupId, `envoie *"!werewolve"* pour rejouer`)
                             delete this.games[groupId]
                             saveGames(this.games)
@@ -484,7 +484,7 @@ export class WereWolvesManager {
             await whatsapp.sendMessage(groupId, `🏆 Partie terminée! \n*${result}* gagnent!`)
             const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`) + ' [' + p.role + "]").join("\n")
             const mentions = game.players.map((p, i) => p.jid)
-            await whatsapp.sendMessage(victim.jid, "Joueurs :\n\n " + names, mentions)
+            await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
             await whatsapp.sendMessage(groupId, `envoie *"!werewolve"* pour rejouer`)
             delete this.games[groupId]
             saveGames(this.games)
@@ -508,16 +508,16 @@ export class WereWolvesManager {
 
         game.timer = setTimeout(async () => {
             this.resolveVotes(groupId, whatsapp)
-        }, 3 * 60 * 1000)
+        }, 90 * 1000)
         setTimeout(async () => {
-            await whatsapp.reply("🎮 1 minute restante avant le coucher du soleil!")
-        }, 2 * 60 * 1000)
+            await whatsapp.reply("🎮 60 secondes restante avant le lever du soleil!")
+        }, 30 * 1000)
         setTimeout(async () => {
-            await whatsapp.reply("🎮 30 secondes restantes avant le coucher du soleil!")
-        }, 30000 + (2 * 60 * 1000))
+            await whatsapp.reply("🎮 30 secondes restantes avant le lever du soleil!")
+        }, 60 * 1000)
         setTimeout(async () => {
-            await whatsapp.reply("🎮 15 secondes restantes avant le coucher du soleil!")
-        }, 45000 + (2 * 60 * 1000))
+            await whatsapp.reply("🎮 15 secondes restantes avant le lever du soleil!")
+        }, 75 * 1000)
     }
 
     async castVote(groupId, voterJid, targetJid, whatsapp) {
@@ -604,7 +604,7 @@ export class WereWolvesManager {
                         await whatsapp.sendMessage(groupId, `🏆 Partie terminée! \n*${result}* gagnent!`)
                         const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`) + ' [' + p.role + "]").join("\n")
                         const mentions = game.players.map((p, i) => p.jid)
-                        await whatsapp.sendMessage(victim.jid, "Joueurs :\n\n " + names, mentions)
+                        await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
                         await whatsapp.sendMessage(groupId, `envoie *"!werewolve"* pour rejouer`)
                         delete this.games[groupId]
                         saveGames(this.games)
@@ -629,7 +629,7 @@ export class WereWolvesManager {
             await whatsapp.sendMessage(groupId, `🏆 Partie terminée! \n*${result}* gagnent!`)
             const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`) + ' [' + p.role + "]").join("\n")
             const mentions = game.players.map((p, i) => p.jid)
-            await whatsapp.sendMessage(victim.jid, "Joueurs :\n\n " + names, mentions)
+            await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
             await whatsapp.sendMessage(groupId, `envoie *"!werewolve"* pour rejouer`)
             delete this.games[groupId]
             saveGames(this.games)
