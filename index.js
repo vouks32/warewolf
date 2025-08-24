@@ -1,4 +1,4 @@
-import { makeWASocket, useMultiFileAuthState, DisconnectReason } from "baileys"
+import { makeWASocket, useMultiFileAuthState, DisconnectReason, generateThumbnail } from "baileys"
 import QRCode from 'qrcode'
 import { WereWolvesManager } from "./GamesManagers/werewolve.js"
 import { makeRetryHandler } from "./handler.js";
@@ -169,8 +169,9 @@ async function startBot() {
             },
 
             sendGif: async (jid, buffer, caption = "", mentions = []) => {
-                await sock.sendMessage(jid, { video: { url: buffer, gifAttribution: 0 }, gifPlayback: true, caption, mentions, contextInfo: { statusSourceType: 2 } });
-                await sock.sendMessage(jid, { video: { url: buffer }, gifPlayback: true, caption, mentions });
+                const t = await generateThumbnail(buffer, "video")
+                await sock.sendMessage(jid, { video: { url: buffer }, jpegThumbnail: t.thumbnail, gifPlayback: true, caption, mentions, contextInfo: { statusSourceType: 2 } });
+                //await sock.sendMessage(jid, { video: { url: buffer }, gifPlayback: true, caption, mentions });
             },
 
             getParticipants: async (groupJid) => {
@@ -264,7 +265,7 @@ async function startBot() {
     })
 
     handlers.commands.set("!gif", async (whatsapp) => {
-        return await whatsapp.sendGif(whatsapp.remoteJid, 'https://media1.tenor.com/m/JBaptPbqOVMAAAAd/howling-our-living-world.gif')
+        return await whatsapp.sendGif(whatsapp.remoteJid, 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmFpYXZqZ2E1eTk2Y250OGpzeGlmazZqNXkxamJtOGprbTlqc2F2ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/tiP6DWUdHhvck/giphy.gif')
     })
 
     handlers.commands.set("!startgame", async (whatsapp) => {
