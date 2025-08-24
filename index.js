@@ -9,6 +9,20 @@ const wwm = new WereWolvesManager()
 const qm = new QuizManager()
 const handler = makeRetryHandler();
 
+const _generateThumbnail = (inputPath, outputPath = "thumb.jpg") => {
+    return new Promise((resolve, reject) => {
+        ffmpeg(inputPath)
+            .on("end", () => resolve(fs.readFileSync(outputPath)))
+            .on("error", reject)
+            .screenshots({
+                count: 1,
+                filename: outputPath,
+                folder: ".",
+                size: "320x240"
+            })
+    })
+}
+
 function htmlDecode(text) {
     if (typeof text !== 'string') return text;
     return text
@@ -168,9 +182,11 @@ async function startBot() {
                 await sock.sendMessage(jid, { video: buffer, caption: htmlDecode(caption) })
             },
 
-            sendGif: async (jid, buffer, caption = "", mentions = []) => {
-                const t = await generateThumbnail(buffer, "video")
-                await sock.sendMessage(jid, { video: { url: buffer }, jpegThumbnail: t.thumbnail, gifPlayback: true, caption, mentions, contextInfo: { statusSourceType: 2 } });
+            sendGif: async (jid, gif, caption = "", mentions = []) => {
+
+                const buffer = fs.readFileSync(gif)
+                const t = await _generateThumbnail(buffer, msg.key.id + ".jpg")
+                await sock.sendMessage(jid, { video: buffer, jpegThumbnail: t, gifPlayback: true, caption, mentions, contextInfo: { statusSourceType: 2 } });
                 //await sock.sendMessage(jid, { video: { url: buffer }, gifPlayback: true, caption, mentions });
             },
 
@@ -233,8 +249,8 @@ async function startBot() {
 
 
             if (handled) {
-                console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage?.contextInfo)
-                console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage)
+                //console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage?.contextInfo)
+                //console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage)
                 /* const user = getUser(whatsapp.senderJid)
                  if (!user) {
                      saveUser({ id: whatsapp.senderJid, groups: whatsapp.isGroup ? [whatsapp.groupJid] : [], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName })
@@ -249,6 +265,7 @@ async function startBot() {
         } catch (error) {
             //await whatsapp.reply("Donc... ta commande m'a fait crasher😐\nVas savoir pourquoi... enfin bon, pas de panique, j'ai été programmé pour gérer ça")
             await whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur négro \n\n" + error.toString())
+            console.log(error)
         }
 
     })
@@ -265,7 +282,7 @@ async function startBot() {
     })
 
     handlers.commands.set("!gif", async (whatsapp) => {
-        return await whatsapp.sendGif(whatsapp.remoteJid, 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmFpYXZqZ2E1eTk2Y250OGpzeGlmazZqNXkxamJtOGprbTlqc2F2ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/tiP6DWUdHhvck/giphy.gif')
+        return await whatsapp.sendGif(whatsapp.remoteJid, './gifs/wolf2.gif')
     })
 
     handlers.commands.set("!startgame", async (whatsapp) => {
