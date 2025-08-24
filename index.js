@@ -4,6 +4,7 @@ import { WereWolvesManager } from "./GamesManagers/werewolve.js"
 import { makeRetryHandler } from "./handler.js";
 import { QuizManager } from "./GamesManagers/quiz.js";
 import { Insult1 } from "./apis/insult.js";
+import { getUser, saveUser } from "./userStorage.js";
 const wwm = new WereWolvesManager()
 const qm = new QuizManager()
 const handler = makeRetryHandler();
@@ -223,20 +224,20 @@ async function startBot() {
             }
 
             if (handled) {
-
-            /**/console.log(whatsapp.raw)
-            /**/console.log("Sender : ", whatsapp.senderJid)
-                console.log("private : ", whatsapp.privateJid)
-                console.log("group : ", whatsapp.groupJid)
-                console.log("Text : ", whatsapp.text)
-
-
-                //console.log("Text : ", whatsapp.raw)
-                //console.log("Text : ", await whatsapp.getParticipants(whatsapp.groupJid))
-                console.log("------------------------------")
+                console.log(whatsapp.senderJid, ":", whatsapp.text)
+                const user = getUser(whatsapp.senderJid)
+                if (!user) {
+                    saveUser({ id: whatsapp.senderJid, groups: whatsapp.isGroup ? [whatsapp.groupJid] : [], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName })
+                } else {
+                    if (whatsapp.isGroup && !user.groups.some(g => g === whatsapp.groupJid)) {
+                        user.groups.push(whatsapp.groupJid)
+                        saveUser(user)
+                    }
+                }
+                /*console.log("------------------------------")*/
             }
         } catch (error) {
-           //await whatsapp.reply("Donc... ta commande m'a fait crasher😐\nVas savoir pourquoi... enfin bon, pas de panique, j'ai été programmé pour gérer ça")
+            //await whatsapp.reply("Donc... ta commande m'a fait crasher😐\nVas savoir pourquoi... enfin bon, pas de panique, j'ai été programmé pour gérer ça")
             await whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur négro \n\n" + error.toString())
         }
 

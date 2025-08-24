@@ -2,7 +2,6 @@
 import fs from "fs"
 import path from "path"
 import RoleManager from "./werewolve-utils/roleManager.js"
-import { getUser, saveUser } from "../userStorage.js";
 
 
 const DATA_FILE = path.join(process.cwd(), "games/werewolves.json")
@@ -143,15 +142,6 @@ export class WereWolvesManager {
 
         await whatsapp.reply(`✅ Tu as rejoint!\n\nListe des joueurs:\n\n${names}`, mentions)
 
-        const user = getUser(playerJid)
-        if (!user) {
-            saveUser({ id: playerJid, groups: [groupId], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName })
-        } else {
-            if (!user.groups.some(g => g === groupId)) {
-                user.groups.push(groupId)
-                saveUser(user)
-            }
-        }
     }
 
     async startGame(groupId, whatsapp) {
@@ -225,7 +215,7 @@ export class WereWolvesManager {
                     if ((p.role === "WITCH" && (!game.witchPoisonAvailable))) return
                     if ((p.role === "CUPID" && game.nights !== 1)) return
                     await delay(1000)
-                    const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`)).join("\n")
+                    const names = game.players.map((_p, i) => `[${i + 1}] - *${_p.name}* (@${_p.jid.split('@')[0]}) ` + (!_p.isDead ? ((p.role === "WEREWOLF" && _p.role === "WEREWOLF") ? `🐺` : `😀`) : `☠️`)).join("\n")
                     const mentions = game.players.map((p, i) => p.jid)
                     await whatsapp.sendMessage(p.jid, "Joueurs :\n\n" + names, mentions)
                 }
@@ -258,11 +248,15 @@ export class WereWolvesManager {
         }
 
         const target = game.players.find(p => p.jid === targetJid && !p.isDead)
+
+        if (target.role !== "WEREWOLF") {
+            await whatsapp.sendMessage(wolfJid, "⚠️ Tu ne peux pas tuer un loup 🐺.")
+            return
+        }
         if (!target) {
             await whatsapp.sendMessage(wolfJid, "⚠️ Cible invalide.")
             return
         }
-
         if (target.jid === wolf.jid) {
             await whatsapp.sendMessage(wolfJid, "⚠️ Tu ne peux pas te tuer😑.")
             return

@@ -14,10 +14,10 @@ export function saveUser(user) {
 }
 
 export function getUser(id) {
-    if (!fs.existsSync(path.join(USER_FOLDER, id + '.json'))) return {}
+    if (!fs.existsSync(path.join(USER_FOLDER, id + '.json'))) return null
     try {
         return JSON.parse(fs.readFileSync(path.join(USER_FOLDER, id + '.json')))
     } catch (error) {
-        return {}
+        return null
     }
 }
