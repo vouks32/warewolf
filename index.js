@@ -226,7 +226,7 @@ async function startBot() {
 
             if (handled) {
                 console.log(whatsapp.senderJid, ":", whatsapp.text)
-                const user = getUser(whatsapp.senderJid)
+               /* const user = getUser(whatsapp.senderJid)
                 if (!user) {
                     saveUser({ id: whatsapp.senderJid, groups: whatsapp.isGroup ? [whatsapp.groupJid] : [], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName })
                 } else {
@@ -234,7 +234,7 @@ async function startBot() {
                         user.groups.push(whatsapp.groupJid)
                         saveUser(user)
                     }
-                }
+                }*/
                 /*console.log("------------------------------")*/
             }
         } catch (error) {
