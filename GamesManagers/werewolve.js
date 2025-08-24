@@ -249,7 +249,7 @@ export class WereWolvesManager {
 
         const target = game.players.find(p => p.jid === targetJid && !p.isDead)
 
-        if (target.role !== "WEREWOLF") {
+        if (target.role === "WEREWOLF") {
             await whatsapp.sendMessage(wolfJid, "⚠️ Tu ne peux pas tuer un loup 🐺.")
             return
         }
@@ -447,6 +447,9 @@ export class WereWolvesManager {
                         const result = checkWin(game)
                         if (result) {
                             await whatsapp.sendMessage(groupId, `🏆 Partie terminée! \n*${result}* gagnent!`)
+                            const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`) + ' [' + p.role + "]").join("\n")
+                            const mentions = game.players.map((p, i) => p.jid)
+                            await whatsapp.sendMessage(victim.jid, "Joueurs :\n\n " + names, mentions)
                             await whatsapp.sendMessage(groupId, `envoie *"!werewolve"* pour rejouer`)
                             delete this.games[groupId]
                             saveGames(this.games)
@@ -479,6 +482,9 @@ export class WereWolvesManager {
         const result = checkWin(game)
         if (result) {
             await whatsapp.sendMessage(groupId, `🏆 Partie terminée! \n*${result}* gagnent!`)
+            const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`) + ' [' + p.role + "]").join("\n")
+            const mentions = game.players.map((p, i) => p.jid)
+            await whatsapp.sendMessage(victim.jid, "Joueurs :\n\n " + names, mentions)
             await whatsapp.sendMessage(groupId, `envoie *"!werewolve"* pour rejouer`)
             delete this.games[groupId]
             saveGames(this.games)
@@ -596,6 +602,9 @@ export class WereWolvesManager {
                     const result = checkWin(game)
                     if (result) {
                         await whatsapp.sendMessage(groupId, `🏆 Partie terminée! \n*${result}* gagnent!`)
+                        const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`) + ' [' + p.role + "]").join("\n")
+                        const mentions = game.players.map((p, i) => p.jid)
+                        await whatsapp.sendMessage(victim.jid, "Joueurs :\n\n " + names, mentions)
                         await whatsapp.sendMessage(groupId, `envoie *"!werewolve"* pour rejouer`)
                         delete this.games[groupId]
                         saveGames(this.games)
@@ -618,6 +627,9 @@ export class WereWolvesManager {
         const result = checkWin(game)
         if (result) {
             await whatsapp.sendMessage(groupId, `🏆 Partie terminée! \n*${result}* gagnent!`)
+            const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`) + ' [' + p.role + "]").join("\n")
+            const mentions = game.players.map((p, i) => p.jid)
+            await whatsapp.sendMessage(victim.jid, "Joueurs :\n\n " + names, mentions)
             await whatsapp.sendMessage(groupId, `envoie *"!werewolve"* pour rejouer`)
             delete this.games[groupId]
             saveGames(this.games)
