@@ -13,7 +13,7 @@ const handler = makeRetryHandler();
 
 const _generateThumbnail = (inputPath, outputPath = "thumb.jpg") => {
     return new Promise((resolve, reject) => {
-        ffmpeg(inputPath)
+        ffmpeg({source : inputPath})
             .on("end", () => resolve(fs.readFileSync(outputPath)))
             .on("error", reject)
             .screenshots({
@@ -187,7 +187,7 @@ async function startBot() {
             sendGif: async (jid, gif, caption = "", mentions = []) => {
 
                 const buffer = fs.readFileSync(gif)
-                const t = await _generateThumbnail(buffer, msg.key.id + ".jpg")
+                const t = await _generateThumbnail(gif, msg.key.id + ".jpg")
                 await sock.sendMessage(jid, { video: buffer, jpegThumbnail: t, gifPlayback: true, caption, mentions, contextInfo: { statusSourceType: 2 } });
                 //await sock.sendMessage(jid, { video: { url: buffer }, gifPlayback: true, caption, mentions });
             },
