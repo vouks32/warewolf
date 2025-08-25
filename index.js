@@ -1,26 +1,26 @@
-import { makeWASocket, useMultiFileAuthState, DisconnectReason, generateThumbnail } from "baileys"
+import { makeWASocket, useMultiFileAuthState, DisconnectReason } from "baileys"
 import QRCode from 'qrcode'
 import { WereWolvesManager } from "./GamesManagers/werewolve.js"
 import { makeRetryHandler } from "./handler.js";
 import { QuizManager } from "./GamesManagers/quiz.js";
-import fs from "fs"
-import ffmpeg from "fluent-ffmpeg"
 import { Insult1 } from "./apis/insult.js";
-
+import { getUser, saveUser } from "./userStorage.js";
 const wwm = new WereWolvesManager()
 const qm = new QuizManager()
 const handler = makeRetryHandler();
 
-const _generateThumbnail = (inputPath, outputPath = "thumb.jpg") => {
+import ffmpeg from "fluent-ffmpeg"
+import fs from "fs"
+const generateThumbnail = (inputPath, outputPath = "thumb.jpg") => {
     return new Promise((resolve, reject) => {
-        ffmpeg({source : inputPath})
+        ffmpeg(inputPath)
             .on("end", () => resolve(fs.readFileSync(outputPath)))
             .on("error", reject)
             .screenshots({
                 count: 1,
                 filename: outputPath,
                 folder: ".",
-                size: "320x240"
+                size: "320x320"
             })
     })
 }
@@ -184,14 +184,10 @@ async function startBot() {
                 await sock.sendMessage(jid, { video: buffer, caption: htmlDecode(caption) })
             },
 
-            sendGif: async (jid, gif, caption = "", mentions = []) => {
-
-                const buffer = fs.readFileSync(gif)
-                const t = await _generateThumbnail(gif, msg.key.id + ".jpg")
-                await sock.sendMessage(jid, { video: buffer, jpegThumbnail: t, gifPlayback: true, caption, mentions, contextInfo: { statusSourceType: 2 } });
-                //await sock.sendMessage(jid, { video: { url: buffer }, gifPlayback: true, caption, mentions });
+            sendGif: async (jid, gifPath, caption = '', mentions = []) => {
+                const thumb = await generateThumbnail(gifPath, msg.key.id + '.jpg')
+                await sock.sendMessage(jid, { video: { url: gifPath }, gifPlayback: true, jpegThumbnail : thumb, caption: htmlDecode(caption) })
             },
-
             getParticipants: async (groupJid) => {
                 try {
                     // Fetch group metadata
@@ -252,7 +248,7 @@ async function startBot() {
 
             if (handled) {
                 //console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage?.contextInfo)
-                //console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage)
+                console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage)
                 /* const user = getUser(whatsapp.senderJid)
                  if (!user) {
                      saveUser({ id: whatsapp.senderJid, groups: whatsapp.isGroup ? [whatsapp.groupJid] : [], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName })
