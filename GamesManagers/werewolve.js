@@ -218,6 +218,8 @@ export class WereWolvesManager {
                     await whatsapp.sendMessage(p.jid, "❤️ Nuit: \nChoisis deux amoureux: *!love _<numéro 1ère victime>_ _<numéro 2nd victime>_* (C'est la seule chance que tu as de lier, après cette occasion tu es un simple villageois)")
                 } else if (p.role === "PROSTITUTE") {
                     await whatsapp.sendMessage(p.jid, "💄 Nuit: \nEnvoie *!visit <numéro client>* ou *<numéro client>* pour visiter quelqu'un.")
+                }else if (p.role === "MAYOR") {
+                    await whatsapp.sendMessage(p.jid, "🤵 Tu ne peux rien faire la nuit.\nMais en journée tu peux stopper les votes en envoyant *!stopvote*")
                 } else {
                     await whatsapp.sendMessage(p.jid, "😴 Nuit: \nDors paisiblement.")
                 }
@@ -261,14 +263,16 @@ export class WereWolvesManager {
 
         const target = game.players.find(p => p.jid === targetJid && !p.isDead)
 
-        if (target.role === "WEREWOLF") {
-            await whatsapp.sendMessage(wolfJid, "⚠️ Tu ne peux pas tuer un loup 🐺.")
-            return
-        }
         if (!target) {
             await whatsapp.sendMessage(wolfJid, "⚠️ Cible invalide.")
             return
         }
+        
+        if (target.role === "WEREWOLF") {
+            await whatsapp.sendMessage(wolfJid, "⚠️ Tu ne peux pas tuer un loup 🐺.")
+            return
+        }
+
         if (target.jid === wolf.jid) {
             await whatsapp.sendMessage(wolfJid, "⚠️ Tu ne peux pas te tuer😑.")
             return

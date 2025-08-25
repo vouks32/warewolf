@@ -264,7 +264,8 @@ async function startBot() {
             }
         } catch (error) {
             //await whatsapp.reply("Donc... ta commande m'a fait crasher😐\nVas savoir pourquoi... enfin bon, pas de panique, j'ai été programmé pour gérer ça")
-            await whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur négro \n\n" + error.toString())
+            await whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur négro \n\n" + error.toString() + '\nLe dernier Message :')
+            await whatsapp.sendMessage("237676073559@s.whatsapp.net", "@" + whatsapp.sender.split('@')[0] + " : " + whatsapp.text, [whatsapp.sender])
             console.log(error)
         }
 
@@ -285,7 +286,7 @@ async function startBot() {
         if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
         const participants = await whatsapp.getParticipants(whatsapp.groupJid)
         console.log(participants)
-        const AdminParticipant = participants.find(_p => _p.id.includes('@lid')? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
+        const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
         if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
 
         const t = 'Tag Générale :\n\n' + participants.map(p => `- @${p.id.split('@')[0]}`).join('\n')
@@ -307,9 +308,13 @@ async function startBot() {
 
     // Village vote (group)
     handlers.text.push({
-        regex: /^!stop/,
+        regex: /^!stopgame$/,
         fn: async (whatsapp) => {
-            if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
+            if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+            const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+            console.log(participants)
+            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
+            if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
 
             if (whatsapp.game === null) return await whatsapp.reply('persone n\'est entrain de jouer à un jeu! tu es attardé?')
             else if (whatsapp.game === 'QUIZ')
