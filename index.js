@@ -1,4 +1,4 @@
-import { makeWASocket, useMultiFileAuthState, DisconnectReason } from "baileys"
+import { makeWASocket, useMultiFileAuthState, DisconnectReason, extractImageThumb } from "baileys"
 import QRCode from 'qrcode'
 import { WereWolvesManager } from "./GamesManagers/werewolve.js"
 import { makeRetryHandler } from "./handler.js";
@@ -26,12 +26,12 @@ const generateThumbnail = (inputPath, outputPath = "thumb.jpg") => {
 }
 
 function toArrayBuffer(buffer) {
-  const arrayBuffer = new ArrayBuffer(buffer.length);
-  const view = new Uint8Array(arrayBuffer);
-  for (let i = 0; i < buffer.length; ++i) {
-    view[i] = buffer[i];
-  }
-  return arrayBuffer;
+    const arrayBuffer = new ArrayBuffer(buffer.length);
+    const view = new Uint8Array(arrayBuffer);
+    for (let i = 0; i < buffer.length; ++i) {
+        view[i] = buffer[i];
+    }
+    return arrayBuffer;
 }
 
 function htmlDecode(text) {
@@ -138,13 +138,13 @@ async function startBot() {
     // Handle messages
     sock.ev.on("messages.upsert", async (m) => {
         const msg = m.messages[0]
-        
 
-        if (!msg.message || msg.key.fromMe){
-            if(msg.message?.videoMessage)
+
+        if (!msg.message || msg.key.fromMe) {
+            if (msg.message?.videoMessage)
                 console.log(msg.message.videoMessage)
             return
-            }
+        }
 
         // Parse the message to get type and JIDs
         const remoteJid = msg.key.remoteJid;
@@ -201,7 +201,8 @@ async function startBot() {
             sendGif: async (jid, gifPath, caption = '', mentions = []) => {
                 //const thumb = await generateThumbnail(gifPath, msg.key.id + '.jpg')
                 //const gif = fs.readFileSync(gifPath).buffer
-                await sock.sendMessage(jid, { video: {url : gifPath}, gifPlayback: true, caption: htmlDecode(caption) })
+                const t = await extractImageThumb(gifPath)
+                await sock.sendMessage(jid, { video: { url: gifPath }, gifPlayback: true, jpegThumbnail: t.buffer.buffer, caption: htmlDecode(caption) })
             },
             getParticipants: async (groupJid) => {
                 try {
