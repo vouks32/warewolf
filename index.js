@@ -13,18 +13,8 @@ import sharp from "sharp";
 import fs from "fs"
 async function optimizeGifSharp(gifPath, id) {
     return await sharp(gifPath)
-        .resize({ width: 300 }) // Resize to 300px width
-        .gif({ quality: 80 }).toBuffer();
-}
-
-
-function toArrayBuffer(buffer) {
-    const arrayBuffer = new ArrayBuffer(buffer.length);
-    const view = new Uint8Array(arrayBuffer);
-    for (let i = 0; i < buffer.length; ++i) {
-        view[i] = buffer[i];
-    }
-    return arrayBuffer;
+        .resize({ width: 500 }) // Resize to 500px width
+        .gif({ quality: 100 }).toBuffer();
 }
 
 function htmlDecode(text) {
@@ -179,8 +169,15 @@ async function startBot() {
                 await sock.sendMessage(jid, { text: htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : ""), mentions: mentions }).then(handler.addMessage)
             },
 
-            sendImage: async (jid, buffer, caption = "") => {
-                await sock.sendMessage(jid, { image: buffer, caption: htmlDecode(caption) }).then(handler.addMessage)
+            sendImage: async (jid, buffer, caption = "", mentions = []) => {
+                if (gifPath.includes('http')) {
+                    await sock.sendMessage(jid, { image: buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
+                    return
+                }
+                const imagename = gifPath.split('/').pop()
+                let optimizedImage = (await optimizeGifSharp(buffer, './images/send/opt-' + imagename))
+                const t = await extractImageThumb(optimizedImage)
+                await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail: t, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
             },
 
             sendAudio: async (jid, buffer, ptt = false) => {
@@ -191,17 +188,6 @@ async function startBot() {
                 await sock.sendMessage(jid, { video: buffer, caption: htmlDecode(caption) })
             },
 
-            sendGif: async (jid, gifPath, caption = '', mentions = []) => {
-                if (gifPath.includes('http')) {
-                    await sock.sendMessage(jid, { video: { url: gifPath }, gifPlayback: true, caption: htmlDecode(caption), mentions })
-                    return
-                }
-
-                const gifname = gifPath.split('/').pop()
-                let optimizedGif = (await optimizeGifSharp(gifPath, './gifs/send/opt-' + gifname))
-                const t = await extractImageThumb(optimizedGif)
-                await sock.sendMessage(jid, { video: optimizedGif, gifPlayback: true, jpegThumbnail: t, caption: htmlDecode(caption), mentions })
-            },
             getParticipants: async (groupJid) => {
                 try {
                     // Fetch group metadata
@@ -236,11 +222,11 @@ async function startBot() {
         // Dispatch logic
         let handled = false
 
-            // Command match (exact)
-            if (handlers.commands.has(text.toLowerCase())) {
-                await handlers.commands.get(text.toLowerCase())(whatsapp)
-                handled = true
-            }
+        // Command match (exact)
+        if (handlers.commands.has(text.toLowerCase())) {
+            await handlers.commands.get(text.toLowerCase())(whatsapp)
+            handled = true
+        }
 
 
         try {
@@ -295,8 +281,8 @@ async function startBot() {
         )
     })
 
-    handlers.commands.set("!gif", async (whatsapp) => {
-        return await whatsapp.sendGif(whatsapp.remoteJid, './gifs/wolf2.gif')
+    handlers.commands.set("!image", async (whatsapp) => {
+        return await whatsapp.sendImage(whatsapp.remoteJid, './images/creategame.jpg')
     })
 
     handlers.commands.set("!startgame", async (whatsapp) => {
