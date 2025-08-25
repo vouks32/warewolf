@@ -70,7 +70,7 @@ function extractText(msg) {
 }
 
 async function startBot() {
-    const { state, saveCreds } = await useMultiFileAuthState("auth_info")
+    const { state, saveCreds } = await useMultiFileAuthState("../auth_info")
     const sock = makeWASocket({
         auth: state,
         markOnlineOnConnect: false,
