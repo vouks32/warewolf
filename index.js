@@ -9,21 +9,16 @@ const wwm = new WereWolvesManager()
 const qm = new QuizManager()
 const handler = makeRetryHandler();
 
-import ffmpeg from "fluent-ffmpeg"
+import sharp from "sharp";
 import fs from "fs"
-const generateThumbnail = (inputPath, outputPath = "thumb.jpg") => {
-    return new Promise((resolve, reject) => {
-        ffmpeg(inputPath)
-            .on("end", () => resolve(fs.readFileSync(outputPath).buffer))
-            .on("error", reject)
-            .screenshots({
-                count: 1,
-                filename: outputPath,
-                folder: ".",
-                size: "320x320"
-            })
-    })
+async function optimizeGifSharp(gifPath, id) {
+    await sharp(gifPath)
+        .resize({ width: 300 }) // Resize to 300px width
+        .gif({ quality: 80 }) // Adjust GIF quality
+        .toFile('./gifs/send/' + id + '.gif');
+    console.log('GIF optimized with Sharp.');
 }
+
 
 function toArrayBuffer(buffer) {
     const arrayBuffer = new ArrayBuffer(buffer.length);
@@ -199,10 +194,10 @@ async function startBot() {
             },
 
             sendGif: async (jid, gifPath, caption = '', mentions = []) => {
-                //const thumb = await generateThumbnail(gifPath, msg.key.id + '.jpg')
-                //const gif = fs.readFileSync(gifPath).buffer
-                const t = await extractImageThumb(gifPath)
-                await sock.sendMessage(jid, { video: { url: gifPath }, gifPlayback: true, jpegThumbnail: t.buffer, caption: htmlDecode(caption) })
+                await optimizeGifSharp(gifPath, msg.key.id)
+                const gif = fs.readFileSync(msg.key.id + '.gif').buffer
+                const t = await extractImageThumb(gif)
+                await sock.sendMessage(jid, { video: gif, gifPlayback: true, jpegThumbnail: t.buffer, caption: htmlDecode(caption) })
             },
             getParticipants: async (groupJid) => {
                 try {
