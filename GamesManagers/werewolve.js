@@ -5,6 +5,7 @@ import RoleManager from "./werewolve-utils/roleManager.js"
 
 
 const DATA_FILE = path.join(process.cwd(), "games/werewolves.json")
+const IMAGE_FILE = path.join(process.cwd(), "images")
 
 // --- Utilities ---
 function delay(ms) {
@@ -101,7 +102,8 @@ export class WereWolvesManager {
         }
 
         saveGames(this.games)
-        await whatsapp.reply("🎮 Nouvelle partie de loup garou, *Awoooo!😭* \nEnvoie *!play _pseudo_* pour rejoindre (3 minutes restantes).")
+
+        await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "startgame.jpg"), "🎮 Nouvelle partie de loup garou, *Awoooo!😭* \nEnvoie *!play _pseudo_* pour rejoindre (3 minutes restantes).")
 
         this.games[groupId].timer = setTimeout(async () => {
             await this.startGame(groupId, whatsapp)
@@ -175,9 +177,9 @@ export class WereWolvesManager {
         // DM role to each player
         for (const p of game.players) {
             await whatsapp.sendMessage(p.jid, `🎭 Ton rôle est: *${p.role}*`)
+            await delay(500)
         }
 
-        await whatsapp.sendMessage(groupId, "🌙 La nuit est tombée... \nSeules les prostituées rodent.... Du moins... c'est ce qu'elles pensent, \n\nVous avez 3 minutes")
         this.startNight(groupId, whatsapp)
     }
 
@@ -197,7 +199,7 @@ export class WereWolvesManager {
         for (const p of game.players) {
             if (!p.isDead) {
                 console.log("sending role to", p.name)
-                await delay(1500)
+                await delay(1000)
                 if (p.role === "WEREWOLF") {
                     await whatsapp.sendMessage(p.jid, "🐺 Nuit: \nEnvoie *!kill _<numéro victime>_* Pour voter qui vous allez dévorer.")
                 } else if (p.role === "SEER") {
@@ -221,6 +223,8 @@ export class WereWolvesManager {
                 }
             }
         }
+
+        await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "nightfall.jpg"), "🌙 La nuit est tombée... \nSeules les prostituées rodent.... Du moins... c'est ce qu'elles pensent, \n\nVous avez 3 minutes")
 
         // Timer ends night
         game.timer = setTimeout(async () => {
@@ -399,12 +403,13 @@ export class WereWolvesManager {
             }
         }
 
+
         if (victimId) {
             // Check Doctor protection
             if (game.doctorChoice && game.doctorChoice === victimId) {
-                await whatsapp.sendMessage(groupId, "☀️ Le jour se lève... les loups ont attaqué, \nmais leur victime a été sauvée! 💉")
+                await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été sauvée! 💉")
             } else if (game.witchHeal) {
-                await whatsapp.sendMessage(groupId, "☀️ Le jour se lève... les loups ont attaqué, \nmais leur victime a été protégée par magie! 🪄")
+                await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été protégée par magie! 🪄")
             } else {
                 const victim = game.players.find(p => p.jid === victimId)
                 victim.isDead = true
@@ -419,7 +424,8 @@ export class WereWolvesManager {
 
                     // Set hunter timeout
                     game.timer = setTimeout(async () => {
-                        await whatsapp.sendMessage(groupId, `☀️ Le jour se lève... \n@${victimId.split('@')[0]} a été tué pendant la nuit!\n\nMais... c'était un Chasseur 🏹`, [victimId])
+                        await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "sunrise.jpg"), "☀️ Le jour se lève...")
+                        await whatsapp.sendMessage(groupId, `@${victimId.split('@')[0]} a été tué pendant la nuit!\n\nMais... c'était un Chasseur 🏹`, [victimId])
 
                         if (!game.hunterTarget)
                             await whatsapp.sendMessage(groupId, "🏹 Le Chasseur n'a abattu personne avant de mourir.");
@@ -463,7 +469,8 @@ export class WereWolvesManager {
                     return; // Don't check win condition yet
                 }
 
-                await whatsapp.sendMessage(groupId, `☀️ Le jour se lève... \n@${victimId.split('@')[0]} a été tué pendant la nuit!`, [victimId])
+                await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "sunrise.jpg"), "☀️ Le jour se lève...")
+                await whatsapp.sendMessage(groupId, `@${victimId.split('@')[0]} a été tué pendant la nuit!`, [victimId])
                 if (victim.lover) {
                     const partner = game.players.find(p => p.jid === victim.lover)
                     if (partner && !partner.isDead) {
