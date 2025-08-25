@@ -188,7 +188,7 @@ export class WereWolvesManager {
 
     async startNight(groupId, whatsapp) {
         const game = this.games[groupId]
-        if (!game) return
+        if (!game || game.state == "NIGHT") return
 
         game.state = "NIGHT"
         game.wolfChoices = {}
@@ -464,108 +464,113 @@ export class WereWolvesManager {
 
 
     async resolveNight(groupId, whatsapp) {
+
         const game = this.games[groupId]
         if (!game) return
-
-        // Tally wolf votes
-        const counts = {}
-        for (const wolf in game.wolfChoices) {
-            const target = game.wolfChoices[wolf]
-            counts[target] = (counts[target] || 0) + 1
-        }
-
-        let victimId = null
-        let maxVotes = 0
-        for (const target in counts) {
-            if (counts[target] > maxVotes) {
-                victimId = target
-                maxVotes = counts[target]
+        try {
+            // Tally wolf votes
+            const counts = {}
+            for (const wolf in game.wolfChoices) {
+                const target = game.wolfChoices[wolf]
+                counts[target] = (counts[target] || 0) + 1
             }
-        }
+
+            let victimId = null
+            let maxVotes = 0
+            for (const target in counts) {
+                if (counts[target] > maxVotes) {
+                    victimId = target
+                    maxVotes = counts[target]
+                }
+            }
 
 
-        if (victimId) {
-            // Check Doctor protection
-            if (game.prostituteProtected && game.prostituteProtected.includes(victimId)) {
-                await whatsapp.sendMessage(groupId, `💄 La victime des loups était trop occupé à baiser pour ouvrir aux loups!\nPersonne n'est mort`)
-                // Remove from protected list for the next night
-                game.prostituteProtected = null
-            } else if (game.doctorChoice && game.doctorChoice === victimId) {
-                await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été sauvée! 💉")
-            } else if (game.witchHeal) {
-                await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été protégée par magie! 🪄")
-            } else {
-                const victim = game.players.find(p => p.jid === victimId)
-                victim.isDead = true
-                if (victim.role === "HUNTER") {
-                    game.pendingHunter = victim.jid;
-                    game.hunterTimeout = Date.now();
+            if (victimId) {
+                // Check Doctor protection
+                if (game.prostituteProtected && game.prostituteProtected.includes(victimId)) {
+                    await whatsapp.sendMessage(groupId, `💄 La victime des loups était trop occupé à baiser pour ouvrir aux loups!\nPersonne n'est mort`)
+                    // Remove from protected list for the next night
+                    game.prostituteProtected = null
+                } else if (game.doctorChoice && game.doctorChoice === victimId) {
+                    await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été sauvée! 💉")
+                } else if (game.witchHeal) {
+                    await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été protégée par magie! 🪄")
+                } else {
+                    const victim = game.players.find(p => p.jid === victimId)
+                    victim.isDead = true
+                    if (victim.role === "HUNTER") {
+                        game.pendingHunter = victim.jid;
+                        game.hunterTimeout = Date.now();
 
-                    await whatsapp.sendMessage(victim.jid, "☠️ Tu es mourant. \nEnvoie *!shoot  _<numéro victime>_* dans les 45 secondes pour emmener quelqu'un avec toi!");
-                    const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`)).join("\n")
-                    const mentions = game.players.map((p, i) => p.jid)
-                    await whatsapp.sendMessage(victim.jid, "Joueurs :\n\n " + names, mentions)
+                        await whatsapp.sendMessage(victim.jid, "☠️ Tu es mourant. \nEnvoie *!shoot  _<numéro victime>_* dans les 45 secondes pour emmener quelqu'un avec toi!");
+                        const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`)).join("\n")
+                        const mentions = game.players.map((p, i) => p.jid)
+                        await whatsapp.sendMessage(victim.jid, "Joueurs :\n\n " + names, mentions)
 
-                    // Set hunter timeout
-                    game.timer = setTimeout(async () => {
-                        await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "sunrise.jpg"), "☀️ Le jour se lève...")
-                        await whatsapp.sendMessage(groupId, `@${victimId.split('@')[0]} a été tué pendant la nuit!\n\nMais... c'était un Chasseur 🏹`, [victimId])
+                        // Set hunter timeout
+                        game.timer = setTimeout(async () => {
+                            await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "sunrise.jpg"), "☀️ Le jour se lève...")
+                            await whatsapp.sendMessage(groupId, `@${victimId.split('@')[0]} a été tué pendant la nuit!\n\nMais... c'était un Chasseur 🏹`, [victimId])
 
-                        if (!game.hunterTarget)
-                            await whatsapp.sendMessage(groupId, "🏹 Le Chasseur n'a abattu personne avant de mourir.");
-                        else {
-                            await whatsapp.sendMessage(groupId, `🏹 Le Chasseur a abattu *${game.hunterTarget.name}* (@${game.hunterTarget.jid.split('@')[0]}) en mourant!`, [game.hunterTarget.jid])
-                            if (game.hunterTarget.lover) {
-                                const partner = game.players.find(p => p.jid === game.hunterTarget.lover)
+                            if (!game.hunterTarget)
+                                await whatsapp.sendMessage(groupId, "🏹 Le Chasseur n'a abattu personne avant de mourir.");
+                            else {
+                                await whatsapp.sendMessage(groupId, `🏹 Le Chasseur a abattu *${game.hunterTarget.name}* (@${game.hunterTarget.jid.split('@')[0]}) en mourant!`, [game.hunterTarget.jid])
+                                if (game.hunterTarget.lover) {
+                                    const partner = game.players.find(p => p.jid === game.hunterTarget.lover)
+                                    if (partner && !partner.isDead) {
+                                        partner.isDead = true
+                                        await whatsapp.sendMessage(groupId, `💔 *${partner.name}* (@${partner.jid.split('@')[0]}) est mort de chagrin suite à la perte de son amoureux.`, [partner.jid])
+                                    }
+                                }
+                            }
+                            game.hunterTarget = null;
+
+                            if (victim.lover) {
+                                const partner = game.players.find(p => p.jid === victim.lover)
                                 if (partner && !partner.isDead) {
                                     partner.isDead = true
                                     await whatsapp.sendMessage(groupId, `💔 *${partner.name}* (@${partner.jid.split('@')[0]}) est mort de chagrin suite à la perte de son amoureux.`, [partner.jid])
                                 }
                             }
-                        }
-                        game.hunterTarget = null;
-
-                        if (victim.lover) {
-                            const partner = game.players.find(p => p.jid === victim.lover)
-                            if (partner && !partner.isDead) {
-                                partner.isDead = true
-                                await whatsapp.sendMessage(groupId, `💔 *${partner.name}* (@${partner.jid.split('@')[0]}) est mort de chagrin suite à la perte de son amoureux.`, [partner.jid])
-                            }
-                        }
-                        saveGames(this.games)
-
-                        const result = checkWin(game)
-                        if (result) {
-                            await whatsapp.sendMessage(groupId, `🏆 Partie terminée! \n*${result}* gagnent!`)
-                            const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`) + ' [' + p.role + "]").join("\n")
-                            const mentions = game.players.map((p, i) => p.jid)
-                            await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
-                            await whatsapp.sendMessage(groupId, `envoie *"!werewolve"* pour rejouer`)
-                            delete this.games[groupId]
                             saveGames(this.games)
-                            return
-                        }
 
-                        await this.startDay(groupId, whatsapp)
-                    }, 45 * 1000);
+                            const result = checkWin(game)
+                            if (result) {
+                                await whatsapp.sendMessage(groupId, `🏆 Partie terminée! \n*${result}* gagnent!`)
+                                const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`) + ' [' + p.role + "]").join("\n")
+                                const mentions = game.players.map((p, i) => p.jid)
+                                await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
+                                await whatsapp.sendMessage(groupId, `envoie *"!werewolve"* pour rejouer`)
+                                delete this.games[groupId]
+                                saveGames(this.games)
+                                return
+                            }
 
-                    saveGames(this.games)
-                    return; // Don't check win condition yet
-                }
+                            await this.startDay(groupId, whatsapp)
+                        }, 45 * 1000);
 
-                await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "sunrise.jpg"), "☀️ Le jour se lève...")
-                await whatsapp.sendMessage(groupId, `@${victimId.split('@')[0]} a été tué pendant la nuit!`, [victimId])
-                if (victim.lover) {
-                    const partner = game.players.find(p => p.jid === victim.lover)
-                    if (partner && !partner.isDead) {
-                        partner.isDead = true
-                        await whatsapp.sendMessage(groupId, `💔 *${partner.name}* (@${partner.jid.split('@')[0]}) est mort de chagrin suite à la perte de son amoureux.`, [partner.jid])
+                        saveGames(this.games)
+                        return; // Don't check win condition yet
                     }
-                }
 
+                    await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "sunrise.jpg"), "☀️ Le jour se lève...")
+                    await whatsapp.sendMessage(groupId, `@${victimId.split('@')[0]} a été tué pendant la nuit!`, [victimId])
+                    if (victim.lover) {
+                        const partner = game.players.find(p => p.jid === victim.lover)
+                        if (partner && !partner.isDead) {
+                            partner.isDead = true
+                            await whatsapp.sendMessage(groupId, `💔 *${partner.name}* (@${partner.jid.split('@')[0]}) est mort de chagrin suite à la perte de son amoureux.`, [partner.jid])
+                        }
+                    }
+
+                }
+            } else {
+                await whatsapp.sendMessage(groupId, "☀️ Le jour se lève... \npersonne n'est mort cette nuit.")
             }
-        } else {
-            await whatsapp.sendMessage(groupId, "☀️ Le jour se lève... \npersonne n'est mort cette nuit.")
+        } catch (error) {
+            await whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur dans resolve night négro \n\n" + error.toString() + '\nLe dernier Message :')
+            console.log(error)
         }
 
         saveGames(this.games)
