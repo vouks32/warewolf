@@ -171,13 +171,13 @@ async function startBot() {
 
             sendImage: async (jid, buffer, caption = "", mentions = []) => {
                 if (buffer.includes('http')) {
-                    await sock.sendMessage(jid, { image: {url : buffer}, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
+                    await sock.sendMessage(jid, { image: { url: buffer }, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
                     return
                 }
                 const imagename = buffer.split('/').pop()
                 let optimizedImage = (await optimizeGifSharp(buffer, './images/send/opt-' + imagename))
                 const t = await extractImageThumb(optimizedImage)
-                await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail : t.buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
+                await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail: t.buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
             },
 
             sendAudio: async (jid, buffer, ptt = false) => {
@@ -269,7 +269,7 @@ async function startBot() {
         }
 
     })
- 
+
     //////////////////////////// UTILITIES //////////////////////////////////////////////////
     handlers.commands.set("!info", async (whatsapp) => {
         return await whatsapp.reply('Je suis un bot créé par Vouks - (676073559)\n' +
@@ -436,6 +436,34 @@ async function startBot() {
 
             console.log("vote ---- ", whatsapp.groupJid, targetJid, whatsapp)
             await wwm.castVote(whatsapp.groupJid, whatsapp.sender, targetJid, whatsapp)
+        }
+    })
+
+    // Prostitute visit
+    handlers.text.push({
+        regex: /^!visit\s+(\S+)/,
+        fn: async (whatsapp) => {
+            if (whatsapp.isGroup) return await whatsapp.reply("Cette action en peut être éffectué que dans l'intimité de notre conversation")
+            const groupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
+            if (!groupJid) return await whatsapp.reply("Tu n'es dans aucune partie dont j'ai connaissance")
+            const target = parseInt(whatsapp.text.split(" ")[1]) - 1
+            const targetJid = wwm.getPlayerJidFromNumber(groupJid, target)
+            console.log("pute ---- ", groupJid, targetJid, whatsapp)
+            await wwm.prostituteVisit(groupJid, whatsapp.sender, targetJid, whatsapp)
+        }
+    })
+
+    // Mayor stop vote
+    handlers.text.push({
+        regex: /^!stopvote$/,
+        fn: async (whatsapp) => {
+            if (whatsapp.isGroup) return await whatsapp.reply("Cette action en peut être éffectué que dans l'intimité de notre conversation")
+            const groupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
+            if (!groupJid) return await whatsapp.reply("Tu n'es dans aucune partie dont j'ai connaissance")
+            const target = parseInt(whatsapp.text.split(" ")[1]) - 1
+            const targetJid = wwm.getPlayerJidFromNumber(groupJid, target)
+            console.log("mayor ---- ", groupJid, targetJid, whatsapp)
+            await wwm.mayorStopVote(groupJid, whatsapp.sender, whatsapp)
         }
     })
 

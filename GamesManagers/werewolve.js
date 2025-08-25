@@ -99,6 +99,9 @@ export class WereWolvesManager {
             witchPoisonAvailable: true,
             nights: 0,
             timer: null,
+            prostituteChoice: null,  // Stores who the prostitute visited
+            mayorPowerAvailable: true,  // Track if mayor can stop vote
+            votesStopped: false
         }
 
         saveGames(this.games)
@@ -191,6 +194,9 @@ export class WereWolvesManager {
         game.wolfChoices = {}
         game.nights += 1
         game.seerChoice = null
+        game.prostituteChoice = null
+        game.prostituteProtected = null
+        game.seerFakeWolves = null
         game.doctorChoice = null
 
         saveGames(this.games)
@@ -210,10 +216,12 @@ export class WereWolvesManager {
                     await whatsapp.sendMessage(p.jid, "🧪 Nuit: \nEnvoie \n- *!heal* (et sauve la victime des loups pour ce soir) ou \n- *!poison _<numéro victime>_* (pour tuer quelqu'un).\n Tu ne peux le faire qu'une fois durant tout le jeu.")
                 } else if (p.role === "CUPID" && game.nights == 1) {
                     await whatsapp.sendMessage(p.jid, "❤️ Nuit: \nChoisis deux amoureux: *!love _<numéro 1ère victime>_ _<numéro 2nd victime>_* (C'est la seule chance que tu as de lier, après cette occasion tu es un simple villageois)")
+                } else if (p.role === "PROSTITUTE") {
+                    await whatsapp.sendMessage(p.jid, "💄 Nuit: \nEnvoie *!visit <numéro client>* ou *<numéro client>* pour visiter quelqu'un.")
                 } else {
                     await whatsapp.sendMessage(p.jid, "😴 Nuit: \nDors paisiblement.")
                 }
-                if (p.role !== "VILLAGER" && p.role !== "HUNTER") {
+                if (p.role !== "VILLAGER" && p.role !== "HUNTER" && p.role !== "MAYOR") {
                     if ((p.role === "WITCH" && (!game.witchPoisonAvailable))) return
                     if ((p.role === "CUPID" && game.nights !== 1)) return
                     await delay(1000)
@@ -297,7 +305,9 @@ export class WereWolvesManager {
         game.seerChoice = targetJid
         saveGames(this.games)
 
-        const result = target.role === "WEREWOLF" ? "un 🐺 Loup-Garou" : "pas un Loup-Garou"
+        const result = (target.role === "WEREWOLF" ||
+            (game.seerFakeWolves && game.seerFakeWolves.includes(target.jid))) ?
+            "un 🐺 Loup-Garou" : "pas un Loup-Garou";
         await whatsapp.sendMessage(seer.jid, `🔮 Résultat: \n*${target.name}* (@${target.jid.split('@')[0]}) est ${result}.`, [target.jid])
     }
 
@@ -382,6 +392,72 @@ export class WereWolvesManager {
         await whatsapp.sendMessage(jid2, "❤️ Tu es amoureux de " + jid1)
     }
 
+    async prostituteVisit(groupId, prostituteJid, targetJid, whatsapp) {
+        const game = this.games[groupId]
+        if (!game || game.state !== "NIGHT") return
+
+        const prostitute = game.players.find(p => p.jid === prostituteJid)
+        if (!prostitute || prostitute.role !== "PROSTITUTE" || prostitute.isDead) {
+            await whatsapp.sendMessage(prostituteJid, "⚠️ Tu ne peux pas visiter.")
+            return
+        }
+
+        if (game.prostituteChoice) {
+            await whatsapp.sendMessage(prostituteJid, "⚠️ Tu ne peux plus visiter, ékié!\n2 Coups en 1 soir?.")
+            return
+        }
+
+        const target = game.players.find(p => p.jid === targetJid && !p.isDead)
+        if (!target || target.jid === prostituteJid) {
+            await whatsapp.sendMessage(prostituteJid, "⚠️ Cible invalide.")
+            return
+        }
+
+        game.prostituteChoice = targetJid
+        saveGames(this.games)
+
+        await whatsapp.sendMessage(prostituteJid, `✅ Tu as visité *${target.name}* (@${target.jid.split('@')[0]}).`, [target.jid])
+
+        // If visited a wolf, prostitute dies
+        if (target.role === "WEREWOLF") {
+            prostitute.isDead = true
+            await whatsapp.sendMessage(prostituteJid, "⚠️ Vous avez visité un loup-garou et êtes morte!")
+            await whatsapp.sendMessage(groupId, `💄 La Prostituée a visité un loup-garou et est morte!`, [prostitute.jid])
+        } else {
+            // Mark both as protected from wolf attack
+            game.prostituteProtected = [prostituteJid, targetJid]
+            // Mark prostitute as appearing as wolf to seer
+            game.seerFakeWolves = game.seerFakeWolves || []
+            game.seerFakeWolves.push(prostituteJid)
+        }
+    }
+
+    // New method for mayor action
+    async mayorStopVote(groupId, mayorJid, whatsapp) {
+        const game = this.games[groupId]
+        if (!game) return
+
+
+        const mayor = game.players.find(p => p.jid === mayorJid)
+        if (!mayor || mayor.role !== "MAYOR" || mayor.isDead) {
+            await whatsapp.sendMessage(mayorJid, "⚠️ Tu ne peux pas arrêter le vote.")
+            return
+        }
+
+        if (!game.mayorPowerAvailable) {
+            await whatsapp.sendMessage(mayorJid, "⚠️ Tu as déjà utilisé ton pouvoir.")
+            return
+        }
+
+
+        if (game.mayorPowerAvailable) {
+            game.mayorPowerAvailable = false;
+            game.votesStopped = true;
+            saveGames(this.games)
+            await whatsapp.sendMessage(mayorJid, "✋ Tu as arreté le vote pour aujourd'hui.")
+        }
+    }
+
 
     async resolveNight(groupId, whatsapp) {
         const game = this.games[groupId]
@@ -406,7 +482,11 @@ export class WereWolvesManager {
 
         if (victimId) {
             // Check Doctor protection
-            if (game.doctorChoice && game.doctorChoice === victimId) {
+            if (game.prostituteProtected && game.prostituteProtected.includes(victimId)) {
+                await whatsapp.sendMessage(groupId, `💄 La victime des loups était trop occupé à baiser pour ouvrir aux loups!\nPersonne n'est mort`)
+                // Remove from protected list for the next night
+                game.prostituteProtected = null
+            } else if (game.doctorChoice && game.doctorChoice === victimId) {
                 await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été sauvée! 💉")
             } else if (game.witchHeal) {
                 await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été protégée par magie! 🪄")
@@ -553,6 +633,15 @@ export class WereWolvesManager {
         const game = this.games[groupId]
         if (!game) return
 
+        // At start of resolveVotes:
+        if (game.votesStopped) {
+            await whatsapp.sendMessage(groupId, "⚖️ Le vote a été annulé par le Maire!")
+            game.votesStopped = false
+            // Then proceed to night
+            this.startNight(groupId, whatsapp)
+            return
+        }
+
         const counts = {}
         for (const voter in game.votes) {
             const target = game.votes[voter]
@@ -680,6 +769,8 @@ export class WereWolvesManager {
                 await this.doctorSave(groupId, targetJid, whatsapp)
             } else if (p.role === "WITCH" && game.witchPoisonAvailable) {
                 await this.witchPoison(groupId, targetJid, whatsapp)
+            } else if (p.role === "PROSTITUTE") {
+                await this.prostituteVisit(groupId, playerJid, targetJid, whatsapp)
             }
         } else if (game.state === "DAY") {
             if (whatsapp.isGroup) {
