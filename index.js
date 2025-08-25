@@ -202,7 +202,7 @@ async function startBot() {
                 //const thumb = await generateThumbnail(gifPath, msg.key.id + '.jpg')
                 //const gif = fs.readFileSync(gifPath).buffer
                 const t = await extractImageThumb(gifPath)
-                await sock.sendMessage(jid, { video: { url: gifPath }, gifPlayback: true, jpegThumbnail: t.buffer.buffer, caption: htmlDecode(caption) })
+                await sock.sendMessage(jid, { video: { url: gifPath }, gifPlayback: true, jpegThumbnail: t.buffer, caption: htmlDecode(caption) })
             },
             getParticipants: async (groupJid) => {
                 try {
