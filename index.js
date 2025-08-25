@@ -198,9 +198,9 @@ async function startBot() {
                 }
 
                 const gifname = gifPath.split('/').pop()
-                let optimizedGif = (await optimizeGifSharp(gifPath, './gifs/send/opt-' + gifname)).buffer
+                let optimizedGif = (await optimizeGifSharp(gifPath, './gifs/send/opt-' + gifname))
                 const t = await extractImageThumb(optimizedGif)
-                await sock.sendMessage(jid, { video: optimizedGif, gifPlayback: true, jpegThumbnail: t.buffer, caption: htmlDecode(caption), mentions })
+                await sock.sendMessage(jid, { video: optimizedGif, gifPlayback: true, jpegThumbnail: t, caption: htmlDecode(caption), mentions })
             },
             getParticipants: async (groupJid) => {
                 try {
@@ -242,7 +242,7 @@ async function startBot() {
                 handled = true
             }
 
-            
+
         try {
 
             // Regex/text match
