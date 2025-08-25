@@ -170,11 +170,11 @@ async function startBot() {
             },
 
             sendImage: async (jid, buffer, caption = "", mentions = []) => {
-                if (gifPath.includes('http')) {
+                if (buffer.includes('http')) {
                     await sock.sendMessage(jid, { image: buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
                     return
                 }
-                const imagename = gifPath.split('/').pop()
+                const imagename = buffer.split('/').pop()
                 let optimizedImage = (await optimizeGifSharp(buffer, './images/send/opt-' + imagename))
                 const t = await extractImageThumb(optimizedImage)
                 await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail: t, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
