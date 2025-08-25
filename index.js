@@ -200,8 +200,8 @@ async function startBot() {
 
             sendGif: async (jid, gifPath, caption = '', mentions = []) => {
                 const thumb = await generateThumbnail(gifPath, msg.key.id + '.jpg')
-                const gif = fs.readFileSync(gifPath).buffer
-                await sock.sendMessage(jid, { video: gif, gifPlayback: true, jpegThumbnail : thumb, caption: htmlDecode(caption) })
+                //const gif = fs.readFileSync(gifPath).buffer
+                await sock.sendMessage(jid, { video: {url : gifPath}, gifPlayback: true, jpegThumbnail : thumb, caption: htmlDecode(caption) })
             },
             getParticipants: async (groupJid) => {
                 try {
