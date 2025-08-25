@@ -12,11 +12,9 @@ const handler = makeRetryHandler();
 import sharp from "sharp";
 import fs from "fs"
 async function optimizeGifSharp(gifPath, id) {
-    await sharp(gifPath)
+    return await sharp(gifPath)
         .resize({ width: 300 }) // Resize to 300px width
-        .gif({ quality: 80 }) // Adjust GIF quality
-        .toFile('./gifs/send/' + id + '.gif');
-    console.log('GIF optimized with Sharp.');
+        .gif({ quality: 80 }).toBuffer();
 }
 
 
@@ -194,10 +192,15 @@ async function startBot() {
             },
 
             sendGif: async (jid, gifPath, caption = '', mentions = []) => {
-                await optimizeGifSharp(gifPath, msg.key.id)
-                const gif = fs.readFileSync('./gifs/send/' + msg.key.id + '.gif').buffer
-                const t = await extractImageThumb(gif)
-                await sock.sendMessage(jid, { video: gif, gifPlayback: true, jpegThumbnail: t.buffer, caption: htmlDecode(caption) })
+                if (gifPath.includes('http')) {
+                    await sock.sendMessage(jid, { video: { url: gifPath }, gifPlayback: true, caption: htmlDecode(caption), mentions })
+                    return
+                }
+
+                const gifname = gifPath.split('/').pop()
+                let optimizedGif = (await optimizeGifSharp(gifPath, './gifs/send/opt-' + gifname)).buffer
+                const t = await extractImageThumb(optimizedGif)
+                await sock.sendMessage(jid, { video: optimizedGif, gifPlayback: true, jpegThumbnail: t.buffer, caption: htmlDecode(caption), mentions })
             },
             getParticipants: async (groupJid) => {
                 try {
