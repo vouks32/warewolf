@@ -15,7 +15,7 @@ http.createServer((req, res) => {
             console.log("Webhook received:", new Date().toISOString());
 
             // Call your PowerShell script
-            exec('powershell -ExecutionPolicy Bypass -File "C:\\Users\\Administrator\\Desktop\\werewolf\\auto-pull"', (error, stdout, stderr) => {
+            exec('powershell -ExecutionPolicy Bypass -File "C:\\Users\\Administrator\\Desktop\\werewolf\\auto-pull\\update.ps1"', (error, stdout, stderr) => {
                 if (error) {
                     console.error(`Error: ${error.message}`);
                     return;
