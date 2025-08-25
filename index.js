@@ -195,7 +195,7 @@ async function startBot() {
 
             sendGif: async (jid, gifPath, caption = '', mentions = []) => {
                 await optimizeGifSharp(gifPath, msg.key.id)
-                const gif = fs.readFileSync(msg.key.id + '.gif').buffer
+                const gif = fs.readFileSync('./gifs/send/' + msg.key.id + '.gif').buffer
                 const t = await extractImageThumb(gif)
                 await sock.sendMessage(jid, { video: gif, gifPlayback: true, jpegThumbnail: t.buffer, caption: htmlDecode(caption) })
             },
