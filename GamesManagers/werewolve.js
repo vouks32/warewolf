@@ -751,7 +751,7 @@ export class WereWolvesManager {
         if (!game) return
 
         if (game.lastPlayerList > Date.now() - 60000) return
-        const names = game.players.map((_p, i) => `[${i + 1}] - *${_p.name}* (@${_p.jid.split('@')[0]}) ` + (!_p.isDead ? ((p.role === "WEREWOLF" && _p.role === "WEREWOLF") ? `🐺` : `😀`) : `☠️`)).join("\n")
+        const names = game.players.map((_p, i) => `[${i + 1}] - *${_p.name}* (@${_p.jid.split('@')[0]}) ` + (!_p.isDead ? `😀` : `☠️`)).join("\n")
         const mentions = game.players.map((p, i) => p.jid)
         game.lastPlayerList = Date.now()
         await whatsapp.sendMessage(p.jid, "Joueurs :\n\n" + names, mentions)
