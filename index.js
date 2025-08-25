@@ -236,12 +236,14 @@ async function startBot() {
         // Dispatch logic
         let handled = false
 
-        try {
             // Command match (exact)
             if (handlers.commands.has(text.toLowerCase())) {
                 await handlers.commands.get(text.toLowerCase())(whatsapp)
                 handled = true
             }
+
+            
+        try {
 
             // Regex/text match
             for (const { regex, fn } of handlers.text) {
