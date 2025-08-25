@@ -766,6 +766,7 @@ export class WereWolvesManager {
         await whatsapp.sendMessage(groupId, `🏆 Partie terminée!`)
         await whatsapp.sendMessage(groupId, `envoie *"!werewolve"* pour rejouer`)
         delete this.games[groupId]
+        clearInterval(game.timer)
         saveGames(this.games)
         return
     }
