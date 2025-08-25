@@ -218,7 +218,7 @@ export class WereWolvesManager {
                     await whatsapp.sendMessage(p.jid, "❤️ Nuit: \nChoisis deux amoureux: *!love _<numéro 1ère victime>_ _<numéro 2nd victime>_* (C'est la seule chance que tu as de lier, après cette occasion tu es un simple villageois)")
                 } else if (p.role === "PROSTITUTE") {
                     await whatsapp.sendMessage(p.jid, "💄 Nuit: \nEnvoie *!visit <numéro client>* ou *<numéro client>* pour visiter quelqu'un.")
-                }else if (p.role === "MAYOR") {
+                } else if (p.role === "MAYOR") {
                     await whatsapp.sendMessage(p.jid, "🤵 Tu ne peux rien faire la nuit.\nMais en journée tu peux stopper les votes en envoyant *!stopvote*")
                 } else {
                     await whatsapp.sendMessage(p.jid, "😴 Nuit: \nDors paisiblement.")
@@ -267,7 +267,7 @@ export class WereWolvesManager {
             await whatsapp.sendMessage(wolfJid, "⚠️ Cible invalide.")
             return
         }
-        
+
         if (target.role === "WEREWOLF") {
             await whatsapp.sendMessage(wolfJid, "⚠️ Tu ne peux pas tuer un loup 🐺.")
             return
@@ -458,7 +458,7 @@ export class WereWolvesManager {
             game.mayorPowerAvailable = false;
             game.votesStopped = true;
             saveGames(this.games)
-            await whatsapp.sendMessage(mayorJid, "✋ Tu as arreté le vote pour aujourd'hui.")
+            await whatsapp.sendMessage(mayorJid, "✋ Tu as arreté le vote pour aujourd'hui.\nIls ne le savent pas, mais leurs votes ne servent à rien 🤫")
         }
     }
 
@@ -546,7 +546,7 @@ export class WereWolvesManager {
                             return
                         }
 
-                        this.startDay(groupId, whatsapp)
+                        await this.startDay(groupId, whatsapp)
                     }, 45 * 1000);
 
                     saveGames(this.games)
@@ -582,7 +582,7 @@ export class WereWolvesManager {
             return
         }
 
-        this.startDay(groupId, whatsapp)
+        await this.startDay(groupId, whatsapp)
     }
 
     async startDay(groupId, whatsapp) {
@@ -599,16 +599,16 @@ export class WereWolvesManager {
 
         game.timer = setTimeout(async () => {
             this.resolveVotes(groupId, whatsapp)
-        }, 90 * 1000)
+        }, 150 * 1000)
         setTimeout(async () => {
-            await whatsapp.reply("🎮 60 secondes restante avant le lever du soleil!")
-        }, 30 * 1000)
-        setTimeout(async () => {
-            await whatsapp.reply("🎮 30 secondes restantes avant le lever du soleil!")
+            await whatsapp.reply("🎮 90 secondes restante avant le lever du soleil!")
         }, 60 * 1000)
         setTimeout(async () => {
-            await whatsapp.reply("🎮 15 secondes restantes avant le lever du soleil!")
-        }, 75 * 1000)
+            await whatsapp.reply("🎮 60 secondes restantes avant le lever du soleil!")
+        }, 90 * 1000)
+        setTimeout(async () => {
+            await whatsapp.reply("🎮 30 secondes restantes avant le lever du soleil!")
+        }, 120 * 1000)
     }
 
     async castVote(groupId, voterJid, targetJid, whatsapp) {
@@ -639,10 +639,11 @@ export class WereWolvesManager {
 
         // At start of resolveVotes:
         if (game.votesStopped) {
-            await whatsapp.sendMessage(groupId, "⚖️ Le vote a été annulé par le Maire!")
+            const mayor = game.players.find(p => p.role === "MAYOR")
+            await whatsapp.sendMessage(groupId, "⚖️ Le vote a été annulé par le Maire @" + mayor.jid.split('@')[0], [mayor.jid])
             game.votesStopped = false
             // Then proceed to night
-            this.startNight(groupId, whatsapp)
+            await this.startNight(groupId, whatsapp)
             return
         }
 
@@ -711,7 +712,7 @@ export class WereWolvesManager {
                         return
                     }
 
-                    this.startNight(groupId, whatsapp)
+                    await this.startNight(groupId, whatsapp)
                 }, 45 * 1000);
 
                 saveGames(this.games)
