@@ -283,7 +283,7 @@ async function startBot() {
 
     handlers.commands.set("!tag", async (whatsapp) => {
         if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
-        const participants = whatsapp.getParticipants(whatsapp.groupJid)
+        const participants = await whatsapp.getParticipants(whatsapp.groupJid)
         const AdminParticipant = participants.find(_p => _p.id == whatsapp.ids.lid && _p.admin)
         if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
 
