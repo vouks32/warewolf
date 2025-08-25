@@ -14,7 +14,7 @@ import fs from "fs"
 const generateThumbnail = (inputPath, outputPath = "thumb.jpg") => {
     return new Promise((resolve, reject) => {
         ffmpeg(inputPath)
-            .on("end", () => resolve(fs.readFileSync(outputPath)))
+            .on("end", () => resolve(fs.readFileSync(outputPath).buffer))
             .on("error", reject)
             .screenshots({
                 count: 1,
@@ -23,6 +23,15 @@ const generateThumbnail = (inputPath, outputPath = "thumb.jpg") => {
                 size: "320x320"
             })
     })
+}
+
+function toArrayBuffer(buffer) {
+  const arrayBuffer = new ArrayBuffer(buffer.length);
+  const view = new Uint8Array(arrayBuffer);
+  for (let i = 0; i < buffer.length; ++i) {
+    view[i] = buffer[i];
+  }
+  return arrayBuffer;
 }
 
 function htmlDecode(text) {
@@ -191,7 +200,8 @@ async function startBot() {
 
             sendGif: async (jid, gifPath, caption = '', mentions = []) => {
                 const thumb = await generateThumbnail(gifPath, msg.key.id + '.jpg')
-                await sock.sendMessage(jid, { video: { url: gifPath }, gifPlayback: true, jpegThumbnail : thumb, caption: htmlDecode(caption) })
+                const gif = fs.readFileSync(outputPath).buffer
+                await sock.sendMessage(jid, { video: gif, gifPlayback: true, jpegThumbnail : thumb, caption: htmlDecode(caption) })
             },
             getParticipants: async (groupJid) => {
                 try {
