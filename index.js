@@ -269,7 +269,7 @@ async function startBot() {
         }
 
     })
-
+ 
     //////////////////////////// UTILITIES //////////////////////////////////////////////////
     handlers.commands.set("!info", async (whatsapp) => {
         return await whatsapp.reply('Je suis un bot créé par Vouks - (676073559)\n' +
