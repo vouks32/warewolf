@@ -129,8 +129,13 @@ async function startBot() {
     // Handle messages
     sock.ev.on("messages.upsert", async (m) => {
         const msg = m.messages[0]
+        
 
-        if (!msg.message || msg.key.fromMe) return
+        if (!msg.message || msg.key.fromMe){
+            if(msg.message?.videoMessage)
+                console.log(msg.message.videoMessage)
+            return
+            }
 
         // Parse the message to get type and JIDs
         const remoteJid = msg.key.remoteJid;
