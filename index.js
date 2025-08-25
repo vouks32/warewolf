@@ -285,7 +285,7 @@ async function startBot() {
         if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
         const participants = await whatsapp.getParticipants(whatsapp.groupJid)
         console.log(participants)
-        const AdminParticipant = participants.find(_p => _p.id == whatsapp.ids.lid && _p.admin)
+        const AdminParticipant = participants.find(_p => _p.id.includes('@lid')? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
         if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
 
         const t = 'Tag Générale :\n\n' + participants.map(p => `- @${p.id.split('@')[0]}`).join('\n')
