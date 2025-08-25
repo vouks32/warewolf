@@ -224,8 +224,8 @@ export class WereWolvesManager {
                     await whatsapp.sendMessage(p.jid, "😴 Nuit: \nDors paisiblement.")
                 }
                 if (p.role !== "VILLAGER" && p.role !== "HUNTER" && p.role !== "MAYOR") {
-                    if ((p.role === "WITCH" && (!game.witchPoisonAvailable))) return
-                    if ((p.role === "CUPID" && game.nights !== 1)) return
+                    if ((p.role === "WITCH" && (!game.witchPoisonAvailable))) continue;
+                    if ((p.role === "CUPID" && game.nights !== 1)) continue;
                     await delay(1000)
                     const names = game.players.map((_p, i) => `[${i + 1}] - *${_p.name}* (@${_p.jid.split('@')[0]}) ` + (!_p.isDead ? ((p.role === "WEREWOLF" && _p.role === "WEREWOLF") ? `🐺` : `😀`) : `☠️`)).join("\n")
                     const mentions = game.players.map((p, i) => p.jid)
@@ -377,7 +377,7 @@ export class WereWolvesManager {
         target.isDead = true
         game.witchPoisonAvailable = false
         saveGames(this.games)
-        await whatsapp.sendMessage(groupId, `🧪 La Sorcière a empoisonné *${target.name}* (@${target.jid.split('@')[0]}) pendant la nuit!`, [targetJid])
+        await whatsapp.sendMessage(groupId, `🧪 La Sorcière a empoisonné *${target.name}* (@${target.jid.split('@')[0].split('@')[0]}) pendant la nuit!`, [targetJid])
     }
 
     async cupidPair(groupId, jid1, jid2, whatsapp) {
@@ -391,9 +391,9 @@ export class WereWolvesManager {
         p1.lover = jid2
         p2.lover = jid1
         saveGames(this.games)
-        await whatsapp.sendMessage(cupid.jid, `❤️ Tu as lié ${jid1} et ${jid2} comme amoureux.`)
-        await whatsapp.sendMessage(jid1, "❤️ Tu es amoureux de " + jid2)
-        await whatsapp.sendMessage(jid2, "❤️ Tu es amoureux de " + jid1)
+        await whatsapp.sendMessage(cupid.jid, `❤️ Tu as lié @${jid1.split('@')[0]} et @${jid2.split('@')[0]} comme amoureux.`, [jid1, jid2])
+        await whatsapp.sendMessage(jid1, "❤️ Tu es amoureux de @" + jid2.split('@')[0], [jid2])
+        await whatsapp.sendMessage(jid2, "❤️ Tu es amoureux de @" + jid1.split('@')[0], [jid1])
     }
 
     async prostituteVisit(groupId, prostituteJid, targetJid, whatsapp) {
