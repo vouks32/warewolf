@@ -282,7 +282,7 @@ async function startBot() {
     })
 
     handlers.commands.set("!image", async (whatsapp) => {
-        return await whatsapp.sendImage(whatsapp.remoteJid, './images/creategame.jpg')
+        return //await whatsapp.sendImage(whatsapp.remoteJid, './images/creategame.jpg')
     })
 
     handlers.commands.set("!startgame", async (whatsapp) => {
