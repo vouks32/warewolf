@@ -171,12 +171,13 @@ async function startBot() {
 
             sendImage: async (jid, buffer, caption = "", mentions = []) => {
                 if (buffer.includes('http')) {
-                    await sock.sendMessage(jid, { image: { url: buffer }, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
+                    await sock.sendMessage(jid, { image: {url : buffer}, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
                     return
                 }
                 const imagename = buffer.split('/').pop()
                 let optimizedImage = (await optimizeGifSharp(buffer, './images/send/opt-' + imagename))
-                await sock.sendMessage(jid, { image: optimizedImage, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
+                const t = await extractImageThumb(optimizedImage)
+                await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail : t.buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
             },
 
             sendAudio: async (jid, buffer, ptt = false) => {
@@ -268,7 +269,7 @@ async function startBot() {
         }
 
     })
-
+ 
     //////////////////////////// UTILITIES //////////////////////////////////////////////////
     handlers.commands.set("!info", async (whatsapp) => {
         return await whatsapp.reply('Je suis un bot créé par Vouks - (676073559)\n' +
