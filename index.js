@@ -196,7 +196,7 @@ async function startBot() {
                     // Find the participant by JID
                     const participant = metadata.participants
 
-                    return metadata || null; // Return participant or null if not found
+                    return participant || null; // Return participant or null if not found
                 } catch (error) {
                     console.error('Error fetching group metadata:', error);
                     return null;
@@ -279,6 +279,17 @@ async function startBot() {
             "📝 *!quiz* - pour jouer à un quiz (en Anglais)\n" +
             "\nℹ️ *!info* - Pour tout savoir sur moi"
         )
+    })
+
+    handlers.commands.set("!tag", async (whatsapp) => {
+        if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+        const participants = whatsapp.getParticipants(whatsapp.groupJid)
+        const AdminParticipant = participants.find(_p => _p.id == whatsapp.ids.lid && _p.admin)
+        if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+
+        const t = 'Tag Générale :\n\n' + participants.map(p => `- ${p.id}`).join('\n')
+        const mentions = participants.map(p => p.id)
+        await whatsapp.reply(t, mentions)
     })
 
     handlers.commands.set("!image", async (whatsapp) => {
