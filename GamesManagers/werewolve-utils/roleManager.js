@@ -38,6 +38,12 @@ class RoleManager {
             const j = Math.floor(Math.random() * (i + 1));
             [roles[i], roles[j]] = [roles[j], roles[i]];
         }
+ // Shuffle roles
+        for (let i = 0; i < roles.length - 1; i++) {
+            const j = Math.floor(Math.random() * roles.length);
+            if(j !== i)
+            [roles[i], roles[j]] = [roles[j], roles[i]];
+        }
 
         return roles;
     }

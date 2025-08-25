@@ -484,6 +484,24 @@ async function startBot() {
         }
     })
 
+    // Mayor stop vote
+    handlers.text.push({
+        regex: /^!p$/,
+        fn: async (whatsapp) => {
+           if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+            const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+            console.log(participants)
+            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
+            if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+
+            if (whatsapp.game === null) return await whatsapp.reply('persone n\'est entrain de jouer à un jeu! tu es attardé?')
+            else if (whatsapp.game === 'QUIZ'){
+                //await qm.stopGame(whatsapp.groupJid, whatsapp)
+            }else if (whatsapp.game === 'WEREWOLVE')
+                await wwm.sendPlayerList(whatsapp.groupJid, whatsapp)
+        }
+    })
+
     // Seer action
     handlers.text.push({
         regex: /^!see\s+(\S+)/,
