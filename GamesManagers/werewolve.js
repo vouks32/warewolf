@@ -377,7 +377,7 @@ export class WereWolvesManager {
         target.isDead = true
         game.witchPoisonAvailable = false
         saveGames(this.games)
-        await whatsapp.sendMessage(groupId, `🧪 La Sorcière a empoisonné *${target.name}* (@${target.jid.split('@')[0].split('@')[0]}) pendant la nuit!`, [targetJid])
+        await whatsapp.sendMessage(groupId, `🧪 La Sorcière a empoisonné *${target.name}* (@${target.jid.split('@')[0]}) pendant la nuit!`, [targetJid])
     }
 
     async cupidPair(groupId, jid1, jid2, whatsapp) {
