@@ -24,7 +24,7 @@ function loadGames() {
 
 function saveGames(games) {
     let temp = { ...games }
-    Object.entries(temp).forEach(arr => { temp[arr[0]].timer = false })
+    Object.entries(temp).forEach(arr => { temp[arr[0]].timer = null })
     fs.writeFileSync(DATA_FILE, JSON.stringify(temp, null, 2))
 }
 
@@ -64,6 +64,7 @@ function checkWin(game) {
 export class WereWolvesManager {
     constructor() {
         this.games = loadGames()
+        this.timers = {}
     }
 
     isPlaying(groupId) {
@@ -143,7 +144,7 @@ export class WereWolvesManager {
         game.players.push({ ids: whatsapp.ids, jid: playerJid, name, isPlaying: true, isDead: false, role: null })
         saveGames(this.games)
 
-        const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`)).join("\n")
+        const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
         const mentions = game.players.map((p, i) => p.jid)
 
         await whatsapp.reply(`✅ Tu as rejoint!\n\nListe des joueurs:\n\n${names}`, mentions)
@@ -504,7 +505,7 @@ export class WereWolvesManager {
                         game.hunterTimeout = Date.now();
 
                         await whatsapp.sendMessage(victim.jid, "☠️ Tu es mourant. \nEnvoie *!shoot  _<numéro victime>_* dans les 45 secondes pour emmener quelqu'un avec toi!");
-                        const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`)).join("\n")
+                        const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
                         const mentions = game.players.map((p, i) => p.jid)
                         await whatsapp.sendMessage(victim.jid, "Joueurs :\n\n " + names, mentions)
 
@@ -539,7 +540,7 @@ export class WereWolvesManager {
                             const result = checkWin(game)
                             if (result) {
                                 await whatsapp.sendMessage(groupId, `🏆 Partie terminée! \n*${result}* gagnent!`)
-                                const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`) + ' [' + p.role + "]").join("\n")
+                                const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
                                 const mentions = game.players.map((p, i) => p.jid)
                                 await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
                                 await whatsapp.sendMessage(groupId, `envoie *"!werewolve"* pour rejouer`)
@@ -599,7 +600,7 @@ export class WereWolvesManager {
         saveGames(this.games)
 
         await whatsapp.sendMessage(groupId, "🌞 Jour: Discutez et votez avec *!vote  _<numéro victime>_*\nVous avez 3 minutes")
-        const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`)).join("\n")
+        const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
         const mentions = game.players.map((p, i) => p.jid)
         await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
 
@@ -674,7 +675,7 @@ export class WereWolvesManager {
             await whatsapp.sendMessage(groupId, `⚖️ Le village a exécuté @${victimId.split('@')[0]}. C'était *${victim.role}*.`, [victimId])
             if (victim.role === "HUNTER") {
                 await whatsapp.sendMessage(victim.jid, "🏹 Tu es mourant. Envoie *!shoot  _<numéro victime>_* pour emmener quelqu'un avec toi!")
-                const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`)).join("\n")
+                const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
                 const mentions = game.players.map((p, i) => p.jid)
                 await whatsapp.sendMessage(victim.jid, "Joueurs :\n\n " + names, mentions)
                 game.pendingHunter = victim.jid
@@ -751,7 +752,7 @@ export class WereWolvesManager {
         if (!game) return
 
         if (game.lastPlayerList > Date.now() - 60000) return
-        const names = game.players.map((_p, i) => `[${i + 1}] - *${_p.name}* (@${_p.jid.split('@')[0]}) ` + (!_p.isDead ? `😀` : `☠️`)).join("\n")
+        const names = game.players.map((_p, i) => `[${i + 1}] - *${_p.name}* (@${_p.jid.split('@')[0]}) ` + (!_p.isDead ? `😀` : `☠️ [${_p.role}]`)).join("\n")
         const mentions = game.players.map((p, i) => p.jid)
         game.lastPlayerList = Date.now()
         await whatsapp.sendMessage(p.jid, "Joueurs :\n\n" + names, mentions)

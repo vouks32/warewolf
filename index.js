@@ -5,12 +5,17 @@ import { makeRetryHandler } from "./handler.js";
 import { QuizManager } from "./GamesManagers/quiz.js";
 import { Insult1 } from "./apis/insult.js";
 import { getUser, saveUser } from "./userStorage.js";
+import sharp from "sharp";
+import fs from "fs"
+import NodeCache from "node-cache";
+
+
 const wwm = new WereWolvesManager()
 const qm = new QuizManager()
 const handler = makeRetryHandler();
 
-import sharp from "sharp";
-import fs from "fs"
+const groupCache = new NodeCache({ stdTTL: 5 * 60, useClones: false })
+
 async function optimizeGifSharp(gifPath, id) {
     return await sharp(gifPath)
         .resize({ width: 300 }) // Resize to 500px width
@@ -71,33 +76,6 @@ function extractText(msg) {
 
 async function startBot() {
     const { state, saveCreds } = await useMultiFileAuthState("../auth_info")
-    const sock = makeWASocket({
-        auth: state,
-        markOnlineOnConnect: false,
-        getMessage: handler.getHandler
-    })
-
-    sock.ev.on("creds.update", saveCreds)
-
-    sock.ev.on("connection.update", async (update) => {
-        const { connection, lastDisconnect, qr } = update
-        if (connection === "close") {
-            const statusCode = lastDisconnect?.error?.output?.statusCode
-            const shouldReconnect = statusCode !== DisconnectReason.loggedOut
-
-            console.log("connection closed due to ", lastDisconnect?.error, ", reconnecting ", shouldReconnect)
-
-            if (shouldReconnect) startBot()
-        } else if (connection === "open") {
-            console.log("✅ Bot is online!")
-        }
-
-        if (qr) {
-            console.log(await QRCode.toString(qr, { type: 'terminal' }))
-        }
-    })
-
-
     // Handlers storage
     const handlers = {
         commands: new Map(),   // command -> callback
@@ -118,6 +96,39 @@ async function startBot() {
         }
     }
 
+    const sock = makeWASocket({
+        auth: state,
+        markOnlineOnConnect: false,
+        getMessage: handler.getHandler,
+        cachedGroupMetadata: async (jid) => groupCache.get(jid)
+    })
+
+    sock.ev.on("creds.update", saveCreds)
+    sock.ev.on("connection.update", async (update) => {
+        const { connection, lastDisconnect, qr } = update
+        if (connection === "close") {
+            const statusCode = lastDisconnect?.error?.output?.statusCode
+            const shouldReconnect = statusCode !== DisconnectReason.loggedOut
+
+            console.log("connection closed due to ", lastDisconnect?.error, ", reconnecting ", shouldReconnect)
+
+            if (shouldReconnect) startBot()
+        } else if (connection === "open") {
+            console.log("✅ Bot is online!")
+        }
+
+        if (qr) {
+            console.log(await QRCode.toString(qr, { type: 'terminal' }))
+        }
+    })
+    sock.ev.on('groups.update', async ([event]) => {
+        const metadata = await sock.groupMetadata(event.id)
+        groupCache.set(event.id, metadata)
+    })
+    sock.ev.on('group-participants.update', async (event) => {
+        const metadata = await sock.groupMetadata(event.id)
+        groupCache.set(event.id, metadata)
+    })
     // Handle messages
     sock.ev.on("messages.upsert", async (m) => {
         const msg = m.messages[0]
@@ -128,7 +139,6 @@ async function startBot() {
                 console.log(msg.message.videoMessage)
             return
         }
-
         // Parse the message to get type and JIDs
         const remoteJid = msg.key.remoteJid;
         const isGroup = remoteJid.endsWith('@g.us');
@@ -142,10 +152,7 @@ async function startBot() {
             "";
 
         // Build reusable whatsapp object with proper JID information
-
         const game = !isGroup ? null : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : null
-
-
         const whatsapp = {
             ids: {
                 lid: msg.key.participant?.endsWith('@lid') ? msg.key.participant : null,
@@ -270,6 +277,9 @@ async function startBot() {
         }
 
     })
+
+
+
 
     //////////////////////////// UTILITIES //////////////////////////////////////////////////
     handlers.commands.set("!info", async (whatsapp) => {
@@ -488,16 +498,16 @@ async function startBot() {
     handlers.text.push({
         regex: /^!p$/,
         fn: async (whatsapp) => {
-           if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+            if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
             console.log(participants)
             const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
             if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
 
             if (whatsapp.game === null) return await whatsapp.reply('persone n\'est entrain de jouer à un jeu! tu es attardé?')
-            else if (whatsapp.game === 'QUIZ'){
+            else if (whatsapp.game === 'QUIZ') {
                 //await qm.stopGame(whatsapp.groupJid, whatsapp)
-            }else if (whatsapp.game === 'WEREWOLVE')
+            } else if (whatsapp.game === 'WEREWOLVE')
                 await wwm.sendPlayerList(whatsapp.groupJid, whatsapp)
         }
     })
