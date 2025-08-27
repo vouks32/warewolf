@@ -137,11 +137,15 @@ export class WereWolvesManager {
 
         this.saveGames(this.games)
 
-        await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "startgame.jpg"), "🎮 Nouvelle partie de loup garou, *Awoooo!😭* \nEnvoie *!play _pseudo_* pour rejoindre (3 minutes restantes).")
+        await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "startgame.jpg"), "🎮 Nouvelle partie de loup garou, *Awoooo!😭*.")
+        await whatsapp.sendMessage(groupId, "🎮 Envoie *!play _pseudo_* pour rejoindre (3 minutes restantes)")
 
         this.games[groupId].timer = setTimeout(async () => {
             await this.startGame(groupId, whatsapp)
         }, 3 * 60 * 1000)
+        setTimeout(async () => {
+            await whatsapp.sendMessage(groupId, "🎮 2 minute restantes pour rejoindre la partie! \nEnvoie *!play _pseudo_*")
+        }, 1 * 60 * 1000)
         setTimeout(async () => {
             await whatsapp.sendMessage(groupId, "🎮 1 minute restante pour rejoindre la partie! \nEnvoie *!play _pseudo_*")
         }, 2 * 60 * 1000)
@@ -180,7 +184,8 @@ export class WereWolvesManager {
 
         let user = getUser(playerJid)
         if (!user) {
-            saveUser({ jid: playerJid, groups: [groupId], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName, games: { WEREWOLVE: 1 }, points: 100, pointsTransactions: [{ "nouveau joueur": 100 }] })
+            saveUser({ jid: playerJid, groups: [groupId], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName, games: { WEREWOLVE: 1 }, points: 10, pointsTransactions: [{ "nouveau joueur": 10 }] })
+            await this.sendPlayerProfil(whatsapp)
         } else {
             if (!user.groups.some(g => g === groupId)) {
                 user.groups.push(groupId)
@@ -823,7 +828,13 @@ export class WereWolvesManager {
             return
         }
 
+
+
         if (game.playerChangeVoteCounts[voterJid] === 1 || game.playerChangeVoteCounts[voterJid] === 2) {
+            if (user.points <= 0) {
+                await whatsapp.reply(`Tu n'as pas assez de points`)
+                return
+            }
             user.points += POINTS_LIST.changeVotePenalty * game.playerChangeVoteCounts[voterJid]
             user.pointsTransactions.push({ "Changé son vote": POINTS_LIST.changeVotePenalty * game.playerChangeVoteCounts[voterJid] })
             user = saveUser(user)
@@ -858,7 +869,7 @@ export class WereWolvesManager {
             await whatsapp.reply(`Profil de @${user.jid.split('@')[0]}\n\n` +
                 `Nom : *${user.pushName.trim()}*\n` +
                 `points : *${user.points} points*\n\n` +
-                `Parties joués :\n *${Object.entries(user.games).map(([gameName, number]) => gameName + ' : *' + number + ' Parties joués*').join('\n')}*`, [user.jid])
+                `Parties joués :\n ${Object.entries(user.games).map(([gameName, number]) => gameName + ' : *' + number + ' Parties joués*').join('\n')}`, [user.jid])
         //saveUser({ jid: playerJid, groups: [groupId], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName, points: 100, pointsTransactions: [{ "nouveau joueur": 100 }] })
         else {
             await whatsapp.reply(`🚫 Tu n'es pas encore enregistré, joue d'abord à une partie!`)

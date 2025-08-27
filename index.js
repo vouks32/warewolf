@@ -135,8 +135,6 @@ async function startBot() {
 
 
         if (!msg.message || msg.key.fromMe) {
-            if (msg.message?.videoMessage)
-                console.log(msg.message.videoMessage)
             return
         }
         // Parse the message to get type and JIDs
