@@ -90,7 +90,7 @@ export class WereWolvesManager {
             });
             return { name: "WOLVES", players: wolves }
         }
-        return null
+        return { name: null, players: null }
     }
 
 
