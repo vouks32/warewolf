@@ -831,7 +831,7 @@ export class WereWolvesManager {
 
 
         if (game.playerChangeVoteCounts[voterJid] === 1 || game.playerChangeVoteCounts[voterJid] === 2) {
-            if (user.points <= 0) {
+            if (user.points < 2 * game.playerChangeVoteCounts[voterJid]) {
                 await whatsapp.reply(`Tu n'as pas assez de points`)
                 return
             }
