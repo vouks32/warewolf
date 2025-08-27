@@ -232,10 +232,12 @@ export class WereWolvesManager {
             await delay(500)
         }
 
-        let user = getUser(whatsapp.playerJid)
-        user.points += POINTS_LIST.StartSuccessfulGame
-        user.pointsTransactions.push({ "Lancé une partie de werewolve": POINTS_LIST.StartSuccessfulGame })
-        user = saveUser(user)
+        let user = getUser(whatsapp.sender)
+        if (user) {
+            user.points += POINTS_LIST.StartSuccessfulGame
+            user.pointsTransactions.push({ "Lancé une partie de werewolve": POINTS_LIST.StartSuccessfulGame })
+            user = saveUser(user)
+        }
 
         this.startNight(groupId, whatsapp)
     }

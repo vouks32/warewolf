@@ -17,4 +17,4 @@
 
 // generateThumbnail('./gifs/wolf2.gif')
 let obj = { dog: "yes", cat: 'no' }
-console.log(Object.entries(obj).map(([name, val]) => name + ' : ' + val).join('\n'))
+console.log(['yo', 'ya', 'yu'][Math.floor(Math.random() * 3)])
