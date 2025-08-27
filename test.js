@@ -1,18 +1,20 @@
 
-import ffmpeg from "fluent-ffmpeg"
-import fs from "fs"
-const generateThumbnail = (inputPath, outputPath = "thumb.jpg") => {
-    return new Promise((resolve, reject) => {
-        ffmpeg(inputPath)
-            .on("end", () => resolve(fs.readFileSync(outputPath)))
-            .on("error", reject)
-            .screenshots({
-                count: 1,
-                filename: outputPath,
-                folder: ".",
-                size: "320x240"
-            })
-    })
-}
+// import ffmpeg from "fluent-ffmpeg"
+// import fs from "fs"
+// const generateThumbnail = (inputPath, outputPath = "thumb.jpg") => {
+//     return new Promise((resolve, reject) => {
+//         ffmpeg(inputPath)
+//             .on("end", () => resolve(fs.readFileSync(outputPath)))
+//             .on("error", reject)
+//             .screenshots({
+//                 count: 1,
+//                 filename: outputPath,
+//                 folder: ".",
+//                 size: "320x240"
+//             })
+//     })
+// }
 
-generateThumbnail('./gifs/wolf2.gif')
+// generateThumbnail('./gifs/wolf2.gif')
+let obj = { dog: "yes", cat: 'no' }
+console.log(Object.entries(obj).map(([name, val]) => name + ' : ' + val).join('\n'))

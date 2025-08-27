@@ -229,18 +229,18 @@ async function startBot() {
         // Dispatch logic
         let handled = false
 
-        // Command match (exact)
-        if (handlers.commands.has(text.toLowerCase())) {
-            await handlers.commands.get(text.toLowerCase())(whatsapp)
-            handled = true
-        }
-
 
         try {
 
+            // Command match (exact)
+            if (handlers.commands.has(text.toLowerCase())) {
+                await handlers.commands.get(text.toLowerCase())(whatsapp)
+                handled = true
+            }
+
             // Regex/text match
             for (const { regex, fn } of handlers.text) {
-                if (regex.test(text)) {
+                if (regex.test(text.toLowerCase())) {
                     await fn(whatsapp)
                     handled = true
                 }
@@ -258,15 +258,7 @@ async function startBot() {
             if (handled) {
                 //console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage?.contextInfo)
                 console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage)
-                /* const user = getUser(whatsapp.senderJid)
-                 if (!user) {
-                     saveUser({ id: whatsapp.senderJid, groups: whatsapp.isGroup ? [whatsapp.groupJid] : [], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName })
-                 } else {
-                     if (whatsapp.isGroup && !user.groups.some(g => g === whatsapp.groupJid)) {
-                         user.groups.push(whatsapp.groupJid)
-                         saveUser(user)
-                     }
-                 }*/
+                /* */
                 /*console.log("------------------------------")*/
             }
         } catch (error) {
@@ -316,7 +308,11 @@ async function startBot() {
         )
     })
 
-    // Village vote (group)
+    handlers.commands.set("!profil", async (whatsapp) => {
+        await wwm.sendPlayerProfil(whatsapp)
+    })
+
+    // Stop game (group)
     handlers.text.push({
         regex: /^!stopgame$/,
         fn: async (whatsapp) => {
@@ -352,6 +348,9 @@ async function startBot() {
         fn: async (whatsapp) => {
             if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
             if (whatsapp.text.split("!bot insulte").length == 1 || whatsapp.text.split("!bot insulte")[1].trim().length == 0) return await whatsapp.reply('Moi je vois pas celui que tu veux que j\'insulte 🤷‍♂️')
+            const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
+            if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
 
             const name = whatsapp.text.split("!bot insulte")[1].trim().split(' ')[0]
             const user = whatsapp.ids.lid ? name.replace('@', '') + "@lid" : name.replace('@', '') + "@s.whatsapp.net"
@@ -504,7 +503,7 @@ async function startBot() {
             const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
             if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
 
-            if (whatsapp.game === null) return await whatsapp.reply('persone n\'est entrain de jouer à un jeu! tu es attardé?')
+            if (whatsapp.game === null) return await whatsapp.reply('persone n\'est entrain de jouer à un jeu!')
             else if (whatsapp.game === 'QUIZ') {
                 //await qm.stopGame(whatsapp.groupJid, whatsapp)
             } else if (whatsapp.game === 'WEREWOLVE')
