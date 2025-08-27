@@ -4,16 +4,16 @@ import path from "path"
 const USER_FOLDER = path.join(process.cwd(), "../users")
 export const POINTS_LIST = {
     joinGame: 1,
-    WinAsVillager: 4,
-    WinAsWolve: 6,
-    WinAsLover: 8,
-    StartSuccessfulGame: 3,
+    WinAsVillager: 2,
+    WinAsWolve: 3,
+    WinAsLover: 4,
+    StartSuccessfulGame: 2,
     deathPenatly: -1,
-    changeVotePenalty: -2,
-    hunterKillsWolf: 4,
-    witchPoisonWolf: 4,
+    changeVotePenalty: -3,
+    hunterKillsWolf: 2,
+    witchPoisonWolf: 2,
     votedWolf: 1,
-    votedInnocent: -1
+    votedInnocent: -2
 }
 
 export function saveUser(user) {
