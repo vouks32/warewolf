@@ -414,7 +414,7 @@ export class WereWolvesManager {
         // At start of resolveVotes:
         if (game.votesStopped) {
             const mayor = game.players.find(p => p.role === "MAYOR")
-            await whatsapp.sendMessage(groupId, "⚖️ Le vote a été annulé par le Maire @" + mayor.jid.split('@')[0], [mayor.jid])
+            await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "mayor.jpg"), "⚖️ Le vote a été annulé par le Maire @" + mayor.jid.split('@')[0], [mayor.jid])
             game.votesStopped = false
             // Then proceed to night
             await this.startNight(groupId, whatsapp)
