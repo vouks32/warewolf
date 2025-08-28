@@ -3,7 +3,7 @@ class RoleManager {
     static getRoleDistribution(playerCount) {
         // Define role percentages (adjust as needed)
         const distribution = {
-            WEREWOLF: Math.max(1, Math.floor(playerCount * 0.25)),
+            WEREWOLF: Math.max(1, Math.floor(playerCount * 0.2)),
             SEER: playerCount >= 6 ? 1 : 0,
             DOCTOR: playerCount >= 9 ? 1 : 0,
             HUNTER: playerCount >= 6 ? 1 : 0,
