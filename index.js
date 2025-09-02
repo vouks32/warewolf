@@ -1,4 +1,4 @@
-import { makeWASocket, useMultiFileAuthState, DisconnectReason, extractImageThumb } from "baileys"
+import { makeWASocket, useMultiFileAuthState, DisconnectReason, extractImageThumb, fetchLatestBaileysVersion, Browsers } from "baileys"
 import QRCode from 'qrcode'
 import { WereWolvesManager } from "./GamesManagers/werewolve.js"
 import { makeRetryHandler } from "./handler.js";
@@ -76,6 +76,7 @@ function extractText(msg) {
 
 async function startBot() {
     const { state, saveCreds } = await useMultiFileAuthState("../auth_info")
+    const { version } = await fetchLatestBaileysVersion();
     // Handlers storage
     const handlers = {
         commands: new Map(),   // command -> callback
@@ -97,7 +98,9 @@ async function startBot() {
     }
 
     const sock = makeWASocket({
+        version,
         auth: state,
+        browser: Browsers.macOS('Desktop'),
         markOnlineOnConnect: false,
         getMessage: handler.getHandler,
         cachedGroupMetadata: async (jid) => groupCache.get(jid)
@@ -105,6 +108,9 @@ async function startBot() {
 
     sock.ev.on("creds.update", saveCreds)
     sock.ev.on("connection.update", async (update) => {
+        console.log('---------------------       connection -----------------------------------------')
+        console.log(update)
+        console.log('---------------------       connection -----------------------------------------')
         const { connection, lastDisconnect, qr } = update
         if (connection === "close") {
             const statusCode = lastDisconnect?.error?.output?.statusCode
@@ -492,7 +498,7 @@ async function startBot() {
     })
 
     // Mayor stop vote
-    handlers.text.push({
+   handlers.text.push({
         regex: /^!p$/,
         fn: async (whatsapp) => {
             if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')

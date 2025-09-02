@@ -44,6 +44,30 @@ export class WereWolvesManager {
     }
 
     //////////////////////////////////////////               UTILITIES                     ////////////////////////////////////////////
+
+
+    async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
+        const game = this.games[whatsapp.groupJid]
+        let user = getUser(playerJid)
+        let arr = {}
+        arr[reason] = points
+        game.players.find(p => p.jid === playerJid).points.push(arr)
+
+        if (!user) {
+            saveUser({ jid: playerJid, groups: [whatsapp.groupJid], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName || ' ', games: { WEREWOLF: gamescount }, points, pointsTransactions: [arr] })
+            await this.sendPlayerProfil(whatsapp)
+        } else {
+            if (!user.groups.some(g => g === whatsapp.groupJid)) {
+                user.groups.push(whatsapp.groupJid)
+            }
+            user.points += points
+            user.games.WEREWOLF += gamescount
+            user.pointsTransactions.push(arr)
+            user = saveUser(user)
+        }
+    }
+
+
     loadGames() {
         return {}
         if (!fs.existsSync(DATA_FILE)) return {}
@@ -63,30 +87,20 @@ export class WereWolvesManager {
 
         // Lovers win
         if (alive.length === 2 && alive[0].lover === alive[1].jid) {
-            alive.forEach(p => {
-                let user = getUser(p.jid)
-                user.points += POINTS_LIST.WinAsLover
-                user.pointsTransactions.push({ "Gagné en tant qu'amoureux": POINTS_LIST.WinAsLover })
-                user = saveUser(user)
-
+            alive.forEach(async p => {
+                await this.addUserPoints(p.jid, { groupJid: game.groupId }, POINTS_LIST.WinAsLover, "Gagné en tant qu'amoureux", 0)
             });
             return { name: "LOVERS", players: [alive[0], alive[1]] }
         }
         if (wolves.length === 0) {
-            nonWolves.forEach(p => {
-                let user = getUser(p.jid)
-                user.points += POINTS_LIST.WinAsVillager + (p.isDead ? POINTS_LIST.deathPenatly : 0)
-                user.pointsTransactions.push({ "Gagné en tant que villageoi": POINTS_LIST.WinAsVillager + (p.isDead ? POINTS_LIST.deathPenatly : 0) })
-                user = saveUser(user)
+            nonWolves.forEach(async p => {
+                await this.addUserPoints(p.jid, { groupJid: game.groupId }, POINTS_LIST.WinAsVillager, "Gagné en tant que villageoi", 0)
             });
             return { name: "VILLAGERS", players: nonWolves }
         }
         if (wolves.length >= nonWolves.length) {
-            wolves.forEach(p => {
-                let user = getUser(p.jid)
-                user.points += POINTS_LIST.WinAsWolve + (p.isDead ? POINTS_LIST.deathPenatly : 0)
-                user.pointsTransactions.push({ "Gagné en tant que Loup": POINTS_LIST.WinAsWolve + (p.isDead ? POINTS_LIST.deathPenatly : 0) })
-                user = saveUser(user)
+            wolves.forEach(async p => {
+                await this.addUserPoints(p.jid, { groupJid: game.groupId }, POINTS_LIST.WinAsWolve, "Gagné en tant que Loup", 0)
             });
             return { name: "WOLVES", players: wolves }
         }
@@ -119,6 +133,7 @@ export class WereWolvesManager {
         }
 
         this.games[groupId] = {
+            groupId,
             state: "WAITING_PLAYERS",
             players: [], // { jid, isPlaying, isDead, role }
             votes: {},   // daytime votes { voterJid: targetJid }
@@ -174,7 +189,7 @@ export class WereWolvesManager {
             return
         }
 
-        game.players.push({ ids: whatsapp.ids, jid: playerJid, name, isPlaying: true, isDead: false, role: null })
+        game.players.push({ ids: whatsapp.ids, jid: playerJid, name, isPlaying: true, isDead: false, role: null, points: [] })
         this.saveGames(this.games)
 
         const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
@@ -182,19 +197,7 @@ export class WereWolvesManager {
 
         await whatsapp.reply(`✅ Tu as rejoint!\n\nListe des joueurs:\n\n${names}`, mentions)
 
-        let user = getUser(playerJid)
-        if (!user) {
-            saveUser({ jid: playerJid, groups: [groupId], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName, games: { WEREWOLVE: 1 }, points: 10, pointsTransactions: [{ "nouveau joueur": 10 }] })
-            await this.sendPlayerProfil(whatsapp)
-        } else {
-            if (!user.groups.some(g => g === groupId)) {
-                user.groups.push(groupId)
-            }
-            user.points += POINTS_LIST.joinGame
-            user.games.WEREWOLVE += 1
-            user.pointsTransactions.push({ "rejoin une partie": POINTS_LIST.joinGame })
-            user = saveUser(user)
-        }
+        await this.addUserPoints(playerJid, whatsapp, POINTS_LIST.joinGame, 'Rejoin une partie', 1)
 
     }
 
@@ -232,12 +235,8 @@ export class WereWolvesManager {
             await delay(500)
         }
 
-        let user = getUser(whatsapp.sender)
-        if (user) {
-            user.points += POINTS_LIST.StartSuccessfulGame
-            user.pointsTransactions.push({ "Lancé une partie de werewolve": POINTS_LIST.StartSuccessfulGame })
-            user = saveUser(user)
-        }
+        await this.addUserPoints(whatsapp.sender, whatsapp, POINTS_LIST.StartSuccessfulGame, 'a lancé une partie de loup', 0)
+
 
         this.startNight(groupId, whatsapp)
     }
@@ -324,13 +323,16 @@ export class WereWolvesManager {
             for (const victimId in counts) {
                 wasVictim = true;
                 if (game.prostituteProtected && game.prostituteProtected.includes(victimId)) {
-                    await whatsapp.sendMessage(groupId, `💄 La victime des loups était trop occupé à baiser pour ouvrir aux loups!\nPersonne n'est mort`)
+                    await whatsapp.sendMessage(groupId, `💄 La victime des loups était trop occupé à baiser pour ouvrir aux loups!\nPersonne n'est mort\n` + `+${POINTS_LIST.prostituteProtected} points pour la prostitué`)
+                    await this.addUserPoints(game.players.find(p => p.role === "PROSTITUTE").jid, whatsapp, POINTS_LIST.prostituteProtected, "protection sexuelle", 0)
                     // Remove from protected list for the next night
                     game.prostituteProtected = null
                 } else if (game.doctorChoice && game.doctorChoice === victimId) {
-                    await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été sauvée par la médécine moderne! 💉")
+                    await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été sauvée par la médécine moderne! 💉\n" + `+${POINTS_LIST.doctorProtected} points pour le docteur`)
+                    await this.addUserPoints(game.players.find(p => p.role === "DOCTOR").jid, whatsapp, POINTS_LIST.doctorProtected, "guérison médicinale", 0)
                 } else if (game.witchHeal) {
-                    await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été protégée par magie! 🪄")
+                    await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été protégée par magie! 🪄\n" + `+${POINTS_LIST.witchProtected} points pour la sorcière`)
+                    await this.addUserPoints(game.players.find(p => p.role === "WITCH").jid, whatsapp, POINTS_LIST.witchProtected, "protection magique", 0)
                 } else {
                     const victim = game.players.find(p => p.jid === victimId)
                     victim.isDead = true
@@ -350,12 +352,16 @@ export class WereWolvesManager {
                                 await this._hunterRant(groupId, partner, whatsapp)
                                 wasHunter = true; // Don't check win condition yet
                             }
+                            if (partner.role === "WEREWOLF") {
+                                await whatsapp.sendMessage(groupId, "💘 Le loup est mort grace à cupidon " + `+${POINTS_LIST.cupidonlinkWolf} points pour lui`)
+                                await this.addUserPoints(game.players.find(p => p.role === "CUPID").jid, whatsapp, POINTS_LIST.cupidonlinkWolf, "Cupidon lie le loup", 0)
+                            }
+
                         }
                     }
 
                 }
             }
-
 
             if (wasHunter) {
                 return;
@@ -453,15 +459,12 @@ export class WereWolvesManager {
                     const target = game.votes[voter]
                     if (victim.jid === target) {
                         const _voter = game.players.find(p => p.jid === voter)
-                        let user = getUser(_voter.jid)
-                        user.points += POINTS_LIST.votedWolf
-                        user.pointsTransactions.push({ "voté un loup": POINTS_LIST.votedWolf })
-                        user = saveUser(user)
+                        await this.addUserPoints(_voter.jid, whatsapp, POINTS_LIST.votedWolf, 'voté un loup', 0)
                         wolveVoters.push(_voter)
                     }
                 }
                 await whatsapp.sendMessage(groupId, `⚖️ Les villageois suivant ont *voté un loup à mort,* donc recoivent *+${POINTS_LIST.votedWolf} points*:\n\n` +
-                    `` + wolveVoters.map(_wv => `${_wv.name} (@${_wv.jid.split('@')[0]})`).join('\n')
+                    `` + wolveVoters.map(_wv => `*${_wv.name}* (@${_wv.jid.split('@')[0]})`).join('\n')
                     , wolveVoters.map(w => w.jid))
             } else {
                 const wolveVoters = []
@@ -469,17 +472,15 @@ export class WereWolvesManager {
                     const target = game.votes[voter]
                     if (victim.jid === target) {
                         const _voter = game.players.find(p => p.jid === voter)
-                        let user = getUser(_voter.jid)
-                        user.points += POINTS_LIST.votedInnocent
-                        user.pointsTransactions.push({ "Voté un innocent": POINTS_LIST.votedInnocent })
-                        user = saveUser(user)
+                        await this.addUserPoints(_voter.jid, whatsapp, POINTS_LIST.votedInnocent, 'Voté un innocent', 0)
                         wolveVoters.push(_voter)
                     }
                 }
                 await whatsapp.sendMessage(groupId, `⚖️ Les villageois suivant ont *voté un innocent à mort,* donc sont déduis *${POINTS_LIST.votedInnocent} points*:\n\n` +
-                    `` + wolveVoters.map(_wv => `${_wv.name} (@${_wv.jid.split('@')[0]})`).join('\n')
+                    `` + wolveVoters.map(_wv => `*${_wv.name}* (@${_wv.jid.split('@')[0]})`).join('\n')
                     , wolveVoters.map(w => w.jid))
             }
+
             if (victim.role === "HUNTER") {
                 await this._hunterRant(groupId, victim, whatsapp)
                 return; // Don't check win condition yet
@@ -493,12 +494,27 @@ export class WereWolvesManager {
                         await this._hunterRant(groupId, partner, whatsapp)
                         return; // Don't check win condition yet
                     }
+                    if (partner.role === "WEREWOLF") {
+                        await whatsapp.sendMessage(groupId, "💘 Le loup est mort grace à cupidon " + `+${POINTS_LIST.cupidonlinkWolf} points pour lui`)
+                        await this.addUserPoints(game.players.find(p => p.role === "CUPID").jid, whatsapp, POINTS_LIST.cupidonlinkWolf, "Cupidon lie le loup", 0)
+                    }
                 }
             }
 
         } else {
             await whatsapp.sendMessage(groupId, "⚖️ Personne n'a été exécuté aujourd'hui.")
         }
+
+         const nonVoters = []
+            game.players.forEach(async p => {
+                if (!Object.keys(game.votes).some(_voter => _voter === p.jid)) {
+                    nonVoters.push(p)
+                    await this.addUserPoints(p.jid, whatsapp, POINTS_LIST.didntVote, 'n\'a pas voté', 0)
+                }
+            });
+            await whatsapp.sendMessage(groupId, `⚖️ Les villageois suivant *n'ont pas voté,* donc sont déduis *${POINTS_LIST.didntVote} points*:\n\n` +
+                `` + nonVoters.map(_wv => `*${_wv.name}* (@${_wv.jid.split('@')[0]})`).join('\n')
+                , nonVoters.map(w => w.jid))
 
         this.saveGames(this.games)
 
@@ -639,10 +655,7 @@ export class WereWolvesManager {
                 await whatsapp.sendMessage(groupId, `🏹 Le Chasseur a abattu *${game.hunterTarget.name}* (@${game.hunterTarget.jid.split('@')[0]}) en mourant! il était un [${game.hunterTarget.role}]`, [game.hunterTarget.jid])
                 if (game.hunterTarget.role === "WEREWOLF") {
                     await whatsapp.sendMessage(groupId, `🏹 Le Chasseur a abattu un Loup Garou, *+${POINTS_LIST.hunterKillsWolf} points*`)
-                    let user = getUser(hunter.jid)
-                    user.points += POINTS_LIST.hunterKillsWolf
-                    user.pointsTransactions.push({ "Chasseur tue un loup": POINTS_LIST.hunterKillsWolf })
-                    user = saveUser(user)
+                    await this.addUserPoints(hunter.jid, whatsapp, POINTS_LIST.hunterKillsWolf, "Chasseur tue un loup", 0)
 
                 }
                 if (game.hunterTarget.lover) {
@@ -650,6 +663,10 @@ export class WereWolvesManager {
                     if (partner && !partner.isDead) {
                         partner.isDead = true
                         await whatsapp.sendMessage(groupId, `💔 *${partner.name}* (@${partner.jid.split('@')[0]}) est mort de chagrin suite à la perte de son amoureux.`, [partner.jid])
+                        if (partner.role === "WEREWOLF") {
+                            await whatsapp.sendMessage(groupId, "💘 Le loup est mort grace à cupidon " + `+${POINTS_LIST.cupidonlinkWolf} points pour lui`)
+                            await this.addUserPoints(game.players.find(p => p.role === "CUPID").jid, whatsapp, POINTS_LIST.cupidonlinkWolf, "Cupidon lie le loup", 0)
+                        }
                     }
                 }
             }
@@ -660,7 +677,16 @@ export class WereWolvesManager {
                 if (partner && !partner.isDead) {
                     partner.isDead = true
                     await whatsapp.sendMessage(groupId, `💔 *${partner.name}* (@${partner.jid.split('@')[0]}) est mort de chagrin suite à la perte de son amoureux.`, [partner.jid])
+                    if (partner.role === "WEREWOLF") {
+                        await whatsapp.sendMessage(groupId, "💘 Le loup est mort grace à cupidon " + `+${POINTS_LIST.cupidonlinkWolf} points pour lui`)
+                        await this.addUserPoints(game.players.find(p => p.role === "CUPID").jid, whatsapp, POINTS_LIST.cupidonlinkWolf, "Cupidon lie le loup", 0)
+                    }
+                    if (partner.role === "HUNTER") {
+                        await this._hunterRant(groupId, partner, whatsapp)
+                        return; // Don't check win condition yet
+                    }
                 }
+
             }
             this.saveGames(this.games)
 
@@ -722,11 +748,26 @@ export class WereWolvesManager {
         await whatsapp.sendMessage(witch.jid, `🧪 Tu as empoisonné *${target.name}* (@${target.jid.split('@')[0]}) !`, [targetJid])
         if (target.role === "WEREWOLF") {
             await whatsapp.sendMessage(groupId, `🧪 La Sorcière a empoisonné un Loup Garou, *+${POINTS_LIST.witchPoisonWolf} points*`)
-            let user = getUser(witch.jid)
-            user.points += POINTS_LIST.witchPoisonWolf
-            user.pointsTransactions.push({ "sorcière tue un loup": POINTS_LIST.witchPoisonWolf })
-            user = saveUser(user)
-
+            await this.addUserPoints(witch.jid, whatsapp, POINTS_LIST.witchPoisonWolf, "sorcière tue un loup", 0)
+        }
+        if (target.role === "HUNTER") {
+            await this._hunterRant(groupId, target, whatsapp)
+            return; // Don't check win condition yet
+        }
+        if (target.lover) {
+            const partner = game.players.find(p => p.jid === target.lover)
+            if (partner && !partner.isDead) {
+                partner.isDead = true
+                await whatsapp.sendMessage(groupId, `💔 *${partner.name}* (@${partner.jid.split('@')[0]}) est mort de chagrin suite à la perte de son amoureux. Il était un ${partner.role}`, [partner.jid])
+                if (partner.role === "HUNTER") {
+                    await this._hunterRant(groupId, partner, whatsapp)
+                    return; // Don't check win condition yet
+                }
+                if (partner.role === "WEREWOLF") {
+                    await whatsapp.sendMessage(groupId, "💘 Le loup est mort grace à cupidon " + `+${POINTS_LIST.cupidonlinkWolf} points pour lui`)
+                    await this.addUserPoints(game.players.find(p => p.role === "CUPID").jid, whatsapp, POINTS_LIST.cupidonlinkWolf, "Cupidon lie le loup", 0)
+                }
+            }
         }
     }
 
@@ -768,7 +809,6 @@ export class WereWolvesManager {
         }
 
         game.prostituteChoice = targetJid
-        this.saveGames(this.games)
 
         await whatsapp.sendMessage(prostituteJid, `✅ Tu as visité *${target.name}* (@${target.jid.split('@')[0]}).`, [target.jid])
 
@@ -785,6 +825,8 @@ export class WereWolvesManager {
             game.seerFakeWolves = game.seerFakeWolves || []
             game.seerFakeWolves.push(prostituteJid)
         }
+        this.saveGames(this.games)
+
     }
 
     // New method for mayor action
@@ -837,9 +879,7 @@ export class WereWolvesManager {
                 await whatsapp.reply(`Tu n'as pas assez de points`)
                 return
             }
-            user.points += POINTS_LIST.changeVotePenalty * game.playerChangeVoteCounts[voterJid]
-            user.pointsTransactions.push({ "Changé son vote": POINTS_LIST.changeVotePenalty * game.playerChangeVoteCounts[voterJid] })
-            user = saveUser(user)
+            await this.addUserPoints(voterJid, whatsapp, POINTS_LIST.changeVotePenalty, "Changé son vote", 0)
             await whatsapp.sendMessage(groupId, `⚠️ *${voter.name}* (@${voter.jid.split('@')[0]}), Changer votre vote vous coûte *2 points,* changez encore et ça sera *4 points.*`, [voter.jid])
         } else if (game.playerChangeVoteCounts[voterJid] > 2) {
             await whatsapp.sendMessage(groupId, `🚫 *${voter.name}* (@${voter.jid.split('@')[0]}), Vous ne pouvez plus changer votre vote.*`, [voter.jid])
@@ -857,12 +897,12 @@ export class WereWolvesManager {
         const game = this.games[groupId]
         if (!game) return
 
-        if (game.lastPlayerList > Date.now() - 30000) return
-        const names = game.players.map((_p, i) => `[${i + 1}] - *${_p.name}* (@${_p.jid.split('@')[0]}) ` + (!_p.isDead ? `😀` : `☠️ [${_p.role}]`)).join("\n")
+        //if (game.lastPlayerList > Date.now() - 30000) return
+        const names = game.players.map((_p, i) => `[${i + 1}] - *${_p.name}* (@${_p.jid.split('@')[0]})` + (!_p.isDead ? `😀` : `Mort ☠️ [${_p.role}]`) + `\n   `).join("\n")
         const mentions = game.players.map((p, i) => p.jid)
-        game.lastPlayerList = Date.now()
+        //game.lastPlayerList = Date.now()
         await whatsapp.sendMessage(groupId, "Joueurs :\n\n" + names, mentions)
-        this.saveGames(this.games)
+        //this.saveGames(this.games)
     }
 
     async sendPlayerProfil(whatsapp) {
