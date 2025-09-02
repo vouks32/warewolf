@@ -447,7 +447,7 @@ async function startBot() {
         }
 
         if (quizFRGroupJid) {
-            await qm.handleShortHand(quizFRGroupJid, whatsapp.sender, target, whatsapp)
+            await qmfr.handleShortHand(quizFRGroupJid, whatsapp.sender, target, whatsapp)
         }
     }
     )
