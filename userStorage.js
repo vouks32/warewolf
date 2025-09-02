@@ -5,8 +5,8 @@ const USER_FOLDER = path.join(process.cwd(), "../users")
 const killWithPowers = 2
 export const POINTS_LIST = {
     joinGame: 1,
-    WinAsVillager: 2,
-    WinAsWolve: 4,
+    WinAsVillager: 5,
+    WinAsWolve: 6,
     WinAsLover: 8,
     StartSuccessfulGame: 2,
     deathPenatly: -1,

@@ -252,7 +252,7 @@ export class QuizManager {
         if (!player) {
             await whatsapp.sendMessage(groupId, `Youpiii @${voterJid.split('@')[0]} joined the game`, [voterJid])
             game.players.push({ jid: voterJid, answers: [{ questionIndex: game.rounds, answerIndex: answerIndex, correct: game.questions[game.rounds].answers[answerIndex].correct }] })
-        } else {
+        } else if(!player.answers.some(a=> a.questionIndex === game.rounds)){
             player.answers.push({ questionIndex: game.rounds, answerIndex: answerIndex, correct: game.questions[game.rounds].answers[answerIndex].correct })
         }
 
