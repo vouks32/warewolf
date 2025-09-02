@@ -10,6 +10,10 @@ import fs from "fs"
 import NodeCache from "node-cache";
 import { QuizManagerFR } from "./GamesManagers/quiz-fr.js";
 
+const MAX_MESSAGES = 1000
+
+let messagesCount = MAX_MESSAGES
+let lastGroupJid = null
 
 const wwm = new WereWolvesManager()
 const qm = new QuizManager()
@@ -123,6 +127,10 @@ async function startBot() {
             if (shouldReconnect) startBot()
         } else if (connection === "open") {
             console.log("✅ Bot is online!")
+            messagesCount = MAX_MESSAGES
+            if (lastGroupJid)
+                await sock.sendMessage(lastGroupJid, { text: ' --- BOT de nouveau actif --- \nJe suis de nouveau opérationnel', }).then(handler.addMessage)
+            lastGroupJid = null
         }
 
         if (qr) {
@@ -140,7 +148,11 @@ async function startBot() {
     // Handle messages
     sock.ev.on("messages.upsert", async (m) => {
         const msg = m.messages[0]
-
+        const text = msg.message.conversation ||
+            msg.message.extendedTextMessage?.text ||
+            msg.message.imageMessage?.caption ||
+            msg.message.videoMessage?.caption ||
+            "";
 
         if (!msg.message || msg.key.fromMe) {
             return
@@ -151,14 +163,18 @@ async function startBot() {
         const senderJid = isGroup ? (msg.key?.participant?.endsWith('@lid') && msg.key?.number ? msg.key?.number : msg.key?.participant) : remoteJid;
         const sender = senderJid
 
-        const text = msg.message.conversation ||
-            msg.message.extendedTextMessage?.text ||
-            msg.message.imageMessage?.caption ||
-            msg.message.videoMessage?.caption ||
-            "";
+
 
         // Build reusable whatsapp object with proper JID information
-        const game = !isGroup ? null : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : null
+        const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : null
+
+        if (text.startsWith('!') && !game && messagesCount <= 0) {
+            lastGroupJid = remoteJid
+            await sock.sendMessage(lastGroupJid, { text: ' *--- Redémarrage de sécurité ---* \n\nLa relation toxique que j\'ai avec whatsapp m\'oblige à me redémarrer \n Patiente un peu', }, { quoted: msg }).then(handler.addMessage)
+            await startBot()
+            return
+        }
+        messagesCount--;
         const whatsapp = {
             ids: {
                 lid: msg.key.participant?.endsWith('@lid') ? msg.key.participant : null,
@@ -332,6 +348,8 @@ async function startBot() {
             if (whatsapp.game === null) return await whatsapp.reply('persone n\'est entrain de jouer à un jeu! tu es attardé?')
             else if (whatsapp.game === 'QUIZ')
                 await qm.stopGame(whatsapp.groupJid, whatsapp)
+            else if (whatsapp.game === 'QUIZFR')
+                await qmfr.stopGame(whatsapp.groupJid, whatsapp)
             else if (whatsapp.game === 'WEREWOLVE')
                 await wwm.stopGame(whatsapp.groupJid, whatsapp)
         }
@@ -513,7 +531,7 @@ async function startBot() {
     })
 
     // Mayor stop vote
-   handlers.text.push({
+    handlers.text.push({
         regex: /^!p$/,
         fn: async (whatsapp) => {
             if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
