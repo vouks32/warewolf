@@ -8,10 +8,12 @@ import { getUser, saveUser } from "./userStorage.js";
 import sharp from "sharp";
 import fs from "fs"
 import NodeCache from "node-cache";
+import { QuizManagerFR } from "./GamesManagers/quiz-fr.js";
 
 
 const wwm = new WereWolvesManager()
 const qm = new QuizManager()
+const qmfr = new QuizManagerFR()
 const handler = makeRetryHandler();
 
 const groupCache = new NodeCache({ stdTTL: 5 * 60, useClones: false })
@@ -283,7 +285,8 @@ async function startBot() {
             'Mon but? Jouer avec vous pour vous distraire du fait que le monde va bientôt sombrer entre les mains des intélligences artificiels tel que moi... lors :\n\n' +
             'Pour jouer à un jeu, écris:\n\n' +
             "🐺 *!werewolve* - pour jouer au loup\n" +
-            "📝 *!quiz* - pour jouer à un quiz (en Anglais)\n" +
+            "📝 *!quizen* - pour jouer à un quiz (en Anglais)\n" +
+            "📝 *!quizfr* - pour jouer à un quiz (en Français)\n" +
             "\nℹ️ *!info* - Pour tout savoir sur moi"
         )
     })
@@ -366,7 +369,14 @@ async function startBot() {
 
 
     //////////////////////////// QUIZ //////////////////////////////////////////////////
-    handlers.commands.set("!quiz", async (whatsapp) => {
+    handlers.commands.set("!quizfr", async (whatsapp) => {
+        if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
+        if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
+        await qmfr.createGame(whatsapp.groupJid, whatsapp)
+    })
+
+    //////////////////////////// QUIZ //////////////////////////////////////////////////
+    handlers.commands.set("!quizen", async (whatsapp) => {
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
         if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
         await qm.createGame(whatsapp.groupJid, whatsapp)

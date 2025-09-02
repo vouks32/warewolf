@@ -1,0 +1,13 @@
+[
+        {
+            "question": "Jeff Koons est surtout connu pour ses ... ?",
+            "answer": "Sculptures",
+            "badAnswers": [
+                "Tags",
+                "Peintures",
+                "Dessins"
+            ],
+            "category": "art_litterature",
+            "difficulty": "normal"
+        }
+    ]
