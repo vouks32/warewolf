@@ -415,6 +415,7 @@ async function startBot() {
 
         const werewolfGroupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
         const quizGroupJid = qm.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
+        const quizFRGroupJid = qmfr.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
         const target = parseInt(t) - 1
 
         console.log(" group jids of bollosses", werewolfGroupJid, quizGroupJid)
@@ -425,6 +426,10 @@ async function startBot() {
 
         if (quizGroupJid) {
             await qm.handleShortHand(quizGroupJid, whatsapp.sender, target, whatsapp)
+        }
+
+        if (quizFRGroupJid) {
+            await qm.handleShortHand(quizFRGroupJid, whatsapp.sender, target, whatsapp)
         }
     }
     )
