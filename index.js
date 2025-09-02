@@ -148,11 +148,7 @@ async function startBot() {
     // Handle messages
     sock.ev.on("messages.upsert", async (m) => {
         const msg = m.messages[0]
-        const text = msg.message.conversation ||
-            msg.message.extendedTextMessage?.text ||
-            msg.message.imageMessage?.caption ||
-            msg.message.videoMessage?.caption ||
-            "";
+
 
         if (!msg.message || msg.key.fromMe) {
             return
@@ -162,7 +158,11 @@ async function startBot() {
         const isGroup = remoteJid.endsWith('@g.us');
         const senderJid = isGroup ? (msg.key?.participant?.endsWith('@lid') && msg.key?.number ? msg.key?.number : msg.key?.participant) : remoteJid;
         const sender = senderJid
-
+        const text = msg.message.conversation ||
+            msg.message.extendedTextMessage?.text ||
+            msg.message.imageMessage?.caption ||
+            msg.message.videoMessage?.caption ||
+            "";
 
 
         // Build reusable whatsapp object with proper JID information
@@ -436,7 +436,7 @@ async function startBot() {
         const quizFRGroupJid = qmfr.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
         const target = parseInt(t) - 1
 
-        console.log(" group jids of bollosses", werewolfGroupJid, quizGroupJid)
+        console.log(" group jids of bollosses", werewolfGroupJid, quizGroupJid, quizFRGroupJid)
         if (werewolfGroupJid) {
             const targetJid = wwm.getPlayerJidFromNumber(werewolfGroupJid, target)
             await wwm.handleShortHand(werewolfGroupJid, whatsapp.sender, targetJid, whatsapp)
