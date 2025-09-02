@@ -507,7 +507,7 @@ export class WereWolvesManager {
 
          const nonVoters = []
             game.players.forEach(async p => {
-                if (!Object.keys(game.votes).some(_voter => _voter === p.jid && !p.isDead)) {
+                if (!Object.keys(game.votes).some(_voter => _voter === p.jid) && !p.isDead) {
                     nonVoters.push(p)
                     await this.addUserPoints(p.jid, whatsapp, POINTS_LIST.didntVote, 'n\'a pas voté', 0)
                 }
