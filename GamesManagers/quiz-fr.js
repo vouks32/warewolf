@@ -22,7 +22,8 @@ function delay(ms) {
 }
 
 function loadGames() {
-    if (!fs.existsSync(DATA_FILE)) return {}
+    return {}
+    if (!fs.existsSync(DATA_FILE)) 
     return JSON.parse(fs.readFileSync(DATA_FILE))
 }
 
