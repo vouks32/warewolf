@@ -168,7 +168,7 @@ async function startBot() {
         // Build reusable whatsapp object with proper JID information
         const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : null
 
-        if(isGroup){
+        if (isGroup) {
             lastGroupJid = remoteJid
         }
         if (text.startsWith('!') && !game && messagesCount <= 0 && isGroup) {
@@ -317,6 +317,20 @@ async function startBot() {
         if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
 
         const t = 'Tag Générale :\n\n' + participants.map(p => `- @${p.id.split('@')[0]}`).join('\n')
+        const mentions = participants.map(p => p.id)
+        await whatsapp.reply(t, mentions)
+    })
+
+    handlers.commands.set("!tagtext", async (whatsapp) => {
+        if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+        const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+        console.log(participants)
+        const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
+        if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+
+
+        const text = whatsapp.text.split(" ")[1]
+        const t = '*📢 Annonce*\n\n' + text
         const mentions = participants.map(p => p.id)
         await whatsapp.reply(t, mentions)
     })
