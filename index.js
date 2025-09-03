@@ -107,7 +107,7 @@ async function startBot() {
         version,
         auth: state,
         browser: Browsers.macOS('Desktop'),
-        markOnlineOnConnect: false,
+        markOnlineOnConnect: true,
         getMessage: handler.getHandler,
         cachedGroupMetadata: async (jid) => groupCache.get(jid)
     })
@@ -168,8 +168,10 @@ async function startBot() {
         // Build reusable whatsapp object with proper JID information
         const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : null
 
-        if (text.startsWith('!') && !game && messagesCount <= 0) {
+        if(isGroup){
             lastGroupJid = remoteJid
+        }
+        if (text.startsWith('!') && !game && messagesCount <= 0 && isGroup) {
             await sock.sendMessage(lastGroupJid, { text: ' *--- Redémarrage de sécurité ---* \n\nLa relation toxique que j\'ai avec whatsapp m\'oblige à me redémarrer \n Patiente un peu', }, { quoted: msg }).then(handler.addMessage)
             await startBot()
             return
