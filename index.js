@@ -321,18 +321,24 @@ async function startBot() {
         await whatsapp.reply(t, mentions)
     })
 
-    handlers.commands.set("!tagtext", async (whatsapp) => {
-        if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
-        const participants = await whatsapp.getParticipants(whatsapp.groupJid)
-        console.log(participants)
-        const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
-        if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
 
 
-        const text = whatsapp.text.slice(8)
-        const t = '*📢 Annonce*\n\n' + text
-        const mentions = participants.map(p => p.id)
-        await whatsapp.reply(t, mentions)
+    // Stop game (group)
+    handlers.text.push({
+        regex: /^!tagtext/,
+        fn: async (whatsapp) => {
+            if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+            const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+            console.log(participants)
+            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
+            if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+
+
+            const text = whatsapp.text.slice(8)
+            const t = '*📢 Annonce*\n\n' + text
+            const mentions = participants.map(p => p.id)
+            await whatsapp.reply(t, mentions)
+        }
     })
 
     handlers.commands.set("!image", async (whatsapp) => {
