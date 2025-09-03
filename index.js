@@ -329,7 +329,7 @@ async function startBot() {
         if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
 
 
-        const text = whatsapp.text.split(" ")[1]
+        const text = whatsapp.text.slice(8)
         const t = '*📢 Annonce*\n\n' + text
         const mentions = participants.map(p => p.id)
         await whatsapp.reply(t, mentions)
