@@ -190,7 +190,7 @@ async function startBot() {
             sender,
             text,
             game,
-            messageType: getContentType(msg),
+            messageType: getContentType(msg.message),
             raw: msg,
 
             reply: async (message, mentions = undefined) => {
