@@ -15,11 +15,11 @@ export const POINTS_LIST = {
     witchPoisonWolf: killWithPowers,
     votedWolf: killWithPowers,
     votedInnocent: -2,
-    didntVote : -5,
-    prostituteProtected : killWithPowers,
-    doctorProtected : killWithPowers,
-    witchProtected : killWithPowers,
-    cupidonlinkWolf : killWithPowers,
+    didntVote: -5,
+    prostituteProtected: killWithPowers,
+    doctorProtected: killWithPowers,
+    witchProtected: killWithPowers,
+    cupidonlinkWolf: killWithPowers,
 }
 
 export function saveUser(user) {
@@ -42,4 +42,15 @@ export function getUser(jid) {
     } catch (error) {
         return null
     }
+}
+
+export function getAllUsers() {
+    if (!fs.existsSync(USER_FOLDER)) fs.mkdirSync(USER_FOLDER, { recursive: true })
+
+    const playerFileList = fs.readdirSync(USER_FOLDER)
+    let players = {}
+    playerFileList.forEach(pfile => {
+        players[pfile.replace('.json', '')] = JSON.parse(fs.readFileSync(path.join(USER_FOLDER, pfile)))
+    })
+    return players
 }

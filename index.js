@@ -4,7 +4,7 @@ import { WereWolvesManager } from "./GamesManagers/werewolve.js"
 import { makeRetryHandler } from "./handler.js";
 import { QuizManager } from "./GamesManagers/quiz.js";
 import { Insult1 } from "./apis/insult.js";
-import { getUser, saveUser } from "./userStorage.js";
+import { getAllUsers, getUser, saveUser } from "./userStorage.js";
 import sharp from "sharp";
 import fs from "fs"
 import NodeCache from "node-cache";
@@ -19,6 +19,7 @@ const wwm = new WereWolvesManager()
 const qm = new QuizManager()
 const qmfr = new QuizManagerFR()
 const handler = makeRetryHandler();
+let Interval = null;
 
 const groupCache = new NodeCache({ stdTTL: 5 * 60, useClones: false })
 
@@ -302,6 +303,55 @@ async function startBot() {
 
     })
 
+    const repeatFunction = async () => {
+        const allPlayers = getAllUsers()
+        let groups = {}
+        for (const playerJid in allPlayers) {
+            const player = allPlayers[playerJid];
+            player.groups.forEach(groupJid => {
+                groups[groupJid] = groups[groupJid] ? groups[groupJid].concat(player) : [player]
+            });
+        }
+        for (const groupJid in groups) {
+            const group = groups[groupJid];
+            const metadata = await sock.groupMetadata(groupJid);
+            const participant = metadata.participants
+            group.sort((p1, p2) => p2.points - p1.points)
+
+            await sock.sendMessage(groupJid, {
+                text: `Liste des Joueurs:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n')
+                , mentions: group.map((p) => p.jid)
+            }).then(handler.addMessage)
+
+
+            for (let index = 0; index < group.length; index++) {
+                const p = group[index];
+                const groupParticipant = participant.find(gp => gp.id === p.jid)
+                if (index < 3) {
+                    if (!groupParticipant.admin) {
+                        await sock.groupParticipantsUpdate(
+                            groupJid,
+                            [p.jid],
+                            'promote' // replace this parameter with 'remove' or 'demote' or 'promote'
+                        )
+                        await sock.sendMessage(groupJid, { text: `@${p.jid.split('@')[0]} a été *ajouté* de la haute sphère des Admins` }).then(handler.addMessage)
+                    }
+                } else {
+                    if (groupParticipant.admin === "admin" && !p.jid.includes('650687834')) {
+                        await sock.groupParticipantsUpdate(
+                            groupJid,
+                            [p.jid],
+                            'demote' // replace this parameter with 'remove' or 'demote' or 'promote'
+                        )
+                        await sock.sendMessage(groupJid, { text: `@${p.jid.split('@')[0]} a été *retiré* de la haute sphère des Admins` }).then(handler.addMessage)
+                    }
+                }
+            }
+        }
+
+    }
+    repeatFunction()
+    Interval = setInterval(() => repeatFunction(), 1000 * 60 * 60)
 
 
 
