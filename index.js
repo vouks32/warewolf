@@ -458,7 +458,7 @@ async function startBot() {
         const quizGroupJid = qm.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
         const quizFRGroupJid = qmfr.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
 
-
+        console.log('type', whatsapp.messageType)
         if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image'))) {
             await wwm.addUserPoints(whatsapp.sender, whatsapp, -10, "send image during game", 0)
             await whatsapp.reply('Vous avez reçu *-10 points*')
