@@ -80,6 +80,10 @@ function extractText(msg) {
     return "";
 }
 
+const botTips = [
+    ""
+]
+
 async function startBot() {
     const { state, saveCreds } = await useMultiFileAuthState("../auth_info")
     const { version } = await fetchLatestBaileysVersion();
@@ -285,7 +289,7 @@ async function startBot() {
 
             if (handled) {
                 //console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage?.contextInfo)
-                console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage)
+                console.log(whatsapp.senderJid, ":", text)
                 /* */
                 /*console.log("------------------------------")*/
             }
@@ -458,7 +462,7 @@ async function startBot() {
         const quizGroupJid = qm.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
         const quizFRGroupJid = qmfr.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
 
-        console.log('type', whatsapp.messageType)
+        //console.log('type', whatsapp.messageType)
         if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image'))) {
             await wwm.addUserPoints(whatsapp.sender, whatsapp, -10, "send image during game", 0)
             await whatsapp.reply('Vous avez reçu *-10 points*')

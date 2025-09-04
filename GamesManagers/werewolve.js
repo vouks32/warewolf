@@ -198,7 +198,7 @@ export class WereWolvesManager {
 
         await whatsapp.reply(`✅ Tu as rejoint!\n\nListe des joueurs:\n\n${names}`, mentions)
 
-        await this.addUserPoints(playerJid, whatsapp, POINTS_LIST.joinGame, 'Rejoin une partie', 1)
+        await this.addUserPoints(playerJid, whatsapp, 1, 'Rejoin une partie', 1)
 
     }
 
