@@ -1,4 +1,4 @@
-import { makeWASocket, useMultiFileAuthState, DisconnectReason, extractImageThumb, fetchLatestBaileysVersion, Browsers } from "baileys"
+import { makeWASocket, useMultiFileAuthState, DisconnectReason, extractImageThumb, fetchLatestBaileysVersion, Browsers, generateWAMessageContent, getContentType } from "baileys"
 import QRCode from 'qrcode'
 import { WereWolvesManager } from "./GamesManagers/werewolve.js"
 import { makeRetryHandler } from "./handler.js";
@@ -190,10 +190,14 @@ async function startBot() {
             sender,
             text,
             game,
+            messageType: getContentType(msg),
             raw: msg,
 
             reply: async (message, mentions = undefined) => {
                 await sock.sendMessage(remoteJid, { text: htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : ""), mentions: mentions }, { quoted: msg }).then(handler.addMessage)
+            },
+            delete: async () => {
+                await sock.sendMessage(remoteJid, { delete: msg.key })
             },
 
             sendMessage: async (jid, message, mentions = undefined) => {
@@ -450,15 +454,24 @@ async function startBot() {
 
     // SHORT HAND NUMBER WHEN IN GAME
     handlers.any.push(async (whatsapp) => {
-        const t = whatsapp.text;
-        if (t.length > 2 || !Number.isInteger(parseInt(t))) return
-
         const werewolfGroupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
         const quizGroupJid = qm.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
         const quizFRGroupJid = qmfr.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
+
+
+        if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image'))) {
+            await wwm.addUserPoints(whatsapp.sender, whatsapp, -10, "send image during game", 0)
+            await whatsapp.reply('Vous avez reçu *-10 points*')
+            await whatsapp.delete()
+            return
+        }
+
+        const t = whatsapp.text;
+        if (t.length > 2 || !Number.isInteger(parseInt(t))) return
+
         const target = parseInt(t) - 1
 
-        console.log(" group jids of bollosses", werewolfGroupJid, quizGroupJid, quizFRGroupJid)
+        //console.log(" group jids of bollosses", werewolfGroupJid, quizGroupJid, quizFRGroupJid)
         if (werewolfGroupJid) {
             const targetJid = wwm.getPlayerJidFromNumber(werewolfGroupJid, target)
             await wwm.handleShortHand(werewolfGroupJid, whatsapp.sender, targetJid, whatsapp)
