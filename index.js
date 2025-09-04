@@ -350,7 +350,7 @@ async function startBot() {
         }
 
     }
-    repeatFunction()
+    setTimeout(() => repeatFunction(), 5000)
     Interval = setInterval(() => repeatFunction(), 1000 * 60 * 60)
 
 
