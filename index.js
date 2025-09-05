@@ -328,22 +328,26 @@ async function startBot() {
                 const p = group[index];
                 const groupParticipant = participant.find(gp => gp.id === p.jid)
                 if (index < 3) {
-                    if (!groupParticipant.admin) {
+                    if (!groupParticipant?.admin) {
                         await sock.groupParticipantsUpdate(
                             groupJid,
                             [p.jid],
                             'promote' // replace this parameter with 'remove' or 'demote' or 'promote'
                         )
-                        await sock.sendMessage(groupJid, { text: `@${p.jid.split('@')[0]} a été *ajouté* de la haute sphère des Admins` }).then(handler.addMessage)
+                        await sock.sendMessage(groupJid, { text: `@${p.jid.split('@')[0]} a été *ajouté* à la haute sphère des Admins`, mentions: [p.jid] }).then(handler.addMessage)
+                    } else if (!groupParticipant) {
+                        console.log(p.jid, p.pushName, "is no more in group but top 3")
                     }
                 } else {
-                    if (groupParticipant.admin === "admin" && !p.jid.includes('650687834')) {
+                    if (groupParticipant?.admin === "admin" && !p.jid.includes('650687834')) {
                         await sock.groupParticipantsUpdate(
                             groupJid,
                             [p.jid],
                             'demote' // replace this parameter with 'remove' or 'demote' or 'promote'
                         )
-                        await sock.sendMessage(groupJid, { text: `@${p.jid.split('@')[0]} a été *retiré* de la haute sphère des Admins` }).then(handler.addMessage)
+                        await sock.sendMessage(groupJid, { text: `@${p.jid.split('@')[0]} a été *retiré* à la haute sphère des Admins`, mentions: [p.jid] }).then(handler.addMessage)
+                    } else if (!groupParticipant) {
+                        console.log(p.jid, p.pushName, "is no more in group")
                     }
                 }
             }
