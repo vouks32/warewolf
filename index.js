@@ -354,8 +354,13 @@ async function startBot() {
         }
 
     }
-    setTimeout(() => repeatFunction(), 5000)
-    Interval = setInterval(() => repeatFunction(), 1000 * 60 * 60)
+
+
+        let timetilNext3hr = (60 * 60 * 3) - (Math.floor((new Date()).valueOf() / 1000) % (60 * 60 * 3))
+    setTimeout(() => {
+        //repeatFunction()
+        Interval = setInterval(() => repeatFunction(), 60 * 60 * 3)
+    }, timetilNext3hr)
 
 
 
