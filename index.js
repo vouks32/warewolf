@@ -163,6 +163,8 @@ async function startBot() {
         const isGroup = remoteJid.endsWith('@g.us');
         const senderJid = isGroup ? (msg.key?.participant?.endsWith('@lid') && msg.key?.number ? msg.key?.number : msg.key?.participant) : remoteJid;
         const sender = senderJid
+         const messageType = Object.keys(msg.message)[0]
+        const content = msg.message[messageType]
         const text = msg.message.conversation ||
             msg.message.extendedTextMessage?.text ||
             msg.message.imageMessage?.caption ||
@@ -196,6 +198,8 @@ async function startBot() {
             text,
             game,
             messageType: getContentType(msg.message),
+            isViewOnce : msg.message.viewOnceMessage || msg.message.viewOnceMessageV2 || msg.message.viewOnceMessageV2Extension,
+            isForward : (content?.contextInfo?.isForwarded || content?.contextInfo?.forwardingScore > 0),
             raw: msg,
 
             reply: async (message, mentions = undefined) => {
@@ -522,7 +526,7 @@ async function startBot() {
         const quizFRGroupJid = qmfr.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
 
         //console.log('type', whatsapp.messageType)
-        if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image'))) {
+        if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
             await wwm.addUserPoints(whatsapp.sender, whatsapp, -10, "send image during game", 0)
             await whatsapp.reply('Vous avez reçu *-10 points*')
             await whatsapp.delete()

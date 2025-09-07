@@ -17,4 +17,4 @@
 
 // generateThumbnail('./gifs/wolf2.gif')
 let obj = { dog: "yes", cat: 'no' }
-console.log(['yo', 'ya', 'yu'][Math.floor(Math.random() * 3)])
+console.log(((60 * 60 * 3) - (Math.floor((new Date()).valueOf() / 1000) % (60 * 60 * 3)))/60)

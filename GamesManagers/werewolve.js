@@ -331,9 +331,11 @@ export class WereWolvesManager {
                 } else if (game.doctorChoice && game.doctorChoice === victimId) {
                     await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été sauvée par la médécine moderne! 💉\n" + `+${POINTS_LIST.doctorProtected} points pour le docteur`)
                     await this.addUserPoints(game.players.find(p => p.role === "DOCTOR").jid, whatsapp, POINTS_LIST.doctorProtected, "guérison médicinale", 0)
+                    game.doctorChoice = false
                 } else if (game.witchHeal) {
                     await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été protégée par magie! 🪄\n" + `+${POINTS_LIST.witchProtected} points pour la sorcière`)
                     await this.addUserPoints(game.players.find(p => p.role === "WITCH").jid, whatsapp, POINTS_LIST.witchProtected, "protection magique", 0)
+                    game.witchHeal = false
                 } else {
                     const victim = game.players.find(p => p.jid === victimId)
                     victim.isDead = true
