@@ -15,9 +15,6 @@ const MAX_MESSAGES = 1000
 let messagesCount = MAX_MESSAGES
 let lastGroupJid = null
 
-const wwm = new WereWolvesManager()
-const qm = new QuizManager()
-const qmfr = new QuizManagerFR()
 const handler = makeRetryHandler();
 let Interval = null;
 
@@ -117,6 +114,11 @@ async function startBot() {
         cachedGroupMetadata: async (jid) => groupCache.get(jid)
     })
 
+    const wwm = new WereWolvesManager(sock)
+    const qm = new QuizManager()
+    const qmfr = new QuizManagerFR()
+
+    // Whatsapp Events
     sock.ev.on("creds.update", saveCreds)
     sock.ev.on("connection.update", async (update) => {
         console.log('---------------------       connection -----------------------------------------')
@@ -136,6 +138,26 @@ async function startBot() {
             if (lastGroupJid)
                 await sock.sendMessage(lastGroupJid, { text: ' --- BOT de nouveau actif --- \nJe suis de nouveau opérationnel', }).then(handler.addMessage)
             lastGroupJid = null
+
+            // init games
+            setTimeout(async () => {
+                await wwm.init({
+                    sender: null,
+                    sendMessage: async (jid, message, mentions = undefined) => {
+                        await sock.sendMessage(jid, { text: htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : ""), mentions: mentions }).then(handler.addMessage)
+                    },
+                    sendImage: async (jid, buffer, caption = "", mentions = []) => {
+                        if (buffer.includes('http')) {
+                            await sock.sendMessage(jid, { image: { url: buffer }, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
+                            return
+                        }
+                        const imagename = buffer.split('/').pop()
+                        let optimizedImage = (await optimizeGifSharp(buffer, './images/send/opt-' + imagename))
+                        const t = await extractImageThumb(optimizedImage)
+                        await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail: t.buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
+                    }
+                })
+            }, 2000)
         }
 
         if (qr) {
@@ -163,7 +185,7 @@ async function startBot() {
         const isGroup = remoteJid.endsWith('@g.us');
         const senderJid = isGroup ? (msg.key?.participant?.endsWith('@lid') && msg.key?.number ? msg.key?.number : msg.key?.participant) : remoteJid;
         const sender = senderJid
-         const messageType = Object.keys(msg.message)[0]
+        const messageType = Object.keys(msg.message)[0]
         const content = msg.message[messageType]
         const text = msg.message.conversation ||
             msg.message.extendedTextMessage?.text ||
@@ -198,8 +220,8 @@ async function startBot() {
             text,
             game,
             messageType: getContentType(msg.message),
-            isViewOnce : msg.message.viewOnceMessage || msg.message.viewOnceMessageV2 || msg.message.viewOnceMessageV2Extension,
-            isForward : (content?.contextInfo?.isForwarded || content?.contextInfo?.forwardingScore > 0),
+            isViewOnce: msg.message.viewOnceMessage || msg.message.viewOnceMessageV2 || msg.message.viewOnceMessageV2Extension,
+            isForward: (content?.contextInfo?.isForwarded || content?.contextInfo?.forwardingScore > 0),
             raw: msg,
 
             reply: async (message, mentions = undefined) => {
@@ -526,7 +548,7 @@ async function startBot() {
         const quizFRGroupJid = qmfr.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
 
         //console.log('type', whatsapp.messageType)
-        if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
+        if (werewolfGroupJid && whatsapp.isGroup && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
             await wwm.addUserPoints(whatsapp.sender, whatsapp, -10, "send image during game", 0)
             await whatsapp.reply('Vous avez reçu *-10 points*')
             await whatsapp.delete()
@@ -534,7 +556,10 @@ async function startBot() {
         }
 
         const t = whatsapp.text;
-        if (t.length > 2 || !Number.isInteger(parseInt(t))) return
+        if ((t.length > 2 || !Number.isInteger(parseInt(t))) && whatsapp.isGroup){
+            await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
+            return
+        }
 
         const target = parseInt(t) - 1
 
@@ -576,9 +601,9 @@ async function startBot() {
         }
     })
 
-    // Wolves kill (private DM only)
+    // Wolves eat (private DM only)
     handlers.text.push({
-        regex: /^!kill\s+(\S+)/,
+        regex: /^!eat\s+(\S+)/,
         fn: async (whatsapp) => {
             if (whatsapp.isGroup) return await whatsapp.reply("Cette action en peut être éffectué que dans l'intimité de notre conversation")
             const groupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
@@ -731,6 +756,39 @@ async function startBot() {
             const targetJid2 = wwm.getPlayerJidFromNumber(groupJid, target2)
             console.log("cupid pair : ----- ", groupJid, target1, target2, targetJid1, targetJid2, whatsapp)
             await wwm.cupidPair(groupJid, targetJid1, targetJid2, whatsapp)
+        }
+    })
+
+    // Serial Killer
+    handlers.text.push({
+        regex: /^!kill\s+(\S+)/,
+        fn: async (whatsapp) => {
+            if (whatsapp.isGroup) return await whatsapp.reply("Cette action ne peut être effectuée qu'en privé")
+            const groupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
+            if (!groupJid) return await whatsapp.reply("Tu n'es dans aucune partie")
+            const target = parseInt(whatsapp.text.split(" ")[1]) - 1
+            const targetJid = wwm.getPlayerJidFromNumber(groupJid, target)
+            await wwm.serialKill(groupJid, whatsapp.sender, targetJid, whatsapp)
+        }
+    })
+
+    // Pyromaniac
+    handlers.text.push({
+        regex: /^!(oil|ignite)\s*(\S*)/,
+        fn: async (whatsapp) => {
+            if (whatsapp.isGroup) return await whatsapp.reply("Cette action ne peut être effectuée qu'en privé")
+            const groupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
+            if (!groupJid) return await whatsapp.reply("Tu n'es dans aucune partie")
+
+            const action = whatsapp.text.split(" ")[0].substring(1) // oil ou ignite
+            let targetJid = null
+
+            if (action === 'oil') {
+                const target = parseInt(whatsapp.text.split(" ")[1]) - 1
+                targetJid = wwm.getPlayerJidFromNumber(groupJid, target)
+            }
+
+            await wwm.pyromaniacAction(groupJid, whatsapp.sender, action, targetJid, whatsapp)
         }
     })
 

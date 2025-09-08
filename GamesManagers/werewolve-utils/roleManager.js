@@ -7,17 +7,30 @@ class RoleManager {
             SEER: playerCount >= 6 ? 1 : 0,
             DOCTOR: playerCount >= 9 ? 1 : 0,
             HUNTER: playerCount >= 6 ? 1 : 0,
-            WITCH: playerCount >= 10 ? 1 : 0,
-            CUPID: playerCount >= 5 ? 1 : 0,
+            WITCH: playerCount >= 13 ? 1 : 0,
+            CUPID: playerCount >= 7 ? 1 : 0,
             PROSTITUTE: playerCount >= 7 ? 1 : 0,
-            MAYOR: playerCount >= 4 ? 1 : 0
+            MAYOR: playerCount >= 4 ? 1 : 0,
+            TANNER: playerCount >= 9 ? 1 : 0,
+            MADMAN: playerCount >= 14 ? 2 : playerCount >= 5 ? 1: 0,
+            SERIALKILLER: playerCount > 12 ? 1 : 0,
+            PYROMANIAC: playerCount >= 11 ? 1 : 0
         };
 
         // Calculate total special roles
+        const specialRolesNAMES = Object.keys(distribution)
         const specialRolesCount = Object.values(distribution).reduce((sum, count) => sum + count, 0);
 
         // Fill remaining slots with villagers
         distribution.VILLAGER = Math.max(0, playerCount - specialRolesCount);
+
+        if (playerCount > 6) {
+            const randomRole = specialRolesNAMES[Math.floor(Math.random() * specialRolesNAMES.length)]
+            if (randomRole !== "WEREWOLF") {
+                distribution[randomRole] -= 1
+                distribution.MADMAN += 1
+            }
+        }
 
         return distribution;
     }
@@ -38,11 +51,11 @@ class RoleManager {
             const j = Math.floor(Math.random() * (i + 1));
             [roles[i], roles[j]] = [roles[j], roles[i]];
         }
- // Shuffle roles
+        // Shuffle roles
         for (let i = 0; i < roles.length - 1; i++) {
             const j = Math.floor(Math.random() * roles.length);
-            if(j !== i)
-            [roles[i], roles[j]] = [roles[j], roles[i]];
+            if (j !== i)
+                [roles[i], roles[j]] = [roles[j], roles[i]];
         }
 
         return roles;

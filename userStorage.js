@@ -2,24 +2,25 @@ import fs from "fs"
 import path from "path"
 
 const USER_FOLDER = path.join(process.cwd(), "../users")
-const killWithPowers = 2
+const killWithPowers = 3
 export const POINTS_LIST = {
     joinGame: 10,
-    WinAsVillager: 5,
-    WinAsWolve: 7,
-    WinAsLover: 10,
+    WinAsVillager: 8,
+    WinAsWolve: 12, 
+    WinAsLover: 18,
     StartSuccessfulGame: 2,
     deathPenatly: -1,
     changeVotePenalty: -1,
     hunterKillsWolf: killWithPowers,
     witchPoisonWolf: killWithPowers,
     votedWolf: killWithPowers,
-    votedInnocent: -1,
-    didntVote: -5,
+    votedInnocent: -2,
+    didntVote: -10,
     prostituteProtected: killWithPowers,
     doctorProtected: killWithPowers,
     witchProtected: killWithPowers,
     cupidonlinkWolf: killWithPowers,
+    votedAsTanner : 8,
 }
 
 export function saveUser(user) {
