@@ -222,6 +222,7 @@ async function startBot() {
             messageType: getContentType(msg.message),
             isViewOnce: msg.message.viewOnceMessage || msg.message.viewOnceMessageV2 || msg.message.viewOnceMessageV2Extension,
             isForward: (content?.contextInfo?.isForwarded || content?.contextInfo?.forwardingScore > 0),
+            isReaction: (msg.message.reactionMessage),
             raw: msg,
 
             reply: async (message, mentions = undefined) => {
@@ -556,7 +557,7 @@ async function startBot() {
         }
 
         const t = whatsapp.text;
-        if ((t.length > 2 || !Number.isInteger(parseInt(t))) && whatsapp.isGroup){
+        if ((t.length > 2 || !Number.isInteger(parseInt(t))) && whatsapp.isGroup && !whatsapp.isReaction){
             await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
             return
         }
