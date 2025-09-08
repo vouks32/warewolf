@@ -54,6 +54,9 @@ export class WereWolvesManager {
                     } catch (e) {
                     }
                 }
+            else
+                timers[groupId] = [null, null, null, null, null, null, null]
+            
             const game = this.games[groupId]
             await whatsapp.sendMessage(groupId, "*--- Partie en cours ---*\n\nUne partie était en cours avant que le bot ne redémarre. Reprise de la partie")
             switch (game.state) {
@@ -284,7 +287,7 @@ export class WereWolvesManager {
         }
 
         for (let i = 0; i < game.players.length; i++) {
-            const p = array[i];
+            const p = game.players[i];
             p.role = roles[i]
 
             // Assigner un faux rôle au MadMan
@@ -590,16 +593,16 @@ export class WereWolvesManager {
         game.playerChangeVoteCounts = {}
         this.saveGames(this.games)
 
-        const dayDuration = Math.max(3 * 60 * 1000, game.players.filter(p => !p.isDead).length * 60 * 1000)
+        const dayDuration = Math.min(10 * 60 * 1000, Math.max(3 * 60 * 1000, game.players.filter(p => !p.isDead).length * 60 * 1000))
 
-        await whatsapp.sendMessage(groupId, "🌞 Jour: Discutez et votez avec *!vote  _numéro victime_*\nVous avez 10 minutes")
+        await whatsapp.sendMessage(groupId, "🌞 Jour: Discutez et votez avec *!vote  _numéro victime_*\nVous avez " + (dayDuration / (60 * 1000)) + " minutes")
         const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
         const mentions = game.players.map((p, i) => p.jid)
         await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
 
         timers[groupId][0] = setTimeout(async () => {
             this.resolveVotes(groupId, whatsapp)
-        }, 10 * 60 * 1000)
+        }, dayDuration)
         timers[groupId][1] = setTimeout(async () => {
             await this.sendTips(groupId, whatsapp)
             await whatsapp.sendMessage(groupId, "*⏱️ 5 Minutes restante avant le coucher du soleil!*")
