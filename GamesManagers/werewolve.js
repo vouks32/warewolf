@@ -595,6 +595,7 @@ export class WereWolvesManager {
 
         const dayDuration = Math.min(10 * 60 * 1000, Math.max(3 * 60 * 1000, game.players.filter(p => !p.isDead).length * 60 * 1000))
 
+        let seconds = 0
         await whatsapp.sendMessage(groupId, "🌞 Jour: Discutez et votez avec *!vote  _numéro victime_*\nVous avez " + (dayDuration / (60 * 1000)) + " minutes")
         const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
         const mentions = game.players.map((p, i) => p.jid)
@@ -603,26 +604,34 @@ export class WereWolvesManager {
         timers[groupId][0] = setTimeout(async () => {
             this.resolveVotes(groupId, whatsapp)
         }, dayDuration)
+
+        seconds = ((dayDuration) / (2 * 1000))
         timers[groupId][1] = setTimeout(async () => {
             await this.sendTips(groupId, whatsapp)
-            await whatsapp.sendMessage(groupId, "*⏱️ " + (dayDuration / (2 * 60 * 1000)).toPrecision(2) + " Minutes restante avant le coucher du soleil!*")
+            await whatsapp.sendMessage(groupId, "*⏱️ " + (seconds < 120 ? seconds + " secondes" : (seconds / 60).toPrecision(2) + " minutes") + " restante avant le coucher du soleil!*")
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
         }, dayDuration / 2)
+
+        seconds = ((dayDuration) / (5 * 1000))
         timers[groupId][2] = setTimeout(async () => {
-            await whatsapp.sendMessage(groupId, "*⏱️ " + ((dayDuration) / (5 * 60 * 1000)).toPrecision(2) + " minutes restantes avant le coucher du soleil!*")
+            await whatsapp.sendMessage(groupId, "*⏱️ " + (seconds < 120 ? seconds + " secondes" : (seconds / 60).toPrecision(2) + " minutes") + "  restantes avant le coucher du soleil!*")
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
         }, (4 * dayDuration) / (5))
+
+        seconds = ((dayDuration) / (10 * 1000))
         timers[groupId][3] = setTimeout(async () => {
             await this.sendTips(groupId, whatsapp)
             await whatsapp.sendMessage(groupId, "*📩 Il est plus que temps de voter!*")
-            await whatsapp.sendMessage(groupId, "*⏱️ " + ((dayDuration) / (10 * 60 * 1000)).toPrecision(2) + " minutes restantes avant le coucher du soleil!*")
+            await whatsapp.sendMessage(groupId, "*⏱️ " + (seconds < 120 ? seconds + " secondes" : (seconds / 60).toPrecision(2) + " minutes") + " restantes avant le coucher du soleil!*")
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
         }, (9 * dayDuration) / (10))
-        timers[groupId][4] = setTimeout(async () => {
-            await whatsapp.sendMessage(groupId, "*📩 Il est plus que temps de voter!*")
-            await whatsapp.sendMessage(groupId, "*⏱️ 30 secondes restantes avant le coucher du soleil!*")
-            await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
-        }, dayDuration - (1000 * 30))
+
+        if (seconds >= 60)
+            timers[groupId][4] = setTimeout(async () => {
+                await whatsapp.sendMessage(groupId, "*📩 Il est plus que temps de voter!*")
+                await whatsapp.sendMessage(groupId, "*⏱️ 30 secondes restantes avant le coucher du soleil!*")
+                await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
+            }, dayDuration - (1000 * 30))
     }
 
     async resolveVotes(groupId, whatsapp) {
