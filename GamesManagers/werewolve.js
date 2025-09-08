@@ -605,19 +605,19 @@ export class WereWolvesManager {
         }, dayDuration)
         timers[groupId][1] = setTimeout(async () => {
             await this.sendTips(groupId, whatsapp)
-            await whatsapp.sendMessage(groupId, "*⏱️ " + (dayDuration / (2 * 60 * 1000)).toFixed(1) + " Minutes restante avant le coucher du soleil!*")
+            await whatsapp.sendMessage(groupId, "*⏱️ " + (dayDuration / (2 * 60 * 1000)).toPrecision(2) + " Minutes restante avant le coucher du soleil!*")
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
         }, dayDuration / 2)
         timers[groupId][2] = setTimeout(async () => {
-            await whatsapp.sendMessage(groupId, "*⏱️ " + ((dayDuration) / (5 * 60 * 1000)).toFixed(1) + " minutes restantes avant le coucher du soleil!*")
+            await whatsapp.sendMessage(groupId, "*⏱️ " + ((dayDuration) / (5 * 60 * 1000)).toPrecision(2) + " minutes restantes avant le coucher du soleil!*")
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
-        }, (4 * dayDuration) / (5 * 60 * 1000))
+        }, (4 * dayDuration) / (5))
         timers[groupId][3] = setTimeout(async () => {
             await this.sendTips(groupId, whatsapp)
             await whatsapp.sendMessage(groupId, "*📩 Il est plus que temps de voter!*")
-            await whatsapp.sendMessage(groupId, "*⏱️ " + ((dayDuration) / (9 * 60 * 1000)).toFixed(1) + " minutes restantes avant le coucher du soleil!*")
+            await whatsapp.sendMessage(groupId, "*⏱️ " + ((dayDuration) / (10 * 60 * 1000)).toPrecision(2) + " minutes restantes avant le coucher du soleil!*")
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
-        }, (9 * dayDuration) / (10 * 60 * 1000))
+        }, (9 * dayDuration) / (10))
         timers[groupId][4] = setTimeout(async () => {
             await whatsapp.sendMessage(groupId, "*📩 Il est plus que temps de voter!*")
             await whatsapp.sendMessage(groupId, "*⏱️ 30 secondes restantes avant le coucher du soleil!*")
@@ -768,7 +768,11 @@ export class WereWolvesManager {
         if (!game || game.state !== "NIGHT") return
 
         const wolf = game.players.find(p => p.jid === wolfJid)
-        if (!wolf || (wolf.role !== "WEREWOLF" && wolf.role !== "ALPHAWEREWOLF") || wolf.isDead) {
+        if (wolf.role !== "WEREWOLF" && wolf.role !== "ALPHAWEREWOLF") {
+            await whatsapp.sendMessage(wolfJid, "⚠️ Tu n'es pas loup.")
+            return
+        }
+        if (!wolf || wolf.isDead) {
             await whatsapp.sendMessage(wolfJid, "⚠️ Tu n'es pas autorisé à tuer.")
             return
         }
@@ -1330,6 +1334,8 @@ export class WereWolvesManager {
         if (game.state === "NIGHT") {
             if (whatsapp.isGroup) return
             if (p.role.includes("WEREWOLF")) {
+                await this.wolfKill(groupId, playerJid, targetJid, whatsapp)
+            } else if (p.role.includes("ALPHAWEREWOLF")) {
                 await this.wolfKill(groupId, playerJid, targetJid, whatsapp)
             } else if (p.role === "SEER") {
                 await this.seerInspect(groupId, targetJid, whatsapp)
