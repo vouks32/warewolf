@@ -768,7 +768,7 @@ export class WereWolvesManager {
         if (!game || game.state !== "NIGHT") return
 
         const wolf = game.players.find(p => p.jid === wolfJid)
-        if (!wolf || wolf.role !== "WEREWOLF" || wolf.role !== "ALPHAWEREWOLF" || wolf.isDead) {
+        if (!wolf || (wolf.role !== "WEREWOLF" && wolf.role !== "ALPHAWEREWOLF") || wolf.isDead) {
             await whatsapp.sendMessage(wolfJid, "⚠️ Tu n'es pas autorisé à tuer.")
             return
         }
