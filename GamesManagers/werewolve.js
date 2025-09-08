@@ -601,6 +601,7 @@ export class WereWolvesManager {
             this.resolveVotes(groupId, whatsapp)
         }, 10 * 60 * 1000)
         timers[groupId][1] = setTimeout(async () => {
+            await this.sendTips(groupId, whatsapp)
             await whatsapp.sendMessage(groupId, "*⏱️ 5 Minutes restante avant le coucher du soleil!*")
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
         }, 5 * 60 * 1000)
@@ -609,6 +610,7 @@ export class WereWolvesManager {
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
         }, 8 * 60 * 1000)
         timers[groupId][3] = setTimeout(async () => {
+            await this.sendTips(groupId, whatsapp)
             await whatsapp.sendMessage(groupId, "*📩 Il est plus que temps de voter!*")
             await whatsapp.sendMessage(groupId, "*⏱️ 1 minutes restantes avant le coucher du soleil!*")
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
@@ -1366,7 +1368,7 @@ export class WereWolvesManager {
                 await whatsapp.reply('Les esprits ça parle uniquement la nuit!\nVous avez été déduis *-5 points*')
                 await whatsapp.delete()
             } else {
-               // await whatsapp.reply("⚠️ Le suicide n'est jamais une solution.\n\nSi tu as besoin d'aide contacte un centre d'appel anti-suicide, ou tire un coup")
+                // await whatsapp.reply("⚠️ Le suicide n'est jamais une solution.\n\nSi tu as besoin d'aide contacte un centre d'appel anti-suicide, ou tire un coup")
                 return
             }
 
