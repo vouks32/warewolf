@@ -134,6 +134,7 @@ export class WereWolvesManager {
         const alive = game.players.filter(p => !p.isDead)
         const wolves = alive.filter(p => p.role.includes("WEREWOLF"))
         const nonWolves = game.players.filter(p => !p.role.includes("WEREWOLF"))
+        const nonWolvesAlive = alive.filter(p => !p.role.includes("WEREWOLF"))
 
         // Lovers win
         if (alive.length === 2 && alive[0].lover === alive[1].jid) {
@@ -148,7 +149,7 @@ export class WereWolvesManager {
             });
             return { name: "VILLAGERS", players: nonWolves }
         }
-        if (wolves.length >= nonWolves.length) {
+        if (wolves.length >= nonWolvesAlive.length) {
             wolves.forEach(async p => {
                 await this.addUserPoints(p.jid, { groupJid: game.groupId }, POINTS_LIST.WinAsWolve, "Gagné en tant que Loup", 0)
             });
