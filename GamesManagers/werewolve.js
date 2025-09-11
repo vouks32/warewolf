@@ -202,6 +202,9 @@ export class WereWolvesManager {
             votesStopped: false,
             playerChangeVoteCounts: {},
 
+            madProstituteChoice: false,
+            madSeerSaw: false,
+
             serialKillerChoice: null,
             pyromaniacOiled: [],  // Liste des joueurs trempés dans l'huile
             pyromaniacOiledTonight: false,  // Liste des joueurs trempés dans l'huile
@@ -250,7 +253,7 @@ export class WereWolvesManager {
             return
         }
 
-        game.players.push({ ids: whatsapp.ids, jid: playerJid, name, isPlaying: true, isDead: false, role: null, points: [] })
+        game.players.push({ ids: whatsapp.ids, jid: playerJid, name, isPlaying: true, isDead: false, hasSpokenDeathCount: 0, role: null, points: [] })
         this.saveGames(this.games)
 
         const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
@@ -594,7 +597,7 @@ export class WereWolvesManager {
         game.playerChangeVoteCounts = {}
         this.saveGames(this.games)
 
-        const dayDuration = Math.min(10 * 60 * 1000, Math.max(3 * 60 * 1000, game.players.filter(p => !p.isDead).length * 60 * 1000))
+        const dayDuration = Math.min(5 * 60 * 1000, Math.max(3 * 30 * 1000, (game.players.filter(p => !p.isDead).length / 2) * 60 * 1000))
 
         let seconds = 0
         await whatsapp.sendMessage(groupId, "🌞 Jour: Discutez et votez avec *!vote  _numéro victime_*\nVous avez " + (dayDuration / (60 * 1000)) + " minutes")
@@ -606,33 +609,26 @@ export class WereWolvesManager {
             this.resolveVotes(groupId, whatsapp)
         }, dayDuration)
 
-        seconds = ((dayDuration) / (2 * 1000))
         timers[groupId][1] = setTimeout(async () => {
+            seconds = ((dayDuration) / (2 * 1000))
             await this.sendTips(groupId, whatsapp)
-            await whatsapp.sendMessage(groupId, "*⏱️ " + (seconds < 120 ? seconds + " secondes" : (seconds / 60).toPrecision(2) + " minutes") + " restante avant le coucher du soleil!*")
+            await whatsapp.sendMessage(groupId, "*⏱️ " + (seconds < 60 ? seconds + " secondes" : (seconds / 60).toFixed(0) + ":" + (seconds % 60) + " minutes") + " restante avant le coucher du soleil!*")
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
         }, dayDuration / 2)
 
-        seconds = ((dayDuration) / (5 * 1000))
         timers[groupId][2] = setTimeout(async () => {
-            await whatsapp.sendMessage(groupId, "*⏱️ " + (seconds < 120 ? seconds + " secondes" : (seconds / 60).toPrecision(2) + " minutes") + "  restantes avant le coucher du soleil!*")
+            seconds = ((dayDuration) / (5 * 1000))
+            await whatsapp.sendMessage(groupId, "*⏱️ " + (seconds < 60 ? seconds + " secondes" : (seconds / 60).toPrecision(0) + ":" + (seconds % 60) + " minutes") + "  restantes avant le coucher du soleil!*")
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
         }, (4 * dayDuration) / (5))
 
-        seconds = ((dayDuration) / (10 * 1000))
         timers[groupId][3] = setTimeout(async () => {
+            seconds = ((dayDuration) / (10 * 1000))
             await this.sendTips(groupId, whatsapp)
             await whatsapp.sendMessage(groupId, "*📩 Il est plus que temps de voter!*")
-            await whatsapp.sendMessage(groupId, "*⏱️ " + (seconds < 120 ? seconds + " secondes" : (seconds / 60).toPrecision(2) + " minutes") + " restantes avant le coucher du soleil!*")
+            await whatsapp.sendMessage(groupId, "*⏱️ " + (seconds < 60 ? seconds + " secondes" : (seconds / 60).toPrecision(0) + ":" + (seconds % 60) + " minutes") + " restantes avant le coucher du soleil!*")
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
         }, (9 * dayDuration) / (10))
-
-        if (seconds >= 60)
-            timers[groupId][4] = setTimeout(async () => {
-                await whatsapp.sendMessage(groupId, "*📩 Il est plus que temps de voter!*")
-                await whatsapp.sendMessage(groupId, "*⏱️ 30 secondes restantes avant le coucher du soleil!*")
-                await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
-            }, dayDuration - (1000 * 30))
     }
 
     async resolveVotes(groupId, whatsapp) {
@@ -721,8 +717,17 @@ export class WereWolvesManager {
 
             // Vérifier si la victime est le Tanner
             if (victim.role === "TANNER") {
+                let t = ""
+
+                if (victim.lover) {
+                    const partner = game.players.find(p => p.jid === victim.lover)
+                    t = `🎉 *Bande de fous !!!*\nLe Tanner a gagné ! Il a réussi à se faire voter par le village.\n*+${POINTS_LIST.votedAsTanner} Points* pour le TANNEUR` +
+                        (victim.lover ? `\n\nLe TANNEUR emporte avec lui sa concubine *${partner.name}* (@${partner.jid.split('@')[0]}) et lui offre *+${POINTS_LIST.votedAsTanner} Points*` : ``)
+                } else {
+                    t = `🎉 *Bande de fous !!!*\nLe Tanner a gagné ! Il a réussi à se faire voter par le village.`
+                }
                 // await whatsapp.sendMessage(groupId, `🎭 Le village a exécuté @${victimId.split('@')[0]}. C'était un *[${victim.role}]*.`, [victimId])
-                await whatsapp.sendMessage(groupId, `🎉 *Bande de fous !!!*\nLe Tanner a gagné ! Il a réussi à se faire voter par le village.`)
+                await whatsapp.sendMessage(groupId, t)
                 await this.addUserPoints(victim.jid, whatsapp, POINTS_LIST.votedAsTanner, 'mort comme tanneur', 0)
                 // Terminer la partie - le Tanner gagne seul
                 TANNERWASVOTED = true
@@ -740,9 +745,10 @@ export class WereWolvesManager {
                 await this.addUserPoints(p.jid, whatsapp, POINTS_LIST.didntVote, 'n\'a pas voté', 0)
             }
         });
-        await whatsapp.sendMessage(groupId, `⚖️ Les villageois suivant *n'ont pas voté,* donc sont déduis *${POINTS_LIST.didntVote} points*:\n\n` +
-            `` + nonVoters.map(_wv => `*${_wv.name}* (@${_wv.jid.split('@')[0]})`).join('\n')
-            , nonVoters.map(w => w.jid))
+        if (nonVoters.length > 0)
+            await whatsapp.sendMessage(groupId, `⚖️ Les villageois suivant *n'ont pas voté,* donc sont déduis *${POINTS_LIST.didntVote} points*:\n\n` +
+                `` + nonVoters.map(_wv => `*${_wv.name}* (@${_wv.jid.split('@')[0]})`).join('\n')
+                , nonVoters.map(w => w.jid))
 
         this.saveGames(this.games)
 
@@ -842,8 +848,8 @@ export class WereWolvesManager {
 
         const result = (target.role.includes("WEREWOLF") ||
             (game.seerFakeWolves && game.seerFakeWolves.includes(target.jid))) ?
-            "un 🐺 Loup-Garou" : "pas un Loup-Garou";
-        await whatsapp.sendMessage(seer.jid, `🔮 Résultat: \n*${target.name}* (@${target.jid.split('@')[0]}) est ${result}.`, [target.jid])
+            "est un 🐺 Loup-Garou" : "n'est pas un Loup-Garou";
+        await whatsapp.sendMessage(seer.jid, `🔮 Résultat: \n*${target.name}* (@${target.jid.split('@')[0]}) ${result}.`, [target.jid])
     }
 
     async doctorSave(groupId, targetJid, whatsapp) {
@@ -1099,10 +1105,17 @@ export class WereWolvesManager {
             return
         }
 
-        game.serialKillerChoice = targetJid
-        this.saveGames(this.games)
+        if (!game.serialKillerChoice) {
+            game.serialKillerChoice = targetJid
+            this.saveGames(this.games)
+            await whatsapp.sendMessage(killerJid, `✅ Tu as choisi de tuer *${target.name}* (@${target.jid.split('@')[0]}) cette nuit.`, [target.jid])
+        } else {
+            game.serialKillerChoice = targetJid
+            this.saveGames(this.games)
+            await whatsapp.sendMessage(killerJid, `✅ Tu as changer ta cible pour *${target.name}* (@${target.jid.split('@')[0]})`, [target.jid])
+        }
 
-        await whatsapp.sendMessage(killerJid, `✅ Tu as choisi de tuer *${target.name}* (@${target.jid.split('@')[0]}) cette nuit.`, [target.jid])
+
     }
 
     // Actions pour Pyromaniac
@@ -1128,6 +1141,11 @@ export class WereWolvesManager {
                 return
             }
 
+            if (game.pyromaniacOiledTonight) {
+                await whatsapp.sendMessage(pyroJid, "⚠️ Tu as assez trempé pour cette nuit, rendez-vous demain soir.")
+                return
+            }
+
             if (!game.pyromaniacOiled.includes(targetJid)) {
                 game.pyromaniacOiled.push(targetJid)
                 game.pyromaniacOiledTonight = true
@@ -1137,6 +1155,11 @@ export class WereWolvesManager {
                 await whatsapp.sendMessage(pyroJid, `❌ Tu l'as déjà trempé dans l'huile.`)
             }
         } else if (action === 'ignite') {
+            if (game.pyromaniacOiledTonight) {
+                await whatsapp.sendMessage(pyroJid, "⚠️ Tu as déjà utilisé toutes tes capacités pour cette nuit.")
+                return
+            }
+            game.pyromaniacOiledTonight = true
             game.pyromaniacChoice = 'ignite'
             await whatsapp.sendMessage(pyroJid, "✅ Tu as choisi d'immoler tous les joueurs trempés.")
         }
@@ -1154,18 +1177,42 @@ export class WereWolvesManager {
         // Selon le faux rôle, simuler l'action
         if (madman.fakeRole === "SEER") {
             // Donner une information fausse
-            const target = game.players.find(p => p.jid === targetJid)
-            const fakeResult = Math.random() > 0.5 ? "un 🐺 Loup-Garou" : "pas un Loup-Garou"
-            await whatsapp.sendMessage(madmanJid, `🔮 Résultat: \n*${target.name}* est ${fakeResult}.`, [target.jid])
+            const target = game.players.find(p => p.jid === targetJid && !p.isDead)
+            if (!target || target.jid === madmanJid) {
+                await whatsapp.sendMessage(madmanJid, "⚠️ Cible invalide.")
+                return
+            }
+
+            if (game.madSeerSaw) {
+                await whatsapp.sendMessage(madmanJid, `⚠️ Tu ne peux utiliser ta capacité qu'une fois par nuit`)
+                return
+            }
+            game.madSeerSaw = true
+            const fakeResult = Math.random() > 0.5 ? "est un 🐺 Loup-Garou" : "n'est pas un Loup-Garou"
+            await whatsapp.sendMessage(madmanJid, `🔮 Résultat: \n *${target.name}* (@${target.jid.split('@')[0]}) ${fakeResult}.`, [target.jid])
         } else if (madman.fakeRole === "PROSTITUTE") {
             // Simuler une visite sans effet
-            const target = game.players.find(p => p.jid === targetJid)
-            await whatsapp.sendMessage(madmanJid, `✅ Tu as visité *${target.name}*.`, [target.jid])
+            const target = game.players.find(p => p.jid === targetJid && !p.isDead)
+
+            if (game.madProstituteChoice) {
+                await whatsapp.sendMessage(madmanJid, "⚠️ Tu ne peux plus visiter, ékié!\n2 Coups en 1 soir?.")
+                return
+            }
+
+            if (!target || target.jid === madmanJid) {
+                await whatsapp.sendMessage(madmanJid, "⚠️ Cible invalide.")
+                return
+            }
+            game.madProstituteChoice = true
+            await whatsapp.sendMessage(madmanJid, `✅ Tu as visité *${target.name}* (@${target.jid.split('@')[0]}).`, [target.jid])
         } else if (madman.fakeRole === "MAYOR") {
             // Simuler une visite sans effet
             //const target = game.players.find(p => p.jid === targetJid)
             await whatsapp.sendMessage(madmanJid, "✋ Tu as arreté le vote pour aujourd'hui.\nIls ne le savent pas, mais leurs votes ne servent à rien 🤫")
         }
+
+        this.saveGames(this.games)
+
         // ... autres faux rôles ...
     }
 
@@ -1383,9 +1430,14 @@ export class WereWolvesManager {
 
         if (player.isDead) {
             if (game.state !== "NIGHT") {
-                await this.addUserPoints(whatsapp.sender, whatsapp, -5, "talk when dead", 0)
-                await whatsapp.reply('Les esprits ça parle uniquement la nuit!\nVous avez été déduis *-5 points*')
-                await whatsapp.delete()
+                if (player.hasSpokenDeathCount > 0) {
+                    await this.addUserPoints(whatsapp.sender, whatsapp, -5, "talk when dead", 0)
+                    await whatsapp.reply('Les esprits ça parle uniquement la nuit!\nVous avez été déduis *-5 points*')
+                    await whatsapp.delete()
+                } else {
+                    await whatsapp.reply('⚠️ Attention, vous êtes mort, donc fermez votre bouche sinon vous serez déduis *-5 points*')
+                    player.hasSpokenDeathCount += 1
+                }
             } else {
                 // await whatsapp.reply("⚠️ Le suicide n'est jamais une solution.\n\nSi tu as besoin d'aide contacte un centre d'appel anti-suicide, ou tire un coup")
                 return

@@ -548,6 +548,8 @@ async function startBot() {
         const quizGroupJid = qm.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
         const quizFRGroupJid = qmfr.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
 
+        if (whatsapp.isReaction) return
+        
         //console.log('type', whatsapp.messageType)
         if (werewolfGroupJid && whatsapp.isGroup && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
             await wwm.addUserPoints(whatsapp.sender, whatsapp, -10, "send image during game", 0)
@@ -557,7 +559,7 @@ async function startBot() {
         }
 
         const t = whatsapp.text;
-        if ((t.length > 2 || !Number.isInteger(parseInt(t))) && whatsapp.isGroup && !whatsapp.isReaction){
+        if ((t.length > 2 || !Number.isInteger(parseInt(t))) && whatsapp.isGroup) {
             await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
             return
         }
