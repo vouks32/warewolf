@@ -443,6 +443,42 @@ async function startBot() {
         }
     })
 
+    // Send +5 points
+    handlers.text.push({
+        regex: /^!sendPoints/,
+        fn: async (whatsapp) => {
+            if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+            const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+            console.log(participants)
+            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin) && _p.admin.includes('super'))
+            if (!AdminParticipant) return await whatsapp.reply('Mon chaud... tu n\'es pas *super admin*, donc laisse!')
+
+
+            const name = whatsapp.text.split("!sendPoints")[1].trim().split(' ')[0]
+            const userjid = whatsapp.ids.lid ? name.replace('@', '') + "@lid" : name.replace('@', '') + "@s.whatsapp.net"
+            await wwm.addUserPoints(userjid, whatsapp, 5, "envoyé par super admin", 0)
+            whatsapp.reply(`${name} a reçu *+5 points*`)
+        }
+    })
+
+    // remove -5 points
+    handlers.text.push({
+        regex: /^!removePoints/,
+        fn: async (whatsapp) => {
+            if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+            const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+            console.log(participants)
+            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin) && _p.admin.includes('super'))
+            if (!AdminParticipant) return await whatsapp.reply('Mon chaud... tu n\'es pas *super admin*, donc laisse!')
+
+
+            const name = whatsapp.text.split("!sendPoints")[1].trim().split(' ')[0]
+            const userjid = whatsapp.ids.lid ? name.replace('@', '') + "@lid" : name.replace('@', '') + "@s.whatsapp.net"
+            await wwm.addUserPoints(userjid, whatsapp, -5, "envoyé par super admin", 0)
+            whatsapp.reply(`${name} a été déduis *-5 points*`)
+        }
+    })
+
     handlers.commands.set("!image", async (whatsapp) => {
         return //await whatsapp.sendImage(whatsapp.remoteJid, './images/creategame.jpg')
     })
@@ -459,7 +495,7 @@ async function startBot() {
         await wwm.sendPlayerProfil(whatsapp)
     })
 
- handlers.commands.set("!points", async (whatsapp) => {
+    handlers.commands.set("!points", async (whatsapp) => {
         await wwm.sendPlayerPoints(whatsapp)
     })
 
