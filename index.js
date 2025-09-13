@@ -172,9 +172,9 @@ async function startBot() {
         const metadata = await sock.groupMetadata(event.id)
         groupCache.set(event.id, metadata)
 
-        for (p of event.participants) {
+        for (const p of event.participants) {
             if (event.action === "add") {
-                const text = `Bienvenue @${p.split('@')[0]},\n\nJe suis un bot donc pas la peine de me repondre, je m'en fou\n\nIci il y a plein de jeux mais on joue tout le temps au jeu du loups donc...\n\nEnvoie *!info* pour en savoir plus`
+                const text = `Bienvenue @${p.split('@')[0]},\n\nJe suis un bot donc pas la peine de me repondre, je m'en fou\n\nIci personne ne se connait donc ne soit pas peur, parle nous\n\nIci il y a plein de jeux mais on joue tout le temps au jeu du loups donc...\n\nEnvoie *!info* pour en savoir plus`
                 await sock.sendMessage(event.id, { text, mentions: [p, '237676073559@s.whatsapp.net'] })
             }
         }
@@ -597,7 +597,7 @@ async function startBot() {
         const quizGroupJid = qm.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
         const quizFRGroupJid = qmfr.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
 
-        if (whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid)) {
+        if (whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
             await whatsapp.reply(([
                 `@${whatsapp.sender.split('@')[0]} on est pas dans ton village ici, les morts ne réagissent pas\nVous avez reçu *-5 points*`,
                 `@${whatsapp.sender.split('@')[0]} Tu es mort et tu envoie les réactions ehh, *-5 points*`,
