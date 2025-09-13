@@ -96,12 +96,9 @@ export class WereWolvesManager {
 
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
-        const game = this.games[whatsapp.groupJid]
-        if (!game) return
         let user = getUser(playerJid)
         let arr = {}
         arr[reason] = points
-        game.players.find(p => p.jid === playerJid).points.push(arr)
 
         if (!user) {
             saveUser({ jid: playerJid, groups: [whatsapp.groupJid], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName || ' ', games: { WEREWOLF: gamescount }, points: 50, pointsTransactions: [arr] })
