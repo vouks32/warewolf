@@ -171,6 +171,14 @@ async function startBot() {
     sock.ev.on('group-participants.update', async (event) => {
         const metadata = await sock.groupMetadata(event.id)
         groupCache.set(event.id, metadata)
+
+        for (p of event.participants) {
+            if (event.action === "add") {
+                const text = `Bienvenue @${p.split('@')[0]},\n\nJe suis un bot donc pas la peine de me repondre, je m'en fou\n\nIci il y a plein de jeux mais on joue tout le temps au jeu du loups donc...\n\nEnvoie *!info* pour en savoir plus`
+                await sock.sendMessage(event.id, { text, mentions: [p, '237676073559@s.whatsapp.net'] })
+            }
+        }
+
     })
     // Handle messages
     sock.ev.on("messages.upsert", async (m) => {
@@ -372,7 +380,7 @@ async function startBot() {
                             [p.jid],
                             'demote' // replace this parameter with 'remove' or 'demote' or 'promote'
                         )
-                        await sock.sendMessage(groupJid, { text: `@${p.jid.split('@')[0]} a été *retiré* à la haute sphère des Admins`, mentions: [p.jid] }).then(handler.addMessage)
+                        await sock.sendMessage(groupJid, { text: `@${p.jid.split('@')[0]} a été *retiré* de la haute sphère des Admins`, mentions: [p.jid] }).then(handler.addMessage)
                     } else if (!groupParticipant) {
                         console.log(p.jid, p.pushName, "is no more in group")
                     }
@@ -424,8 +432,8 @@ async function startBot() {
             if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
             console.log(participants)
-            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
-            if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin) && _p.admin.includes('super'))
+            if (!AdminParticipant) return await whatsapp.reply('Mon chaud... tu n\'es pas *super admin*, donc laisse!')
 
 
             const text = whatsapp.text.slice(8)
@@ -451,15 +459,20 @@ async function startBot() {
         await wwm.sendPlayerProfil(whatsapp)
     })
 
+ handlers.commands.set("!points", async (whatsapp) => {
+        await wwm.sendPlayerPoints(whatsapp)
+    })
+
     // Stop game (group)
     handlers.text.push({
         regex: /^!stopgame$/,
         fn: async (whatsapp) => {
             if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+
             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
             console.log(participants)
-            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
-            if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin && _p.admin.includes('super')))
+            if (!AdminParticipant) return await whatsapp.reply('Seule le *SUPER ADMIN* peut faire ça! donc calme toi')
 
             if (whatsapp.game === null) return await whatsapp.reply('persone n\'est entrain de jouer à un jeu! tu es attardé?')
             else if (whatsapp.game === 'QUIZ')
@@ -548,8 +561,16 @@ async function startBot() {
         const quizGroupJid = qm.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
         const quizFRGroupJid = qmfr.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
 
-        if (whatsapp.isReaction) return
-        
+        if (whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid)) {
+            await whatsapp.reply(([
+                `@${whatsapp.sender.split('@')[0]} on est pas dans ton village ici, les morts ne réagissent pas\nVous avez reçu *-5 points*`,
+                `@${whatsapp.sender.split('@')[0]} Tu es mort et tu envoie les réactions ehh, *-5 points*`,
+                `@${whatsapp.sender.split('@')[0]} Si tu voulais trop réagir fallait le faire de ton vivant , *-5 points*`,
+            ])[Math.floor(Math.random() * 3)])
+            await wwm.addUserPoints(whatsapp.sender, whatsapp, -5, "réagis étant mort", 0)
+            return
+        }
+
         //console.log('type', whatsapp.messageType)
         if (werewolfGroupJid && whatsapp.isGroup && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
             await wwm.addUserPoints(whatsapp.sender, whatsapp, -10, "send image during game", 0)
