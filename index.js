@@ -455,7 +455,7 @@ async function startBot() {
 
 
             const name = whatsapp.text.split("!sendpoints")[1].trim().split(' ')[0]
-            const userjid = whatsapp.ids.lid ? name.replace('@', '') + "@lid" : name.replace('@', '') + "@s.whatsapp.net"
+            const userjid = name.replace('@', '') + "@s.whatsapp.net"
             await wwm.addUserPoints(userjid, whatsapp, 5, "envoyé par super admin", 0)
             whatsapp.reply(`${name} a reçu *+5 points*`)
         }
