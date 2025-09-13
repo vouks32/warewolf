@@ -445,7 +445,7 @@ async function startBot() {
 
     // Send +5 points
     handlers.text.push({
-        regex: /^!sendPoints/,
+        regex: /^!sendpoints/,
         fn: async (whatsapp) => {
             if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
@@ -454,7 +454,7 @@ async function startBot() {
             if (!AdminParticipant) return await whatsapp.reply('Mon chaud... tu n\'es pas *super admin*, donc laisse!')
 
 
-            const name = whatsapp.text.split("!sendPoints")[1].trim().split(' ')[0]
+            const name = whatsapp.text.split("!sendpoints")[1].trim().split(' ')[0]
             const userjid = whatsapp.ids.lid ? name.replace('@', '') + "@lid" : name.replace('@', '') + "@s.whatsapp.net"
             await wwm.addUserPoints(userjid, whatsapp, 5, "envoyé par super admin", 0)
             whatsapp.reply(`${name} a reçu *+5 points*`)
@@ -463,7 +463,7 @@ async function startBot() {
 
     // remove -5 points
     handlers.text.push({
-        regex: /^!removePoints/,
+        regex: /^!removepoints/,
         fn: async (whatsapp) => {
             if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
@@ -472,7 +472,7 @@ async function startBot() {
             if (!AdminParticipant) return await whatsapp.reply('Mon chaud... tu n\'es pas *super admin*, donc laisse!')
 
 
-            const name = whatsapp.text.split("!sendPoints")[1].trim().split(' ')[0]
+            const name = whatsapp.text.split("!removepoints")[1].trim().split(' ')[0]
             const userjid = whatsapp.ids.lid ? name.replace('@', '') + "@lid" : name.replace('@', '') + "@s.whatsapp.net"
             await wwm.addUserPoints(userjid, whatsapp, -5, "envoyé par super admin", 0)
             whatsapp.reply(`${name} a été déduis *-5 points*`)
