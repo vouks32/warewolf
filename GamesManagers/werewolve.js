@@ -513,7 +513,7 @@ export class WereWolvesManager {
                     await this.addUserPoints(game.players.find(p => p.role === "WITCH").jid, whatsapp, POINTS_LIST.witchProtected, "protection magique", 0)
                 } else {
                     if (victim.role === "HUNTER") {
-                        if (counts[victimId] == 1 && Math.random() < 0.2) {
+                        if (counts[victimId] == 1 && Math.random() < 0.3) {
                             wolf.isDead = true
                             this.saveGames(this.games)
                             await whatsapp.sendMessage(groupId, `Le loup a visité le chasseur et a reçus une balle en argent dans la tête\n@${wolfjid.split('@')[0]} a été tué par le HUNTER`, [wolfjid])
@@ -968,7 +968,11 @@ export class WereWolvesManager {
                 return
             }
 
-            await this.startDay(groupId, whatsapp)
+            if (game.state === "NIGHT")
+                await this.startDay(groupId, whatsapp)
+            else
+                await this.startNight(groupId, whatsapp)
+
         }, 45 * 1000);
 
         this.saveGames(this.games)
