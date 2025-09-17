@@ -1455,7 +1455,7 @@ export class WereWolvesManager {
 
     }
 
-    async playerCanSpeak(playerJid, groupId) {
+    playerCanSpeak(playerJid, groupId) {
         const game = this.games[groupId]
         if (!game) return true
 
@@ -1471,10 +1471,8 @@ export class WereWolvesManager {
 
         const player = game.players.find(p => p.jid === playerJid)
         if (!player) return
-        console.log('check if can speak -- 2')
 
-        if (!(await this.playerCanSpeak(playerJid, groupId))) {
-            console.log('check if can speak -- 3')
+        if (!(this.playerCanSpeak(playerJid, groupId))) {
             if (player.hasSpokenDeathCount > 0) {
                 await this.addUserPoints(whatsapp.sender, whatsapp, -5, "talk when dead", 0)
                 await whatsapp.sendMessage(groupId, `` + 'Les esprits ça parle uniquement la nuit!\nVous avez été déduis *-5 points*')
