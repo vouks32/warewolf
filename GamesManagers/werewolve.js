@@ -626,7 +626,7 @@ export class WereWolvesManager {
 
         timers[groupId][2] = setTimeout(async () => {
             seconds = ((dayDuration) / (5 * 1000))
-            await whatsapp.sendMessage(groupId, "*⏱️ " + (seconds < 60 ? seconds + " secondes" : (seconds / 60).toPrecision(0) + ":" + (seconds % 60) + " minutes") + "  restantes avant le coucher du soleil!*")
+            await whatsapp.sendMessage(groupId, "*⏱️ " + (seconds < 60 ? seconds + " secondes" : (seconds / 60).toFixed() + ":" + (seconds % 60) + " minutes") + "  restantes avant le coucher du soleil!*")
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
         }, (4 * dayDuration) / (5))
 
@@ -634,7 +634,7 @@ export class WereWolvesManager {
             seconds = ((dayDuration) / (10 * 1000))
             await this.sendTips(groupId, whatsapp)
             await whatsapp.sendMessage(groupId, "*📩 Il est plus que temps de voter!*")
-            await whatsapp.sendMessage(groupId, "*⏱️ " + (seconds < 60 ? seconds + " secondes" : (seconds / 60).toPrecision(0) + ":" + (seconds % 60) + " minutes") + " restantes avant le coucher du soleil!*")
+            await whatsapp.sendMessage(groupId, "*⏱️ " + (seconds < 60 ? seconds + " secondes" : (seconds / 60).toFixed(0) + ":" + (seconds % 60) + " minutes") + " restantes avant le coucher du soleil!*")
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
         }, (9 * dayDuration) / (10))
     }
@@ -1469,26 +1469,18 @@ export class WereWolvesManager {
         const game = this.games[groupId]
         if (!game) return
 
-        let user = getUser(playerJid)
-
         const player = game.players.find(p => p.jid === playerJid)
         if (!player) return
 
         if (!this.playerCanSpeak(playerJid, groupId)) {
-            if (game.state !== "NIGHT") {
                 if (player.hasSpokenDeathCount > 0) {
                     await this.addUserPoints(whatsapp.sender, whatsapp, -5, "talk when dead", 0)
-                    await whatsapp.reply('Les esprits ça parle uniquement la nuit!\nVous avez été déduis *-5 points*')
+                    await whatsapp.sendMessage(groupId, `` + 'Les esprits ça parle uniquement la nuit!\nVous avez été déduis *-5 points*')
                     await whatsapp.delete()
                 } else {
                     await whatsapp.reply('⚠️ Attention, vous êtes mort, donc fermez votre bouche sinon vous serez déduis *-5 points*')
                     player.hasSpokenDeathCount += 1
                 }
-            } else {
-                // await whatsapp.reply("⚠️ Le suicide n'est jamais une solution.\n\nSi tu as besoin d'aide contacte un centre d'appel anti-suicide, ou tire un coup")
-                return
-            }
-
         }
     }
 }

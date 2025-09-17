@@ -418,8 +418,8 @@ async function startBot() {
             "📝 *!quizen* - pour jouer à un quiz (en Anglais)\n" +
             "📝 *!quizfr* - pour jouer à un quiz (en Français)\n" +
             "\nℹ️ *!info* - Pour tout savoir sur moi"
-        )
-    }, ['237676073559@s.whatsapp.net'])
+        , ['237676073559@s.whatsapp.net'])
+    })
 
     handlers.commands.set("!infowerewolve", async (whatsapp) => {
 
@@ -676,11 +676,12 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         const quizFRGroupJid = qmfr.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
 
         if (whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
-            await whatsapp.reply(([
+            const ans = [
                 `@${whatsapp.sender.split('@')[0]} on est pas dans ton village ici, les morts ne réagissent pas\nVous avez reçu *-5 points*`,
                 `@${whatsapp.sender.split('@')[0]} Tu es mort et tu envoie les réactions ehh, *-5 points*`,
                 `@${whatsapp.sender.split('@')[0]} Si tu voulais trop réagir fallait le faire de ton vivant , *-5 points*`,
-            ])[Math.floor(Math.random() * 3)])
+            ]
+            await whatsapp.reply(ans[Math.floor(Math.random() * ans.length)], [whatsapp.sender])
             await wwm.addUserPoints(whatsapp.sender, whatsapp, -5, "réagis étant mort", 0)
             return
         }
@@ -694,7 +695,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         }
 
         const t = whatsapp.text;
-        if ((t.length > 2 || !Number.isInteger(parseInt(t))) && whatsapp.isGroup) {
+        if (t.length > 2  && whatsapp.isGroup) {
             await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
             return
         }
