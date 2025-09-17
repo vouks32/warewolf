@@ -422,6 +422,14 @@ async function startBot() {
     }, ['237676073559@s.whatsapp.net'])
 
     handlers.commands.set("!infowerewolve", async (whatsapp) => {
+
+        if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+        const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+        console.log(participants)
+        const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin) && _p.admin.includes('super'))
+        if (!AdminParticipant) return await whatsapp.reply('Mon chaud... tu n\'es pas *super admin*, donc laisse!')
+
+
         const rulesMessage = `
 🐺 *BIENVENUE DANS LE JEU DES LOUPS-GAROUS* 🐺
 
@@ -478,7 +486,7 @@ Et tu en perds si :
 *VEUX-TU ESSAYER ?* 😈
 Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 `;
-        return await whatsapp.reply(rulesMessage, ['237676073559@s.whatsapp.net'])
+        return await whatsapp.reply(rulesMessage, participants.map(p => p.id))
     })
 
     handlers.commands.set("!tag", async (whatsapp) => {
