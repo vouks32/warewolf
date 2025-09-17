@@ -153,14 +153,14 @@ async function startBot() {
                         }
                         const imagename = buffer.split('/').pop()
                         let optimizedImage = (await optimizeGifSharp(buffer))
-                        let t = (await optimizeGifSharp(buffer, 32, 80))
-                        try {
-                            t = await extractImageThumb(optimizedImage)
-                            await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail: t.buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
-                        } catch (error) {
-                            console.log("couldn't get thumbnail")
-                            await sock.sendMessage(jid, { image: optimizedImage, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
-                        }
+                        /*let t = (await optimizeGifSharp(buffer, 32, 80))
+                try {
+                    t = await extractImageThumb(optimizedImage)
+                    await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail: t.buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
+                } catch (error) {
+                    console.log("couldn't get thumbnail")
+                }*/
+                        await sock.sendMessage(jid, { image: optimizedImage, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
                     }
                 })
             }, 2000)
@@ -257,14 +257,14 @@ async function startBot() {
                 }
                 const imagename = buffer.split('/').pop()
                 let optimizedImage = (await optimizeGifSharp(buffer))
-                let t = (await optimizeGifSharp(buffer, 32, 80))
+                /*let t = (await optimizeGifSharp(buffer, 32, 80))
                 try {
                     t = await extractImageThumb(optimizedImage)
                     await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail: t.buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
                 } catch (error) {
                     console.log("couldn't get thumbnail")
-                    await sock.sendMessage(jid, { image: optimizedImage, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
-                }
+                }*/
+                await sock.sendMessage(jid, { image: optimizedImage, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
             },
 
             sendAudio: async (jid, buffer, ptt = false) => {
