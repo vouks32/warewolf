@@ -353,7 +353,7 @@ export class WereWolvesManager {
         this.saveGames(this.games)
 
         // DM prompts
-        /*for (const p of game.players) {
+        for (const p of game.players) {
             if (!p.isDead) {
                 console.log("sending role to", p.name)
                 await delay(1000)
@@ -405,7 +405,7 @@ export class WereWolvesManager {
                     await whatsapp.sendMessage(p.jid, "Joueurs :\n\n" + names, mentions)
                 }
             }
-        }*/
+        }
 
         const nightText = [
                 "🌙 La nuit est tombée... \nSeules les prostituées rodent.... Du moins... c'est ce qu'elles pensent, \n\nVous avez *2 minutes*",

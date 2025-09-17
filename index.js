@@ -153,9 +153,9 @@ async function startBot() {
                         }
                         const imagename = buffer.split('/').pop()
                         let optimizedImage = (await optimizeGifSharp(buffer))
-                        let t = (await optimizeGifSharp(buffer, 64, 80))
+                        let t = (await optimizeGifSharp(buffer, 32, 80))
                         try {
-                           // t = await extractImageThumb(optimizedImage)
+                           t = await extractImageThumb(optimizedImage)
                         } catch (error) {
                             console.log("couldn't get thumbnail")
                         }
@@ -256,9 +256,9 @@ async function startBot() {
                 }
                 const imagename = buffer.split('/').pop()
                 let optimizedImage = (await optimizeGifSharp(buffer))
-                let t = (await optimizeGifSharp(buffer, 64, 80))
+                let t = (await optimizeGifSharp(buffer, 32, 80))
                 try {
-                   // t = await extractImageThumb(optimizedImage)
+                    t = await extractImageThumb(optimizedImage)
                 } catch (error) {
                     console.log("couldn't get thumbnail")
                 }
