@@ -353,7 +353,7 @@ export class WereWolvesManager {
         this.saveGames(this.games)
 
         // DM prompts
-       /* for (const p of game.players) {
+        /*for (const p of game.players) {
             if (!p.isDead) {
                 console.log("sending role to", p.name)
                 await delay(1000)
