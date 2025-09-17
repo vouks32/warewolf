@@ -155,7 +155,7 @@ async function startBot() {
                         let optimizedImage = (await optimizeGifSharp(buffer))
                         let t = (await optimizeGifSharp(buffer, 32, 80))
                         try {
-                           t = await extractImageThumb(optimizedImage)
+                            t = await extractImageThumb(optimizedImage)
                         } catch (error) {
                             console.log("couldn't get thumbnail")
                         }
@@ -411,7 +411,7 @@ async function startBot() {
 
     //////////////////////////// UTILITIES //////////////////////////////////////////////////
     handlers.commands.set("!info", async (whatsapp) => {
-        return await whatsapp.reply('Je suis un bot créé par Vouks - (676073559)\n' +
+        return await whatsapp.reply('Je suis un bot créé par Vouks - (@237676073559)\n' +
             'Mon but? Jouer avec vous pour vous distraire du fait que le monde va bientôt sombrer entre les mains des intélligences artificiels tel que moi... lors :\n\n' +
             'Pour jouer à un jeu, écris:\n\n' +
             "🐺 *!werewolve* - pour jouer au loup\n" +
@@ -419,6 +419,66 @@ async function startBot() {
             "📝 *!quizfr* - pour jouer à un quiz (en Français)\n" +
             "\nℹ️ *!info* - Pour tout savoir sur moi"
         )
+    }, ['237676073559@s.whatsapp.net'])
+
+    handlers.commands.set("!infowerewolve", async (whatsapp) => {
+        const rulesMessage = `
+🐺 *BIENVENUE DANS LE JEU DES LOUPS-GAROUS* 🐺
+
+*QU'EST-CE QUE C'EST ?*
+C'est un jeu d'ambiance et de déduction où deux camps s'affrontent :
+• Les *Villageois* (et autres rôles spéciaux) qui veulent éliminer tous les Loups
+• Les *Loups-Garous* qui mangent les villageois chaque nuit
+
+*COMMENT JOUER ?*
+1. Rejoins une partie avec *!play tonpseudo*
+2. Reçois ton rôle en MP (message privé)
+3. Les parties alternent entre *Nuit* et *Jour* :
+
+🌙 *LA NUIT* :
+- Les Loups choisissent une victime (*!eat numéro*)
+- Les rôles spéciaux agissent (Voyante, Docteur, Sorcière...)
+- Tout se passe en MP
+
+☀️ *LE JOUR* :
+- Tout le monde discute en groupe
+- On vote pour exécuter un suspect (*!vote numéro*)
+- Les morts ne peuvent plus parler (sauf la nuit !)
+
+*QUELQUES RÔLES IMPORTANTS* :
+• 🐺 *Loup-Garou* - Mange les joueurs la nuit
+• 🔮 *Voyante* - Peut découvrir un rôle chaque nuit
+• 💉 *Docteur* - Sauve un joueur des loups
+• 🧪 *Sorcière* - Peut soigner ou empoisonner (1 fois chaque)
+• ❤️ *Cupidon* - Lie deux amoureux (s'ils meurent, l'autre aussi)
+• 💄 *Prostituée* - Bloque un joueur (mais meurt si c'est un loup)
+• 🎭 *Fou* - Reçoit un faux rôle et doit faire croire qu'il est un autre rôle
+
+*COMMANDES UTILES* :
+• *!werewolve* - Démarrer une partie
+• *!play pseudo* - Rejoindre la partie
+• *!vote numéro* - Voter contre un joueur
+• *!profil* - Voir ton profil et tes points
+
+*CONSEILS AUX DÉBUTANTS* :
+1. Cache bien ton rôle !
+2. Observe les comportements des autres
+3. Les loups mentent, les villageois cherchent des incohérences
+4. Ne révèle pas ton rôle sans raison
+
+*POINTS ET RÉCOMPENSES* :
+Tu gagnes des points en :
+- Gagnant une partie (+10)
+- Devinant un loup (+3)
+- Utilisant bien ton rôle spécial (+2 à +5)
+Et tu en perds si :
+- Tu votes un innocent (-1)
+- Tu parles quand tu es mort (-5)
+
+*VEUX-TU ESSAYER ?* 😈
+Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
+`;
+        return await whatsapp.reply(rulesMessage, ['237676073559@s.whatsapp.net'])
     })
 
     handlers.commands.set("!tag", async (whatsapp) => {
