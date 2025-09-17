@@ -418,7 +418,7 @@ async function startBot() {
             "📝 *!quizen* - pour jouer à un quiz (en Anglais)\n" +
             "📝 *!quizfr* - pour jouer à un quiz (en Français)\n" +
             "\nℹ️ *!info* - Pour tout savoir sur moi"
-        , ['237676073559@s.whatsapp.net'])
+            , ['237676073559@s.whatsapp.net'])
     })
 
     handlers.commands.set("!infowerewolve", async (whatsapp) => {
@@ -695,12 +695,14 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         }
 
         const t = whatsapp.text;
-        if (t.length > 2  && whatsapp.isGroup) {
+        if (t.length > 2 && whatsapp.isGroup) {
             await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
             return
         }
 
         const target = parseInt(t) - 1
+
+        if (target < 0 || t.length == 0) return
 
         //console.log(" group jids of bollosses", werewolfGroupJid, quizGroupJid, quizFRGroupJid)
         if (werewolfGroupJid) {
