@@ -353,7 +353,7 @@ export class WereWolvesManager {
         this.saveGames(this.games)
 
         // DM prompts
-        for (const p of game.players) {
+       /* for (const p of game.players) {
             if (!p.isDead) {
                 console.log("sending role to", p.name)
                 await delay(1000)
@@ -405,15 +405,16 @@ export class WereWolvesManager {
                     await whatsapp.sendMessage(p.jid, "Joueurs :\n\n" + names, mentions)
                 }
             }
-        }
+        }*/
 
-        await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "nightfall.jpg"),
-            ([
+        const nightText = [
                 "🌙 La nuit est tombée... \nSeules les prostituées rodent.... Du moins... c'est ce qu'elles pensent, \n\nVous avez *2 minutes*",
                 "🌙 La nuit est tombée... \nLe vent souffle.... Les putes baisent... et les loups dévorent, \n\nVous avez *2 minutes*",
                 "🌙 La nuit est tombée... \nSeule les agents du mal sont encore debout, et Les putes aussi..., \n\nVous avez *2 minutes*",
-            ])[Math.floor(Math.random() * 3)]
-        )
+            ]
+            console.log('sending night msg')
+        await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "nightfall.jpg"), nightText[Math.floor(Math.random() * nightText.length)])
+            console.log('sended night msg')
 
         // Timer ends night
         timers[groupId][0] = setTimeout(async () => {
