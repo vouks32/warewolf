@@ -151,16 +151,17 @@ async function startBot() {
                             await sock.sendMessage(jid, { image: { url: buffer }, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
                             return
                         }
-                        const imagename = buffer.split('/').pop()
-                        let optimizedImage = (await optimizeGifSharp(buffer))
-                        /*let t = (await optimizeGifSharp(buffer, 32, 80))
-                try {
-                    t = await extractImageThumb(optimizedImage)
-                    await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail: t.buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
-                } catch (error) {
-                    console.log("couldn't get thumbnail")
-                }*/
-                        await sock.sendMessage(jid, { image: optimizedImage, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
+                        /* const imagename = buffer.split('/').pop()
+                 let optimizedImage = (await optimizeGifSharp(buffer))
+                 let t = (await optimizeGifSharp(buffer, 32, 80))
+                 try {
+                     t = await extractImageThumb(optimizedImage)
+                     await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail: t.buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
+                 } catch (error) {
+                     console.log("couldn't get thumbnail")
+                 }
+                 await sock.sendMessage(jid, { image: optimizedImage, caption: htmlDecode(caption), mentions }).then(handler.addMessage)*/
+                        await sock.sendMessage(jid, { text: htmlDecode(caption) + (caption.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : ""), mentions: mentions }).then(handler.addMessage)
                     }
                 })
             }, 2000)
@@ -255,16 +256,18 @@ async function startBot() {
                     await sock.sendMessage(jid, { image: { url: buffer }, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
                     return
                 }
-                const imagename = buffer.split('/').pop()
-                let optimizedImage = (await optimizeGifSharp(buffer))
-                /*let t = (await optimizeGifSharp(buffer, 32, 80))
-                try {
-                    t = await extractImageThumb(optimizedImage)
-                    await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail: t.buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
-                } catch (error) {
-                    console.log("couldn't get thumbnail")
-                }*/
-                await sock.sendMessage(jid, { image: optimizedImage, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
+                /* const imagename = buffer.split('/').pop()
+                 let optimizedImage = (await optimizeGifSharp(buffer))
+                 let t = (await optimizeGifSharp(buffer, 32, 80))
+                 try {
+                     t = await extractImageThumb(optimizedImage)
+                     await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail: t.buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
+                 } catch (error) {
+                     console.log("couldn't get thumbnail")
+                 }
+                 await sock.sendMessage(jid, { image: optimizedImage, caption: htmlDecode(caption), mentions }).then(handler.addMessage)*/
+                await sock.sendMessage(jid, { text: htmlDecode(caption) + (caption.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : ""), mentions: mentions }).then(handler.addMessage)
+
             },
 
             sendAudio: async (jid, buffer, ptt = false) => {
