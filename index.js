@@ -20,10 +20,10 @@ let Interval = null;
 
 const groupCache = new NodeCache({ stdTTL: 5 * 60, useClones: false })
 
-async function optimizeGifSharp(gifPath, id) {
+async function optimizeGifSharp(gifPath, width = 300, quality = 80) {
     return await sharp(gifPath)
-        .resize({ width: 300 }) // Resize to 500px width
-        .jpeg({ quality: 80 }).toBuffer();
+        .resize({ width }) // Resize to 500px width
+        .jpeg({ quality }).toBuffer();
 }
 
 function htmlDecode(text) {
@@ -153,7 +153,13 @@ async function startBot() {
                         }
                         const imagename = buffer.split('/').pop()
                         let optimizedImage = (await optimizeGifSharp(buffer, './images/send/opt-' + imagename))
-                        await sock.sendMessage(jid, { image: optimizedImage, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
+                        let t = (await optimizeGifSharp(buffer, './images/send/opt-' + imagename, 64, 80))
+                        try {
+                            t = await extractImageThumb(optimizedImage)
+                        } catch (error) {
+                            console.log("couldn't get thumbnail")
+                        }
+                        await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail: t.buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
                     }
                 })
             }, 2000)
@@ -250,7 +256,13 @@ async function startBot() {
                 }
                 const imagename = buffer.split('/').pop()
                 let optimizedImage = (await optimizeGifSharp(buffer, './images/send/opt-' + imagename))
-                await sock.sendMessage(jid, { image: optimizedImage, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
+                let t = (await optimizeGifSharp(buffer, './images/send/opt-' + imagename, 64, 80))
+                try {
+                    t = await extractImageThumb(optimizedImage)
+                } catch (error) {
+                    console.log("couldn't get thumbnail")
+                }
+                await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail: t.buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
             },
 
             sendAudio: async (jid, buffer, ptt = false) => {
