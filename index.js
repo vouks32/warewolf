@@ -152,8 +152,8 @@ async function startBot() {
                             return
                         }
                         const imagename = buffer.split('/').pop()
-                        let optimizedImage = (await optimizeGifSharp(buffer, './images/send/opt-' + imagename))
-                        let t = (await optimizeGifSharp(buffer, './images/send/opt-' + imagename, 64, 80))
+                        let optimizedImage = (await optimizeGifSharp(buffer))
+                        let t = (await optimizeGifSharp(buffer, 64, 80))
                         try {
                             t = await extractImageThumb(optimizedImage)
                         } catch (error) {
@@ -255,8 +255,8 @@ async function startBot() {
                     return
                 }
                 const imagename = buffer.split('/').pop()
-                let optimizedImage = (await optimizeGifSharp(buffer, './images/send/opt-' + imagename))
-                let t = (await optimizeGifSharp(buffer, './images/send/opt-' + imagename, 64, 80))
+                let optimizedImage = (await optimizeGifSharp(buffer))
+                let t = (await optimizeGifSharp(buffer, 64, 80))
                 try {
                     t = await extractImageThumb(optimizedImage)
                 } catch (error) {
