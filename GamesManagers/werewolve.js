@@ -129,7 +129,7 @@ export class WereWolvesManager {
 
     checkWin(game) {
         const alive = game.players.filter(p => !p.isDead)
-        const wolves = game.player.filter(p => p.role.includes("WEREWOLF"))
+        const wolves = game.players.filter(p => p.role.includes("WEREWOLF"))
         const wolvesAlive = alive.filter(p => p.role.includes("WEREWOLF"))
         const nonWolves = game.players.filter(p => !p.role.includes("WEREWOLF"))
         const nonWolvesAlive = alive.filter(p => !p.role.includes("WEREWOLF"))
