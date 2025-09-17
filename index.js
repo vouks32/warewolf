@@ -695,7 +695,8 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         }
 
         const t = whatsapp.text;
-        if (t.length > 2 && whatsapp.isGroup) {
+        if ((t.length > 2 || Number.isNaN(parseInt(t))) && whatsapp.isGroup) {
+            console.log('check if can speak -- 1')
             await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
             return
         }

@@ -408,13 +408,13 @@ export class WereWolvesManager {
         }
 
         const nightText = [
-                "🌙 La nuit est tombée... \nSeules les prostituées rodent.... Du moins... c'est ce qu'elles pensent, \n\nVous avez *2 minutes*",
-                "🌙 La nuit est tombée... \nLe vent souffle.... Les putes baisent... et les loups dévorent, \n\nVous avez *2 minutes*",
-                "🌙 La nuit est tombée... \nSeule les agents du mal sont encore debout, et Les putes aussi..., \n\nVous avez *2 minutes*",
-            ]
-            console.log('sending night msg')
+            "🌙 La nuit est tombée... \nSeules les prostituées rodent.... Du moins... c'est ce qu'elles pensent, \n\nVous avez *2 minutes*",
+            "🌙 La nuit est tombée... \nLe vent souffle.... Les putes baisent... et les loups dévorent, \n\nVous avez *2 minutes*",
+            "🌙 La nuit est tombée... \nSeule les agents du mal sont encore debout, et Les putes aussi..., \n\nVous avez *2 minutes*",
+        ]
+        console.log('sending night msg')
         await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "nightfall.jpg"), nightText[Math.floor(Math.random() * nightText.length)])
-            console.log('sended night msg')
+        console.log('sended night msg')
 
         // Timer ends night
         timers[groupId][0] = setTimeout(async () => {
@@ -1456,7 +1456,7 @@ export class WereWolvesManager {
     }
 
     async playerCanSpeak(playerJid, groupId) {
-         const game = this.games[groupId]
+        const game = this.games[groupId]
         if (!game) return true
 
         const player = game.players.find(p => p.jid === playerJid)
@@ -1471,16 +1471,18 @@ export class WereWolvesManager {
 
         const player = game.players.find(p => p.jid === playerJid)
         if (!player) return
+        console.log('check if can speak -- 2')
 
         if (!this.playerCanSpeak(playerJid, groupId)) {
-                if (player.hasSpokenDeathCount > 0) {
-                    await this.addUserPoints(whatsapp.sender, whatsapp, -5, "talk when dead", 0)
-                    await whatsapp.sendMessage(groupId, `` + 'Les esprits ça parle uniquement la nuit!\nVous avez été déduis *-5 points*')
-                    await whatsapp.delete()
-                } else {
-                    await whatsapp.reply('⚠️ Attention, vous êtes mort, donc fermez votre bouche sinon vous serez déduis *-5 points*')
-                    player.hasSpokenDeathCount += 1
-                }
+            console.log('check if can speak -- 3')
+            if (player.hasSpokenDeathCount > 0) {
+                await this.addUserPoints(whatsapp.sender, whatsapp, -5, "talk when dead", 0)
+                await whatsapp.sendMessage(groupId, `` + 'Les esprits ça parle uniquement la nuit!\nVous avez été déduis *-5 points*')
+                await whatsapp.delete()
+            } else {
+                await whatsapp.reply('⚠️ Attention, vous êtes mort, donc fermez votre bouche sinon vous serez déduis *-5 points*')
+                player.hasSpokenDeathCount += 1
+            }
         }
     }
 }
