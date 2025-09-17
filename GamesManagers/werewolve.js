@@ -1473,7 +1473,7 @@ export class WereWolvesManager {
         if (!player) return
         console.log('check if can speak -- 2')
 
-        if (!this.playerCanSpeak(playerJid, groupId)) {
+        if (!(await this.playerCanSpeak(playerJid, groupId))) {
             console.log('check if can speak -- 3')
             if (player.hasSpokenDeathCount > 0) {
                 await this.addUserPoints(whatsapp.sender, whatsapp, -5, "talk when dead", 0)
