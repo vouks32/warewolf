@@ -585,7 +585,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
 
             const name = whatsapp.text.split("!removepoints")[1].trim().split(' ')[0]
-             const amount = -(whatsapp.text.split("!removepoints")[1].trim().split(' ')[1] || 5)
+            const amount = -(whatsapp.text.split("!removepoints")[1].trim().split(' ')[1] || 5)
             const userjid = name.replace('@', '') + "@s.whatsapp.net"
             await wwm.addUserPoints(userjid, whatsapp, amount, "envoyé par super admin", 0)
             whatsapp.reply(`${name} a été déduis *-5 points*`)
@@ -658,6 +658,35 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             const name = whatsapp.text.split("!bot insulte")[1].trim().split(' ')[0]
             const user = whatsapp.ids.lid ? name.replace('@', '') + "@lid" : name.replace('@', '') + "@s.whatsapp.net"
             Insult1(whatsapp.groupJid, user, whatsapp)
+        }
+    })
+
+
+    // NOTE player
+    handlers.text.push({
+        regex: /!note/,
+        fn: async (whatsapp) => {
+            if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
+            if (whatsapp.text.split("!bot insulte").length == 1 || whatsapp.text.split("!bot insulte")[1].trim().length == 0) return await whatsapp.reply('Moi je vois pas celui que tu veux que j\'insulte 🤷‍♂️')
+            const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
+            if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+
+            const t = whatsapp.text.split("!note")[1].trim().split(' ')[0]
+            const target = parseInt(t) - 1
+            if (!(target >= 0 && target < 10) || t.length > 2) return
+
+            const text = whatsapp.text.split("!note")[1].trim().split(' ').slice(1).join(' ') || null
+
+            if (whatsapp.game === null) return await whatsapp.reply('persone n\'est entrain de jouer à un jeu! tu es attardé?')
+            if (whatsapp.game === 'WEREWOLVE') {
+                const werewolfGroupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
+                const targetJid = wwm.getPlayerJidFromNumber(werewolfGroupJid, target)
+
+                if (!text || text.length > 12) return await wwm.setNote(whatsapp.groupJid, targetJid, null, whatsapp)
+
+                await wwm.setNote(whatsapp.groupJid, targetJid, text, whatsapp)
+            }
         }
     })
 

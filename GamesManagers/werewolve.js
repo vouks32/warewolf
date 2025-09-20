@@ -259,7 +259,7 @@ export class WereWolvesManager {
             return
         }
 
-        game.players.push({ ids: whatsapp.ids, jid: playerJid, name, isPlaying: true, isDead: false, hasSpokenDeathCount: 0, role: null, points: [] })
+        game.players.push({ ids: whatsapp.ids, jid: playerJid, name, isPlaying: true, isDead: false, hasSpokenDeathCount: 0, role: null, points: [], note: "INCONNU" })
         this.saveGames(this.games)
 
         const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
@@ -1470,6 +1470,22 @@ export class WereWolvesManager {
             }
         }
 
+    }
+
+    async setNote(groupId, playerJid, note, whatsapp) {
+        const game = this.games[groupId]
+        if (!game) return
+
+        const notedPlayer = game.players.find(p => p.jid === playerJid)
+
+        if (note)
+            notedPlayer.note = '*' + note + '*'
+        this.saveGames(this.games)
+
+        const names = game.players.map((_p, i) => `[${i + 1}] - ` + (!_p.isDead ? `😀 ${p.note}` : `Mort ☠️ [${_p.role}]`)).join("\n")
+        const mentions = game.players.map((p, i) => p.jid)
+        //game.lastPlayerList = Date.now()
+        await whatsapp.sendMessage(groupId, "Joueurs :\n\n" + names, mentions)
     }
 
     playerCanSpeak(playerJid, groupId) {
