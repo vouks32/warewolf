@@ -1476,11 +1476,13 @@ export class WereWolvesManager {
         const game = this.games[groupId]
         if (!game) return
 
-        const notedPlayer = game.players.find(p => p.jid === playerJid)
+        if (!playerJid) {
+            const notedPlayer = game.players.find(p => p.jid === playerJid)
 
-        if (note)
-            notedPlayer.note = '*' + note + '*'
-        this.saveGames(this.games)
+            if (note)
+                notedPlayer.note = '*' + note + '*'
+            this.saveGames(this.games)
+        }
 
         const names = game.players.map((_p, i) => `[${i + 1}] - ` + (!_p.isDead ? `😀 ${p.note}` : `Mort ☠️ [${_p.role}]`)).join("\n")
         const mentions = game.players.map((p, i) => p.jid)
