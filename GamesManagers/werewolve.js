@@ -688,8 +688,8 @@ export class WereWolvesManager {
                 for (const voter in game.votes) {
                     const target = game.votes[voter]
                     if (victim.jid === target && victim.jid !== voter) {
-                        wolveVoters.push(_voter)
                         const _voter = game.players.find(p => p.jid === voter)
+                        wolveVoters.push(_voter)
                         if (_voter.role.includes('WEREWO')) continue
                         await this.addUserPoints(_voter.jid, whatsapp, POINTS_LIST.votedWolf, 'voté un loup', 0)
                     }
