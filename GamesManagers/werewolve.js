@@ -1479,6 +1479,11 @@ export class WereWolvesManager {
         const game = this.games[groupId]
         if (!game) return
 
+        if(!this.playerCanSpeak(whatsapp.sender, groupId)){
+            this.checkIfCanSpeak(groupId, whatsapp.sender, whatsapp)
+            return
+        }
+
         if (!playerJid) {
             const notedPlayer = game.players.find(p => p.jid === playerJid)
 

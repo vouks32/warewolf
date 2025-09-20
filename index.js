@@ -671,12 +671,6 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         regex: /!note/,
         fn: async (whatsapp) => {
             if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
-            const participants = await whatsapp.getParticipants(whatsapp.groupJid)
-            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
-            if (!AdminParticipant) {
-                whatsapp.delete()
-                return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
-            }
 
             const t = whatsapp.text.split("!note")[1].trim().split(' ')[0]
             const target = parseInt(t) - 1
