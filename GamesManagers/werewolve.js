@@ -1484,7 +1484,7 @@ export class WereWolvesManager {
             return
         }
 
-        if (!playerJid) {
+        if (playerJid) {
             const notedPlayer = game.players.find(p => p.jid === playerJid)
 
             if (note)
