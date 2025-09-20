@@ -12,7 +12,7 @@ class RoleManager {
             PROSTITUTE: playerCount >= 7 ? 1 : 0,
             MAYOR: playerCount >= 4 ? 1 : 0,
             TANNER: playerCount >= 9 ? 1 : 0,
-            MADMAN: playerCount >= 14 ? 2 : playerCount >= 5 ? 1: 0,
+            MADMAN: playerCount >= 14 ? 2 : playerCount >= 5 ? 1 : 0,
             SERIALKILLER: playerCount > 12 ? 1 : 0,
             PYROMANIAC: playerCount >= 11 ? 1 : 0
         };
@@ -26,7 +26,7 @@ class RoleManager {
 
         if (playerCount > 6) {
             const randomRole = specialRolesNAMES[Math.floor(Math.random() * specialRolesNAMES.length)]
-            if (randomRole !== "WEREWOLF") {
+            if (!randomRole.includes("WEREWOLF") && Math.random() > 0.4) {
                 distribution[randomRole] -= 1
                 distribution.MADMAN += 1
             }

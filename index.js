@@ -506,6 +506,34 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         await whatsapp.reply(t, mentions)
     })
 
+    handlers.commands.set("!rank", async (whatsapp) => {
+        if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+        const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+        console.log(participants)
+        const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
+        if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+
+        const groupId = whatsapp.groupJid
+
+        const allPlayers = getAllUsers()
+        let group = []
+        for (const playerJid in allPlayers) {
+            const player = allPlayers[playerJid];
+            if (player.groups.some(gJID => gJID === groupId))
+                group.push(player)
+        }
+
+        const metadata = await sock.groupMetadata(groupId);
+        const participant = metadata.participants
+        group.sort((p1, p2) => p2.points - p1.points)
+
+        await sock.sendMessage(groupId, {
+            text: `Liste des Joueurs:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n')
+            , mentions: group.map((p) => p.jid)
+        }).then(handler.addMessage)
+
+    })
+
 
 
     // Stop game (group)
@@ -538,8 +566,9 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
 
             const name = whatsapp.text.split("!sendpoints")[1].trim().split(' ')[0]
+            const amount = whatsapp.text.split("!sendpoints")[1].trim().split(' ')[1] || 5
             const userjid = name.replace('@', '') + "@s.whatsapp.net"
-            await wwm.addUserPoints(userjid, whatsapp, 5, "envoyé par super admin", 0)
+            await wwm.addUserPoints(userjid, whatsapp, amount, "envoyé par super admin", 0)
             whatsapp.reply(`${name} a reçu *+5 points*`)
         }
     })
@@ -556,8 +585,9 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
 
             const name = whatsapp.text.split("!removepoints")[1].trim().split(' ')[0]
+             const amount = -(whatsapp.text.split("!removepoints")[1].trim().split(' ')[1] || 5)
             const userjid = name.replace('@', '') + "@s.whatsapp.net"
-            await wwm.addUserPoints(userjid, whatsapp, -5, "envoyé par super admin", 0)
+            await wwm.addUserPoints(userjid, whatsapp, amount, "envoyé par super admin", 0)
             whatsapp.reply(`${name} a été déduis *-5 points*`)
         }
     })
