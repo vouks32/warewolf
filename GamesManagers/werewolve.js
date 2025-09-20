@@ -466,6 +466,7 @@ export class WereWolvesManager {
                     if (!(game.doctorChoice === target.jid) && !(game.witchHealAvailable && game.witchHeal)) {
                         target.isDead = true
                         await whatsapp.sendMessage(groupId, `🔪 @${target.jid.split('@')[0]} a été tué par le tueur en série! Il était [${target.role}]`, [target.jid])
+                       
                     } else {
                         await whatsapp.sendMessage(groupId, `🔪 Le tueur en série a tenté de tuer @${target.jid.split('@')[0]} mais il a été protégé!`, [target.jid])
                     }
@@ -476,7 +477,7 @@ export class WereWolvesManager {
             if (game.pyromaniacChoice === 'ignite') {
                 for (const oiledJid of game.pyromaniacOiled) {
                     const oiledPlayer = game.players.find(p => p.jid === oiledJid)
-                    if (oiledPlayer && !oiledPlayer.isDead) {
+                    if (oiledPlayer && !oiledPlayer.isDead && !oiledPlayer.role.includes("WEREW")) {
                         oiledPlayer.isDead = true
                         await whatsapp.sendMessage(groupId, `🔥 @${oiledJid.split('@')[0]} a été immolé! Il était [${oiledPlayer.role}]`, [oiledJid])
                     }
@@ -1170,29 +1171,29 @@ export class WereWolvesManager {
                 return
             }
 
-            if (game.pyromaniacOiled.length >= 6) {
+            if (game.pyromaniacOiled.length >= 2) {
                 await whatsapp.sendMessage(pyroJid, "⚠️ Tu as déjà trempé 6 joueurs, tu ne peux plus en tremper.")
                 return
             }
 
-            if (game.pyromaniacOiledTonight) {
+            /*if (game.pyromaniacOiledTonight) {
                 await whatsapp.sendMessage(pyroJid, "⚠️ Tu as assez trempé pour cette nuit, rendez-vous demain soir.")
                 return
-            }
+            }*/
 
             if (!game.pyromaniacOiled.includes(targetJid)) {
                 game.pyromaniacOiled.push(targetJid)
-                game.pyromaniacOiledTonight = true
+                //game.pyromaniacOiledTonight = true
                 await whatsapp.sendMessage(targetJid, "💧 Tu as été trempé dans l'huile par le pyromane!")
                 await whatsapp.sendMessage(pyroJid, `✅ Tu as trempé *${target.name}* dans l'huile.`, [target.jid])
             } else {
                 await whatsapp.sendMessage(pyroJid, `❌ Tu l'as déjà trempé dans l'huile.`)
             }
         } else if (action === 'ignite') {
-            if (game.pyromaniacOiledTonight) {
+           /* if (game.pyromaniacOiledTonight) {
                 await whatsapp.sendMessage(pyroJid, "⚠️ Tu as déjà utilisé toutes tes capacités pour cette nuit.")
                 return
-            }
+            }*/
             game.pyromaniacOiledTonight = true
             game.pyromaniacChoice = 'ignite'
             await whatsapp.sendMessage(pyroJid, "✅ Tu as choisi d'immoler tous les joueurs trempés.")

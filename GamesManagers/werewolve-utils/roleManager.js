@@ -7,14 +7,14 @@ class RoleManager {
             SEER: playerCount >= 6 ? 1 : 0,
             DOCTOR: playerCount >= 9 ? 1 : 0,
             HUNTER: playerCount >= 6 ? 1 : 0,
-            WITCH: playerCount >= 13 ? 1 : 0,
+            WITCH: playerCount >= 11 ? 1 : 0,
             CUPID: playerCount >= 7 ? 1 : 0,
             PROSTITUTE: playerCount >= 7 ? 1 : 0,
             MAYOR: playerCount >= 4 ? 1 : 0,
             TANNER: playerCount >= 9 ? 1 : 0,
             MADMAN: playerCount >= 14 ? 2 : playerCount >= 5 ? 1 : 0,
             SERIALKILLER: playerCount > 12 ? 1 : 0,
-            PYROMANIAC: playerCount >= 11 ? 1 : 0
+            PYROMANIAC: playerCount >= 13 ? 1 : 0
         };
 
         // Calculate total special roles
