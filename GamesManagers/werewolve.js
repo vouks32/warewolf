@@ -113,7 +113,7 @@ export class WereWolvesManager {
             user = saveUser(user)
         }
 
-        const game = this.games[groupId]
+        const game = this.games[(this.getPlayerGroupJid(playerJid) || ' ')]
         if (!game) return
         const Player = game.players.find(p => p.jid === playerJid)
         if (Player)
@@ -1373,7 +1373,7 @@ export class WereWolvesManager {
         if (!game) return
 
         //if (game.lastPlayerList > Date.now() - 30000) return
-        const names = game.players.map((_p, i) => `[${i + 1}] - *${_p.name}* (@${_p.jid.split('@')[0]})` + (!_p.isDead ? `😀` : `Mort ☠️ [${_p.role}]`) + "\n- *(" + (_p.points.reduce((sum, v) => sum + v.points, 0) >= 0 ? '+' : '') + _p.points.reduce((sum, v) => sum + v.points, 0) + " points)*" ).join("\n")
+        const names = game.players.map((_p, i) => `[${i + 1}] - *${_p.name}* (@${_p.jid.split('@')[0]})` + (!_p.isDead ? `😀` : `Mort ☠️ [${_p.role}]`) + "\n- *(" + (_p.points.reduce((sum, v) => sum + v.points, 0) >= 0 ? '+' : '') + _p.points.reduce((sum, v) => sum + v.points, 0) + " points)*").join("\n")
         const mentions = game.players.map((p, i) => p.jid)
         //game.lastPlayerList = Date.now()
         await whatsapp.sendMessage(groupId, "Joueurs :\n\n" + names, mentions)
