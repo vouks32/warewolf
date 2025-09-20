@@ -266,7 +266,11 @@ async function startBot() {
                      console.log("couldn't get thumbnail")
                  }
                  await sock.sendMessage(jid, { image: optimizedImage, caption: htmlDecode(caption), mentions }).then(handler.addMessage)*/
-                await sock.sendMessage(jid, { text: htmlDecode(caption) + (caption.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : ""), mentions: mentions }).then(handler.addMessage)
+
+                const text = "======================\n\n" +
+                    htmlDecode(caption) +
+                    "\n\n======================"
+                await sock.sendMessage(jid, { text, mentions: mentions }).then(handler.addMessage)
 
             },
 
