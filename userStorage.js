@@ -5,8 +5,8 @@ const USER_FOLDER = path.join(process.cwd(), "../users")
 const killWithPowers = 5
 export const POINTS_LIST = {
     joinGame: 10,
-    WinAsVillager: 10,
-    WinAsWolve: 15, 
+    WinAsVillager: 15,
+    WinAsWolve: 25, 
     WinAsLover: 20,
     StartSuccessfulGame: 2,
     deathPenatly: -1,
@@ -20,7 +20,7 @@ export const POINTS_LIST = {
     doctorProtected: killWithPowers,
     witchProtected: killWithPowers,
     cupidonlinkWolf: killWithPowers,
-    votedAsTanner : 15,
+    votedAsTanner : 20,
 }
 
 export function saveUser(user) {
