@@ -572,8 +572,8 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             const name = whatsapp.text.split("!sendpoints")[1].trim().split(' ')[0]
             const amount = whatsapp.text.split("!sendpoints")[1].trim().split(' ')[1] || 5
             const userjid = name.replace('@', '') + "@s.whatsapp.net"
-            await wwm.addUserPoints(userjid, whatsapp, amount, "envoyé par super admin", 0)
-            whatsapp.reply(`${name} a reçu *+5 points*`)
+            await wwm.addUserPoints(userjid, whatsapp, parseInt(amount), "envoyé par super admin", 0)
+            whatsapp.reply(`${name} a reçu *+${amount} points*`)
         }
     })
 
@@ -589,10 +589,10 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
 
             const name = whatsapp.text.split("!removepoints")[1].trim().split(' ')[0]
-            const amount = -(whatsapp.text.split("!removepoints")[1].trim().split(' ')[1] || 5)
+            const amount = -(parseInt(whatsapp.text.split("!removepoints")[1].trim().split(' ')[1]) || 5)
             const userjid = name.replace('@', '') + "@s.whatsapp.net"
             await wwm.addUserPoints(userjid, whatsapp, amount, "envoyé par super admin", 0)
-            whatsapp.reply(`${name} a été déduis *-5 points*`)
+            whatsapp.reply(`${name} a été déduis *-${amount} points*`)
         }
     })
 

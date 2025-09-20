@@ -1346,7 +1346,7 @@ export class WereWolvesManager {
                 break;
             case 1:
                 if (wolfIndex >= 0) {
-                    await whatsapp.sendMessage(groupId, "*--- Indice ---*\n\nLe nom que le loup à donné à une longeur de *" + Math.max(0, game.players[wolfIndex].name.length - Math.floor(Math.random() * 2) - 1) + " à " + (game.players[wolfIndex].name.length + Math.floor(Math.random() * 3) + 1) + " charactères*")
+                    await whatsapp.sendMessage(groupId, "*--- Indice ---*\n\nLe nom que le loup à donné à une longeur de *" + Math.max(0, game.players[wolfIndex].name.length - Math.floor(Math.random() * 2) - 1) + " à " + (game.players[wolfIndex].name.length + Math.floor(Math.random() * 1) + 1) + " charactères*")
                 }
                 break;
             case 2:
@@ -1480,14 +1480,14 @@ export class WereWolvesManager {
             const notedPlayer = game.players.find(p => p.jid === playerJid)
 
             if (note)
-                notedPlayer.note = '*' + note + '*'
+                notedPlayer.note = '*' + note.trim() + '*'
             this.saveGames(this.games)
         }
 
-        const names = game.players.map((_p, i) => `[${i + 1}] - ` + (!_p.isDead ? `😀 ${p.note}` : `Mort ☠️ [${_p.role}]`)).join("\n")
+        const names = game.players.map((_p, i) => `[${i + 1}] - ` + (!_p.isDead ? `😀 _${_p.note}_` : `☠️ [${_p.role}]`)).join("\n")
         const mentions = game.players.map((p, i) => p.jid)
         //game.lastPlayerList = Date.now()
-        await whatsapp.sendMessage(groupId, "Joueurs :\n\n" + names, mentions)
+        await whatsapp.sendMessage(groupId, "📝 ```Broillon```:\n\n" + names, mentions)
     }
 
     playerCanSpeak(playerJid, groupId) {
