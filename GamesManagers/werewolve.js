@@ -466,7 +466,7 @@ export class WereWolvesManager {
                     if (!(game.doctorChoice === target.jid) && !(game.witchHealAvailable && game.witchHeal)) {
                         target.isDead = true
                         await whatsapp.sendMessage(groupId, `🔪 @${target.jid.split('@')[0]} a été tué par le tueur en série! Il était [${target.role}]`, [target.jid])
-                       
+
                     } else {
                         await whatsapp.sendMessage(groupId, `🔪 Le tueur en série a tenté de tuer @${target.jid.split('@')[0]} mais il a été protégé!`, [target.jid])
                     }
@@ -688,9 +688,10 @@ export class WereWolvesManager {
                 for (const voter in game.votes) {
                     const target = game.votes[voter]
                     if (victim.jid === target && victim.jid !== voter) {
-                        const _voter = game.players.find(p => p.jid === voter)
-                        await this.addUserPoints(_voter.jid, whatsapp, POINTS_LIST.votedWolf, 'voté un loup', 0)
                         wolveVoters.push(_voter)
+                        const _voter = game.players.find(p => p.jid === voter)
+                        if (_voter.role.includes('WEREWO')) continue
+                        await this.addUserPoints(_voter.jid, whatsapp, POINTS_LIST.votedWolf, 'voté un loup', 0)
                     }
                 }
                 await whatsapp.sendMessage(groupId, `⚖️ Les villageois suivant ont *voté un loup à mort,* donc recoivent *+${POINTS_LIST.votedWolf} points*:\n(Les loups ne reçoivent rien 🙅‍♂️)\n\n` +
@@ -1190,10 +1191,10 @@ export class WereWolvesManager {
                 await whatsapp.sendMessage(pyroJid, `❌ Tu l'as déjà trempé dans l'huile.`)
             }
         } else if (action === 'ignite') {
-           /* if (game.pyromaniacOiledTonight) {
-                await whatsapp.sendMessage(pyroJid, "⚠️ Tu as déjà utilisé toutes tes capacités pour cette nuit.")
-                return
-            }*/
+            /* if (game.pyromaniacOiledTonight) {
+                 await whatsapp.sendMessage(pyroJid, "⚠️ Tu as déjà utilisé toutes tes capacités pour cette nuit.")
+                 return
+             }*/
             game.pyromaniacOiledTonight = true
             game.pyromaniacChoice = 'ignite'
             await whatsapp.sendMessage(pyroJid, "✅ Tu as choisi d'immoler tous les joueurs trempés.")
