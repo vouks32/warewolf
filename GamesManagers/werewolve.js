@@ -1442,7 +1442,10 @@ export class WereWolvesManager {
         }
 
         if (game.state === "NIGHT") {
-            if (whatsapp.isGroup) return
+            if (whatsapp.isGroup) {
+                await this.checkIfCanSpeak(groupId, playerJid, whatsapp)
+                return
+            }
             if (p.role.includes("WEREWOLF")) {
                 await this.wolfKill(groupId, playerJid, targetJid, whatsapp)
             } else if (p.role.includes("ALPHAWEREWOLF")) {

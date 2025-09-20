@@ -673,13 +673,16 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
             const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
-            if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+            if (!AdminParticipant) {
+                whatsapp.delete()
+                return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+            }
 
             const t = whatsapp.text.split("!note")[1].trim().split(' ')[0]
             const target = parseInt(t) - 1
             if (!(target >= 0 && target < 10) || t.length > 2) return await wwm.setNote(whatsapp.groupJid, null, null, whatsapp)
 
-            const text = whatsapp.text.split("!note")[1].trim().split(' ').slice(1).join(' ') || null
+            const text = whatsapp.text.split("!note")[1].trim().split(' ')[1] || null
 
             if (whatsapp.game === null) return await whatsapp.reply('persone n\'est entrain de jouer à un jeu! tu es attardé?')
             if (whatsapp.game === 'WEREWOLVE') {
