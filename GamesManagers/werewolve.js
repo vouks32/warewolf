@@ -1497,7 +1497,7 @@ export class WereWolvesManager {
             this.saveGames(this.games)
         }
 
-        const names = game.players.map((_p, i) => `[${i + 1}] - ` + (!_p.isDead ? `😀 _${_p.note}_` : `☠️ [${_p.role}]`)).join("\n")
+        const names = game.players.map((_p, i) => `[${i + 1}] - @${_p.split('@')[0]} ` + (!_p.isDead ? `😀 _${_p.note}_` : `☠️ [${_p.role}]`)).join("\n")
         const mentions = game.players.map((p, i) => p.jid)
         //game.lastPlayerList = Date.now()
         await whatsapp.sendMessage(groupId, "📝 ```Broillon```:\n\n" + names, mentions)
