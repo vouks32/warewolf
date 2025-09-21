@@ -617,7 +617,7 @@ export class WereWolvesManager {
         const dayDuration = Math.min(7 * 60 * 1000, Math.max(3 * 30 * 1000, (game.players.filter(p => !p.isDead).length / 1.5) * 60 * 1000))
 
         let seconds = 0
-        await whatsapp.sendMessage(groupId, "🌞 Jour: Discutez et votez avec *!vote _numéro victime_*\n\nVous avez *" + (dayDuration / (60 * 1000)) + " minutes*")
+        await whatsapp.sendMessage(groupId, "🌞 Jour: Discutez et votez avec *!vote _numéro victime_*\n\nVous avez *" + (dayDuration < 60 ? dayDuration + " secondes" : (dayDuration / 60).toFixed(0) + ":" + (dayDuration % 60) + " minutes") + "*")
         const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
         const mentions = game.players.map((p, i) => p.jid)
         await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
