@@ -65,5 +65,5 @@ function fancyTransform(text) {
     }).join("");
 }
 
-return {fancyTransform}
+export {fancyTransform}
 
