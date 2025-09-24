@@ -9,6 +9,13 @@ import sharp from "sharp";
 import fs from "fs"
 import NodeCache from "node-cache";
 import { QuizManagerFR } from "./GamesManagers/quiz-fr.js";
+import { fancyTransform } from './TextConverter.js'
+
+
+
+
+
+
 
 const MAX_MESSAGES = 1000
 
@@ -136,7 +143,7 @@ async function startBot() {
             console.log("✅ Bot is online!")
             messagesCount = MAX_MESSAGES
             if (lastGroupJid)
-                await sock.sendMessage(lastGroupJid, { text: ' --- BOT de nouveau actif --- \nJe suis de nouveau opérationnel', }).then(handler.addMessage)
+                await sock.sendMessage(lastGroupJid, { text: fancyTransform(' --- BOT de nouveau actif --- \nJe suis de nouveau opérationnel'), }).then(handler.addMessage)
             lastGroupJid = null
 
             // init games
@@ -144,11 +151,11 @@ async function startBot() {
                 await wwm.init({
                     sender: null,
                     sendMessage: async (jid, message, mentions = undefined) => {
-                        await sock.sendMessage(jid, { text: htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : ""), mentions: mentions }).then(handler.addMessage)
+                        await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }).then(handler.addMessage)
                     },
                     sendImage: async (jid, buffer, caption = "", mentions = []) => {
                         if (buffer.includes('http')) {
-                            await sock.sendMessage(jid, { image: { url: buffer }, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
+                            await sock.sendMessage(jid, { image: { url: buffer }, caption: fancyTransform(htmlDecode(caption)), mentions }).then(handler.addMessage)
                             return
                         }
                         /* const imagename = buffer.split('/').pop()
@@ -161,7 +168,7 @@ async function startBot() {
                      console.log("couldn't get thumbnail")
                  }
                  await sock.sendMessage(jid, { image: optimizedImage, caption: htmlDecode(caption), mentions }).then(handler.addMessage)*/
-                        await sock.sendMessage(jid, { text: htmlDecode(caption) + (caption.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : ""), mentions: mentions }).then(handler.addMessage)
+                        await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(caption) + (caption.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }).then(handler.addMessage)
                     }
                 })
             }, 2000)
@@ -182,7 +189,7 @@ async function startBot() {
         for (const p of event.participants) {
             if (event.action === "add") {
                 const text = `Bienvenue @${p.split('@')[0]},\n\nJe suis un bot donc pas la peine de me repondre, je m'en fou\n\nIci personne ne se connait donc ne soit pas peur, parle nous\n\nIci il y a plein de jeux mais on joue tout le temps au jeu du loups donc...\n\nEnvoie *!info* pour en savoir plus`
-                await sock.sendMessage(event.id, { text, mentions: [p, '237676073559@s.whatsapp.net'] })
+                await sock.sendMessage(event.id, { text : fancyTransform(text), mentions: [p, '237676073559@s.whatsapp.net'] })
             }
         }
 
@@ -216,7 +223,7 @@ async function startBot() {
             lastGroupJid = remoteJid
         }
         if (text.startsWith('!') && !game && messagesCount <= 0 && isGroup) {
-            await sock.sendMessage(lastGroupJid, { text: ' *--- Redémarrage de sécurité ---* \n\nLa relation toxique que j\'ai avec whatsapp m\'oblige à me redémarrer \n Patiente un peu', }, { quoted: msg }).then(handler.addMessage)
+            await sock.sendMessage(lastGroupJid, { text: fancyTransform(' *--- Redémarrage de sécurité ---* \n\nLa relation toxique que j\'ai avec whatsapp m\'oblige à me redémarrer \n Patiente un peu'), }, { quoted: msg }).then(handler.addMessage)
             await startBot()
             return
         }
@@ -241,19 +248,19 @@ async function startBot() {
             raw: msg,
 
             reply: async (message, mentions = undefined) => {
-                await sock.sendMessage(remoteJid, { text: htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : ""), mentions: mentions }, { quoted: msg }).then(handler.addMessage)
+                await sock.sendMessage(remoteJid, { text: fancyTransform(htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }, { quoted: msg }).then(handler.addMessage)
             },
             delete: async () => {
                 await sock.sendMessage(remoteJid, { delete: msg.key })
             },
 
             sendMessage: async (jid, message, mentions = undefined) => {
-                await sock.sendMessage(jid, { text: htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : ""), mentions: mentions }).then(handler.addMessage)
+                await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }).then(handler.addMessage)
             },
 
             sendImage: async (jid, buffer, caption = "", mentions = []) => {
                 if (buffer.includes('http')) {
-                    await sock.sendMessage(jid, { image: { url: buffer }, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
+                    await sock.sendMessage(jid, { image: { url: buffer }, caption: fancyTransform(htmlDecode(caption)), mentions }).then(handler.addMessage)
                     return
                 }
                 /* const imagename = buffer.split('/').pop()
@@ -270,7 +277,7 @@ async function startBot() {
                 const text = "======================\n\n" +
                     htmlDecode(caption) +
                     "\n\n======================"
-                await sock.sendMessage(jid, { text, mentions: mentions }).then(handler.addMessage)
+                await sock.sendMessage(jid, { text : fancyTransform(text), mentions: mentions }).then(handler.addMessage)
 
             },
 
@@ -279,7 +286,7 @@ async function startBot() {
             },
 
             sendVideo: async (jid, buffer, caption = "") => {
-                await sock.sendMessage(jid, { video: buffer, caption: htmlDecode(caption) })
+                await sock.sendMessage(jid, { video: buffer, caption: fancyTransform(htmlDecode(caption)) })
             },
 
             getParticipants: async (groupJid) => {
@@ -373,7 +380,7 @@ async function startBot() {
             group.sort((p1, p2) => p2.points - p1.points)
 
             await sock.sendMessage(groupJid, {
-                text: `Liste des Joueurs:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n')
+                text: fancyTransform(`Liste des Joueurs:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n'))
                 , mentions: group.map((p) => p.jid)
             }).then(handler.addMessage)
 
@@ -388,7 +395,7 @@ async function startBot() {
                             [p.jid],
                             'promote' // replace this parameter with 'remove' or 'demote' or 'promote'
                         )
-                        await sock.sendMessage(groupJid, { text: `@${p.jid.split('@')[0]} a été *ajouté* à la haute sphère des Admins`, mentions: [p.jid] }).then(handler.addMessage)
+                        await sock.sendMessage(groupJid, { text: fancyTransform(`@${p.jid.split('@')[0]} a été *ajouté* à la haute sphère des Admins`), mentions: [p.jid] }).then(handler.addMessage)
                     } else if (!groupParticipant) {
                         console.log(p.jid, p.pushName, "is no more in group but top 3")
                     }
