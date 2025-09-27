@@ -1016,6 +1016,7 @@ export class WereWolvesManager {
     async witchHeal(groupId, whatsapp) {
         const game = this.games[groupId]
         if (!game) return
+        if (!game || game.state !== "NIGHT") return
         const witch = game.players.find(p => p.jid === whatsapp.sender)
         if (!witch || witch.role !== "WITCH" || !game.witchHealAvailable) return
         game.witchHeal = true
@@ -1026,6 +1027,7 @@ export class WereWolvesManager {
 
     async witchPoison(groupId, targetJid, whatsapp) {
         const game = this.games[groupId]
+        if (!game || game.state !== "NIGHT") return
         if (!game) return
         const witch = game.players.find(p => p.jid === whatsapp.sender)
         if (!witch || witch.role !== "WITCH" || !game.witchPoisonAvailable) return
