@@ -189,7 +189,7 @@ async function startBot() {
         for (const p of event.participants) {
             if (event.action === "add") {
                 const text = `Bienvenue @${p.split('@')[0]},\n\nJe suis un bot donc pas la peine de me repondre, je m'en fou\n\nIci personne ne se connait donc ne soit pas peur, parle nous\n\nIci il y a plein de jeux mais on joue tout le temps au jeu du loups donc...\n\nEnvoie *!info* pour en savoir plus`
-                await sock.sendMessage(event.id, { text : fancyTransform(text), mentions: [p, '237676073559@s.whatsapp.net'] })
+                await sock.sendMessage(event.id, { text: fancyTransform(text), mentions: [p, '237676073559@s.whatsapp.net'] })
             }
         }
 
@@ -277,7 +277,7 @@ async function startBot() {
                 const text = "======================\n\n" +
                     htmlDecode(caption) +
                     "\n\n======================"
-                await sock.sendMessage(jid, { text : fancyTransform(text), mentions: mentions }).then(handler.addMessage)
+                await sock.sendMessage(jid, { text: fancyTransform(text), mentions: mentions }).then(handler.addMessage)
 
             },
 
@@ -380,7 +380,7 @@ async function startBot() {
             group.sort((p1, p2) => p2.points - p1.points)
 
             await sock.sendMessage(groupJid, {
-                text: fancyTransform(`Liste des Joueurs:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n'))
+                text: fancyTransform(`Liste des Joueurs:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : (i == 3 || i == 4) ? '🏅' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n'))
                 , mentions: group.map((p) => p.jid)
             }).then(handler.addMessage)
 
@@ -388,7 +388,7 @@ async function startBot() {
             for (let index = 0; index < group.length; index++) {
                 const p = group[index];
                 const groupParticipant = participant.find(gp => gp.id === p.jid)
-                if (index < 3) {
+                if (index < 5) {
                     if (!groupParticipant?.admin) {
                         await sock.groupParticipantsUpdate(
                             groupJid,
@@ -870,7 +870,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
     })
 
     // Mayor stop vote
-    handlers.text.push({
+   /* handlers.text.push({
         regex: /^!p$/,
         fn: async (whatsapp) => {
             if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
@@ -885,7 +885,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             } else if (whatsapp.game === 'WEREWOLVE')
                 await wwm.sendPlayerList(whatsapp.groupJid, whatsapp)
         }
-    })
+    })*/
 
     // Seer action
     handlers.text.push({

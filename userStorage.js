@@ -6,7 +6,7 @@ const killWithPowers = 5
 export const POINTS_LIST = {
     joinGame: 10,
     WinAsVillager: 0,
-    WinAsWolve: 20, 
+    WinAsWolve: 10, 
     WinAsLover: 15,
     StartSuccessfulGame: 2,
     deathPenatly: -1,
@@ -15,12 +15,12 @@ export const POINTS_LIST = {
     witchPoisonWolf: killWithPowers,
     votedWolf: killWithPowers,
     votedInnocent: -15,
-    didntVote: -5,
+    didntVote: -10,
     prostituteProtected: killWithPowers,
     doctorProtected: killWithPowers,
     witchProtected: killWithPowers,
     cupidonlinkWolf: killWithPowers,
-    votedAsTanner : 20,
+    votedAsTanner : 15,
 }
 
 export function saveUser(user) {
