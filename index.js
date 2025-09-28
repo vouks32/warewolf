@@ -569,7 +569,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         const metadata = await sock.groupMetadata(groupId);
 
         await sock.sendMessage(groupId, {
-            text: `Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n')
+            text: `Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) => ('[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n')
             , mentions: group.map((p) => p.jid)
         }).then(handler.addMessage)
 
