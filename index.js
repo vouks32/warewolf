@@ -380,7 +380,7 @@ async function startBot() {
             group.sort((p1, p2) => p2.points - p1.points)
 
             await sock.sendMessage(groupJid, {
-                text: fancyTransform(`Liste des Joueurs:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : (i == 3 || i == 4) ? '🏅' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n'))
+            text: fancyTransform(`Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n'))
                 , mentions: group.map((p) => p.jid)
             }).then(handler.addMessage)
 
@@ -540,6 +540,36 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
         await sock.sendMessage(groupId, {
             text: `Liste des Joueurs:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n')
+            , mentions: group.map((p) => p.jid)
+        }).then(handler.addMessage)
+
+    })
+
+
+    handlers.commands.set("!resetRank", async (whatsapp) => {
+        if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+        const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+        console.log(participants)
+        const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.toLowerCase().includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin) && _p.admin.toLowerCase().includes('super'))
+        if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es SUPER Admin?!')
+
+        const groupId = whatsapp.groupJid
+
+        const allPlayers = getAllUsers()
+        let group = []
+        for (const playerJid in allPlayers) {
+            const player = allPlayers[playerJid];
+            if (player.groups.some(gJID => gJID === groupId)) {
+                player.points = 50
+                saveUser(player)
+                group.push(player)
+            }
+        }
+
+        const metadata = await sock.groupMetadata(groupId);
+
+        await sock.sendMessage(groupId, {
+            text: `Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n')
             , mentions: group.map((p) => p.jid)
         }).then(handler.addMessage)
 
@@ -870,22 +900,22 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
     })
 
     // Mayor stop vote
-   /* handlers.text.push({
-        regex: /^!p$/,
-        fn: async (whatsapp) => {
-            if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
-            const participants = await whatsapp.getParticipants(whatsapp.groupJid)
-            console.log(participants)
-            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
-            if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
-
-            if (whatsapp.game === null) return await whatsapp.reply('persone n\'est entrain de jouer à un jeu!')
-            else if (whatsapp.game === 'QUIZ') {
-                //await qm.stopGame(whatsapp.groupJid, whatsapp)
-            } else if (whatsapp.game === 'WEREWOLVE')
-                await wwm.sendPlayerList(whatsapp.groupJid, whatsapp)
-        }
-    })*/
+    /* handlers.text.push({
+         regex: /^!p$/,
+         fn: async (whatsapp) => {
+             if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+             console.log(participants)
+             const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
+             if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+ 
+             if (whatsapp.game === null) return await whatsapp.reply('persone n\'est entrain de jouer à un jeu!')
+             else if (whatsapp.game === 'QUIZ') {
+                 //await qm.stopGame(whatsapp.groupJid, whatsapp)
+             } else if (whatsapp.game === 'WEREWOLVE')
+                 await wwm.sendPlayerList(whatsapp.groupJid, whatsapp)
+         }
+     })*/
 
     // Seer action
     handlers.text.push({
