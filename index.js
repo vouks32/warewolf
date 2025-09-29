@@ -375,7 +375,7 @@ async function startBot() {
             group.sort((p1, p2) => p2.points - p1.points)
 
             await sock.sendMessage(groupJid, {
-            text: fancyTransform(`Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n'))
+            text: fancyTransform(`Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : (i == 3 || i == 4)? '🏅' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n'))
                 , mentions: group.map((p) => p.jid)
             }).then(handler.addMessage)
 
@@ -534,7 +534,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         group.sort((p1, p2) => p2.points - p1.points)
 
         await sock.sendMessage(groupId, {
-            text: `Liste des Joueurs:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n')
+            text: `Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n')
             , mentions: group.map((p) => p.jid)
         }).then(handler.addMessage)
 
