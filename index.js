@@ -12,11 +12,6 @@ import { QuizManagerFR } from "./GamesManagers/quiz-fr.js";
 import { fancyTransform } from './TextConverter.js'
 
 
-
-
-
-
-
 const MAX_MESSAGES = 1000
 
 let messagesCount = MAX_MESSAGES

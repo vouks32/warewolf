@@ -96,6 +96,7 @@ export class WereWolvesManager {
 
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
+        if (!playerJid || !whatsapp || !reason || !points) return
         let user = getUser(playerJid)
         let arr = {}
         arr[reason] = points
@@ -502,21 +503,21 @@ export class WereWolvesManager {
                 }
 
                 if (game.prostituteProtected && game.prostituteProtected.includes(victimId)) {
-                    if (game.players.find(p => p.role === "PROSTITUTE").jid === victimId) {
+                    if (game.players.find(p => p.role === "PROSTITUTE")?.jid === victimId) {
                         await whatsapp.sendMessage(groupId, `💄Après s'être faite écarter les jambes, en rentrant chez elle, la prostitué s'est faite écarter la cage thoracique \n` + `La prostitué est morte`)
                         victim.isDead = true
-                        // await this.addUserPoints(game.players.find(p => p.role === "PROSTITUTE").jid, whatsapp, POINTS_LIST.prostituteProtected, "protection sexuelle", 0)
+                        // await this.addUserPoints(game.players.find(p => p.role === "PROSTITUTE")?.jid, whatsapp, POINTS_LIST.prostituteProtected, "protection sexuelle", 0)
                     } else {
                         await whatsapp.sendMessage(groupId, `💄 La victime des loups était trop occupé à baiser pour ouvrir aux loups!\nPersonne n'est mort\n` + `+${POINTS_LIST.prostituteProtected} points pour la prostitué`)
-                        await this.addUserPoints(game.players.find(p => p.role === "PROSTITUTE").jid, whatsapp, POINTS_LIST.prostituteProtected, "protection sexuelle", 0)
+                        await this.addUserPoints(game.players.find(p => p.role === "PROSTITUTE")?.jid, whatsapp, POINTS_LIST.prostituteProtected, "protection sexuelle", 0)
                     }
 
                 } else if (game.doctorChoice && game.doctorChoice === victimId) {
                     await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été sauvée par la médécine moderne! 💉\n" + `+${POINTS_LIST.doctorProtected} points pour le docteur`)
-                    await this.addUserPoints(game.players.find(p => p.role === "DOCTOR").jid, whatsapp, POINTS_LIST.doctorProtected, "guérison médicinale", 0)
+                    await this.addUserPoints(game.players.find(p => p.role === "DOCTOR")?.jid, whatsapp, POINTS_LIST.doctorProtected, "guérison médicinale", 0)
                 } else if (game.witchHeal) {
                     await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été protégée par magie! 🪄\n" + `+${POINTS_LIST.witchProtected} points pour la sorcière`)
-                    await this.addUserPoints(game.players.find(p => p.role === "WITCH").jid, whatsapp, POINTS_LIST.witchProtected, "protection magique", 0)
+                    await this.addUserPoints(game.players.find(p => p.role === "WITCH")?.jid, whatsapp, POINTS_LIST.witchProtected, "protection magique", 0)
                 } else {
                     if (victim.role === "HUNTER") {
                         if (counts[victimId] == 1 && Math.random() < 0.3) {
@@ -553,7 +554,7 @@ export class WereWolvesManager {
                             }
                             if (partner.role === "WEREWOLF" || partner.role === "ALPHAWEREWOLF") {
                                 await whatsapp.sendMessage(groupId, "💘 Le loup est mort grace à cupidon " + `+${POINTS_LIST.cupidonlinkWolf} points pour lui`)
-                                await this.addUserPoints(game.players.find(p => p.role === "CUPID").jid, whatsapp, POINTS_LIST.cupidonlinkWolf, "Cupidon lie le loup", 0)
+                                await this.addUserPoints(game.players.find(p => p.role === "CUPID")?.jid, whatsapp, POINTS_LIST.cupidonlinkWolf, "Cupidon lie le loup", 0)
                             }
 
                         }
@@ -568,7 +569,7 @@ export class WereWolvesManager {
                             }
                             if (partner.role === "WEREWOLF" || partner.role === "ALPHAWEREWOLF") {
                                 await whatsapp.sendMessage(groupId, "💘 Le loup est mort grace à cupidon " + `+${POINTS_LIST.cupidonlinkWolf} points pour lui`)
-                                await this.addUserPoints(game.players.find(p => p.role === "CUPID").jid, whatsapp, POINTS_LIST.cupidonlinkWolf, "Cupidon lie le loup", 0)
+                                await this.addUserPoints(game.players.find(p => p.role === "CUPID")?.jid, whatsapp, POINTS_LIST.cupidonlinkWolf, "Cupidon lie le loup", 0)
                             }
 
                         }
@@ -728,7 +729,7 @@ export class WereWolvesManager {
                     }
                     if (partner.role === "WEREWOLF" || partner.role === "ALPHAWEREWOLF") {
                         await whatsapp.sendMessage(groupId, "💘 Le loup est mort grace à cupidon " + `+${POINTS_LIST.cupidonlinkWolf} points pour lui`)
-                        await this.addUserPoints(game.players.find(p => p.role === "CUPID").jid, whatsapp, POINTS_LIST.cupidonlinkWolf, "Cupidon lie le loup", 0)
+                        await this.addUserPoints(game.players.find(p => p.role === "CUPID")?.jid, whatsapp, POINTS_LIST.cupidonlinkWolf, "Cupidon lie le loup", 0)
                     }
                 }
             }
@@ -950,7 +951,7 @@ export class WereWolvesManager {
                         await whatsapp.sendMessage(groupId, `💔 *${partner.name}* (@${partner.jid.split('@')[0]}) est mort de chagrin suite à la perte de son amoureux.`, [partner.jid])
                         if (partner.role.includes("WEREWOLF") || partner.role === "ALPHAWEREWOLF") {
                             await whatsapp.sendMessage(groupId, "💘 Le loup est mort grace à cupidon " + `+${POINTS_LIST.cupidonlinkWolf} points pour lui`)
-                            await this.addUserPoints(game.players.find(p => p.role === "CUPID").jid, whatsapp, POINTS_LIST.cupidonlinkWolf, "Cupidon lie le loup", 0)
+                            await this.addUserPoints(game.players.find(p => p.role === "CUPID")?.jid, whatsapp, POINTS_LIST.cupidonlinkWolf, "Cupidon lie le loup", 0)
                         }
                     }
                 }
@@ -964,7 +965,7 @@ export class WereWolvesManager {
                     await whatsapp.sendMessage(groupId, `💔 *${partner.name}* (@${partner.jid.split('@')[0]}) est mort de chagrin suite à la perte de son amoureux.`, [partner.jid])
                     if (partner.role.includes("WEREWOLF") || partner.role === "ALPHAWEREWOLF") {
                         await whatsapp.sendMessage(groupId, "💘 Le loup est mort grace à cupidon " + `+${POINTS_LIST.cupidonlinkWolf} points pour lui`)
-                        await this.addUserPoints(game.players.find(p => p.role === "CUPID").jid, whatsapp, POINTS_LIST.cupidonlinkWolf, "Cupidon lie le loup", 0)
+                        await this.addUserPoints(game.players.find(p => p.role === "CUPID")?.jid, whatsapp, POINTS_LIST.cupidonlinkWolf, "Cupidon lie le loup", 0)
                     }
                     if (partner.role === "HUNTER") {
                         await this._hunterRant(groupId, partner, whatsapp)
@@ -1057,7 +1058,7 @@ export class WereWolvesManager {
                 }
                 if (partner.role === "WEREWOLF" || partner.role === "ALPHAWEREWOLF") {
                     await whatsapp.sendMessage(groupId, "💘 Le loup est mort grace à cupidon " + `+${POINTS_LIST.cupidonlinkWolf} points pour lui`)
-                    await this.addUserPoints(game.players.find(p => p.role === "CUPID").jid, whatsapp, POINTS_LIST.cupidonlinkWolf, "Cupidon lie le loup", 0)
+                    await this.addUserPoints(game.players.find(p => p.role === "CUPID")?.jid, whatsapp, POINTS_LIST.cupidonlinkWolf, "Cupidon lie le loup", 0)
                 }
             }
         }
