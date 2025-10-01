@@ -4,15 +4,15 @@ class RoleManager {
         // Define role percentages (adjust as needed)
         const distribution = {
             WEREWOLF: Math.max(1, Math.floor(playerCount * 0.2)),
-            SEER: playerCount >= 6 ? 1 : 0,
-            DOCTOR: playerCount >= 9 ? 1 : 0,
-            HUNTER: playerCount >= 6 ? 1 : 0,
-            WITCH: playerCount >= 11 ? 1 : 0,
-            CUPID: playerCount >= 7 ? 1 : 0,
-            PROSTITUTE: playerCount >= 7 ? 1 : 0,
             MAYOR: playerCount >= 4 ? 1 : 0,
-            TANNER: playerCount >= 9 ? 1 : 0,
             MADMAN: playerCount >= 14 ? 2 : playerCount >= 5 ? 1 : 0,
+            SEER: playerCount >= 5 ? 1 : 0,
+            TANNER: playerCount >= 6 ? 1 : 0,
+            PROSTITUTE: playerCount >= 7 ? 1 : 0,
+            HUNTER: playerCount >= 8 ? 1 : 0,
+            CUPID: playerCount >= 9 ? 1 : 0,
+            DOCTOR: playerCount >= 10 ? 1 : 0,
+            WITCH: playerCount >= 11 ? 1 : 0,
             SERIALKILLER: playerCount > 12 ? 1 : 0,
             PYROMANIAC: playerCount >= 13 ? 1 : 0
         };
@@ -26,7 +26,7 @@ class RoleManager {
 
         if (playerCount > 6) {
             const randomRole = specialRolesNAMES[Math.floor(Math.random() * specialRolesNAMES.length)]
-            if (!randomRole.includes("WEREWOLF") && Math.random() > 0.4) {
+            if (!randomRole.includes("WEREWOLF") && Math.random() > 0.5 && distribution[randomRole] > 0) {
                 distribution[randomRole] -= 1
                 distribution.MADMAN += 1
             }

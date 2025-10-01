@@ -556,6 +556,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             const player = allPlayers[playerJid];
             if (player.groups.some(gJID => gJID === groupId)) {
                 player.points = 50
+                player.games.WEREWOLF = 0 
                 saveUser(player)
                 group.push(player)
             }
