@@ -46,16 +46,13 @@ class RoleManager {
             }
         }
 
-        // Shuffle roles
-        for (let i = roles.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [roles[i], roles[j]] = [roles[j], roles[i]];
-        }
-        // Shuffle roles
-        for (let i = 0; i < roles.length - 1; i++) {
-            const j = Math.floor(Math.random() * roles.length);
-            if (j !== i)
+
+        for (let v = 0; v < 7; v++) {
+            // Shuffle roles
+            for (let i = roles.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
                 [roles[i], roles[j]] = [roles[j], roles[i]];
+            }
         }
 
         return roles;

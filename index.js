@@ -200,7 +200,7 @@ async function startBot() {
         // Parse the message to get type and JIDs
         const remoteJid = msg.key.remoteJid;
         const isGroup = remoteJid.endsWith('@g.us');
-        const senderJid = isGroup ? (msg.key?.participant?.endsWith('@lid') && msg.key?.number ? msg.key?.number : msg.key?.participant) : remoteJid;
+        const senderJid = isGroup ? (msg.key?.number ? msg.key?.number : msg.key?.participant) : remoteJid;
         const sender = senderJid
         const messageType = Object.keys(msg.message)[0]
         const content = msg.message[messageType]
@@ -772,6 +772,15 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         const quizGroupJid = qm.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
         const quizFRGroupJid = qmfr.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
 
+         //console.log('type', whatsapp.messageType)
+        if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
+            await wwm.addUserPoints(whatsapp.sender, whatsapp, -30, "send image during game", 0)
+            await whatsapp.reply('Vous avez reçu *-30 points* pour avoir envoyé une image/vidéo pendant la partie')
+            await whatsapp.delete()
+            return
+        }
+
+
         if (whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
             const ans = [
                 `@${whatsapp.sender.split('@')[0]} on est pas dans ton village ici, les morts ne réagissent pas\nVous avez reçu *-5 points*`,
@@ -780,14 +789,6 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             ]
             await whatsapp.reply(ans[Math.floor(Math.random() * ans.length)], [whatsapp.sender])
             await wwm.addUserPoints(whatsapp.sender, whatsapp, -5, "réagis étant mort", 0)
-            return
-        }
-
-        //console.log('type', whatsapp.messageType)
-        if (werewolfGroupJid && whatsapp.isGroup && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
-            await wwm.addUserPoints(whatsapp.sender, whatsapp, -10, "send image during game", 0)
-            await whatsapp.reply('Vous avez reçu *-10 points*')
-            await whatsapp.delete()
             return
         }
 
