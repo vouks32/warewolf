@@ -214,6 +214,13 @@ async function startBot() {
         // Build reusable whatsapp object with proper JID information
         const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : null
 
+        if(!senderJid || senderJid.length == 0) {
+            console.log(" ============================================================================== ")
+            console.log("no senderJid")
+            console.log( msg)
+            return
+        }
+
         if (isGroup) {
             lastGroupJid = remoteJid
         }
