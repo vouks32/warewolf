@@ -50,7 +50,7 @@ export const makeRetryHandler = () => {
    clearObseleteMessages,
    getHandler: (message) => {
      const msg = getMessage(message.id || "");
-     console.log("Retrying message", msg);
+     //console.log("Retrying message", msg);
      return msg;
    },
  };

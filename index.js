@@ -360,7 +360,7 @@ async function startBot() {
 
                 if (handled) {
                     //console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage?.contextInfo)
-                    console.log(whatsapp.senderJid, ":", text)
+                    //console.log(whatsapp.senderJid, ":", text)
                     /* */
                     /*console.log("------------------------------")*/
                 }
