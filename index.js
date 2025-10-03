@@ -40,49 +40,6 @@ function htmlDecode(text) {
         .replace(/&nbsp;/g, ' ');
 }
 
-function parseMessage(msg) {
-    const remoteJid = msg.key.remoteJid;
-    const isGroup = remoteJid.endsWith('@g.us');
-
-    let groupJid = null;
-    let privateJid = null;
-    let senderJid = null;
-
-    if (isGroup) {
-        groupJid = remoteJid;
-        // For group messages, the actual sender is in the participant field
-        senderJid = msg.key.participant || remoteJid;
-    } else {
-        privateJid = remoteJid;
-        senderJid = remoteJid; // For private messages, sender is the remoteJid
-    }
-
-    return {
-        isGroup,
-        groupJid,
-        privateJid,
-        senderJid,
-        text: extractText(msg),
-        raw: msg
-    };
-}
-
-function extractText(msg) {
-    if (msg.message.conversation) {
-        return msg.message.conversation;
-    } else if (msg.message.extendedTextMessage && msg.message.extendedTextMessage.text) {
-        return msg.message.extendedTextMessage.text;
-    } else if (msg.message.imageMessage && msg.message.imageMessage.caption) {
-        return msg.message.imageMessage.caption;
-    } else if (msg.message.videoMessage && msg.message.videoMessage.caption) {
-        return msg.message.videoMessage.caption;
-    }
-    return "";
-}
-
-const botTips = [
-    ""
-]
 
 async function startBot() {
     const { state, saveCreds } = await useMultiFileAuthState("../auth_info")
@@ -195,12 +152,13 @@ async function startBot() {
         for (const msg of m.messages) {
             console.log('---------------------       message -----------------------------------------')
             console.log(msg)
+
             if (msg.key && msg.key.remoteJid == 'status@broadcast') {
                 //console.log("status message")
                 continue
             }
 
-            if (!msg.message || msg.key.fromMe) {
+            if (msg.key.fromMe) {
                 continue
             }
 
@@ -211,12 +169,13 @@ async function startBot() {
             const isGroup = remoteJid.endsWith('@g.us');
             const senderJid = isGroup ? (msg.key?.participantPn ? msg.key?.participantPn : msg.key?.participantLid) : remoteJid;
             const sender = senderJid
-            const messageType = Object.keys(msg.message)[0]
+            const msgKeys = Object.keys(msg.message || {})
+            const messageType = msgKeys > 0? msgKeys[0] : null
             const content = msg.message[messageType]
-            const text = msg.message.conversation ||
-                msg.message.extendedTextMessage?.text ||
-                msg.message.imageMessage?.caption ||
-                msg.message.videoMessage?.caption ||
+            const text = msg.message?.conversation ||
+                msg.message?.extendedTextMessage?.text ||
+                msg.message?.imageMessage?.caption ||
+                msg.message?.videoMessage?.caption ||
                 "";
 
 
@@ -251,9 +210,9 @@ async function startBot() {
                 text,
                 game,
                 messageType: getContentType(msg.message),
-                isViewOnce: msg.message.viewOnceMessage || msg.message.viewOnceMessageV2 || msg.message.viewOnceMessageV2Extension,
+                isViewOnce: msg.message?.viewOnceMessage || msg.message?.viewOnceMessageV2 || msg.message?.viewOnceMessageV2Extension,
                 isForward: (content?.contextInfo?.isForwarded || content?.contextInfo?.forwardingScore > 0),
-                isReaction: (msg.message.reactionMessage),
+                isReaction: (msg.message?.reactionMessage),
                 raw: msg,
 
                 reply: async (message, mentions = undefined) => {
