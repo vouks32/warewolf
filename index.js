@@ -170,7 +170,7 @@ async function startBot() {
             const senderJid = isGroup ? (msg.key?.participantPn ? msg.key?.participantPn : msg.key?.participantLid) : remoteJid;
             const sender = senderJid
             const msgKeys = Object.keys(msg.message || {})
-            const messageType = msgKeys > 0? msgKeys[0] : null
+            const messageType = msgKeys > 0 ? msgKeys[0] : null
             const content = msg.message[messageType]
             const text = msg.message?.conversation ||
                 msg.message?.extendedTextMessage?.text ||
@@ -210,7 +210,7 @@ async function startBot() {
                 text,
                 game,
                 messageType: getContentType(msg.message),
-                isViewOnce: msg.message?.viewOnceMessage || msg.message?.viewOnceMessageV2 || msg.message?.viewOnceMessageV2Extension,
+                isViewOnce: msg.key?.isViewOnce || msg.message?.viewOnceMessage || msg.message?.viewOnceMessageV2 || msg.message?.viewOnceMessageV2Extension,
                 isForward: (content?.contextInfo?.isForwarded || content?.contextInfo?.forwardingScore > 0),
                 isReaction: (msg.message?.reactionMessage),
                 raw: msg,
