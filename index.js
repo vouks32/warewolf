@@ -191,177 +191,183 @@ async function startBot() {
     })
     // Handle messages
     sock.ev.on("messages.upsert", async (m) => {
-        const msg = m.messages[0]
 
+        for (const msg of m.messages) {
 
-        if (!msg.message || msg.key.fromMe) {
-            return
-        }
-        // Parse the message to get type and JIDs
-        const remoteJid = msg.key.remoteJid;
-        const isGroup = remoteJid.endsWith('@g.us');
-        const senderJid = isGroup ? (msg.key?.number ? msg.key?.number : msg.key?.participant) : remoteJid;
-        const sender = senderJid
-        const messageType = Object.keys(msg.message)[0]
-        const content = msg.message[messageType]
-        const text = msg.message.conversation ||
-            msg.message.extendedTextMessage?.text ||
-            msg.message.imageMessage?.caption ||
-            msg.message.videoMessage?.caption ||
-            "";
-
-
-        // Build reusable whatsapp object with proper JID information
-        const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : null
-
-        if(!senderJid || senderJid.length == 0) {
-            console.log(" ============================================================================== ")
-            console.log("no senderJid")
-            console.log( msg)
-            return
-        }
-
-        if (isGroup) {
-            lastGroupJid = remoteJid
-        }
-        if (text.startsWith('!') && !game && messagesCount <= 0 && isGroup) {
-            await sock.sendMessage(lastGroupJid, { text: fancyTransform(' *--- Redémarrage de sécurité ---* \n\nLa relation toxique que j\'ai avec whatsapp m\'oblige à me redémarrer \n Patiente un peu'), }, { quoted: msg }).then(handler.addMessage)
-            await startBot()
-            return
-        }
-        messagesCount--;
-        const whatsapp = {
-            ids: {
-                lid: msg.key.participant?.endsWith('@lid') ? msg.key.participant : null,
-                jid: senderJid,
-            },
-            isGroup,
-            remoteJid,
-            groupJid: isGroup ? remoteJid : null,
-            privateJid: isGroup ? null : remoteJid,
-            senderJid,
-            sender,
-            text,
-            game,
-            messageType: getContentType(msg.message),
-            isViewOnce: msg.message.viewOnceMessage || msg.message.viewOnceMessageV2 || msg.message.viewOnceMessageV2Extension,
-            isForward: (content?.contextInfo?.isForwarded || content?.contextInfo?.forwardingScore > 0),
-            isReaction: (msg.message.reactionMessage),
-            raw: msg,
-
-            reply: async (message, mentions = undefined) => {
-                await sock.sendMessage(remoteJid, { text: fancyTransform(htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }, { quoted: msg }).then(handler.addMessage)
-            },
-            delete: async () => {
-                await sock.sendMessage(remoteJid, { delete: msg.key })
-            },
-
-            sendMessage: async (jid, message, mentions = undefined) => {
-                await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }).then(handler.addMessage)
-            },
-
-            sendImage: async (jid, buffer, caption = "", mentions = []) => {
-                if (buffer.includes('http')) {
-                    await sock.sendMessage(jid, { image: { url: buffer }, caption: fancyTransform(htmlDecode(caption)), mentions }).then(handler.addMessage)
-                    return
-                }
-                /* const imagename = buffer.split('/').pop()
-                 let optimizedImage = (await optimizeGifSharp(buffer))
-                 let t = (await optimizeGifSharp(buffer, 32, 80))
-                 try {
-                     t = await extractImageThumb(optimizedImage)
-                     await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail: t.buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
-                 } catch (error) {
-                     console.log("couldn't get thumbnail")
-                 }
-                 await sock.sendMessage(jid, { image: optimizedImage, caption: htmlDecode(caption), mentions }).then(handler.addMessage)*/
-
-                const text = "======================\n\n" +
-                    htmlDecode(caption) +
-                    "\n\n======================"
-                await sock.sendMessage(jid, { text: fancyTransform(text), mentions: mentions }).then(handler.addMessage)
-
-            },
-
-            sendAudio: async (jid, buffer, ptt = false) => {
-                await sock.sendMessage(jid, { audio: buffer, mimetype: "audio/mp4", ptt }).then(handler.addMessage)
-            },
-
-            sendVideo: async (jid, buffer, caption = "") => {
-                await sock.sendMessage(jid, { video: buffer, caption: fancyTransform(htmlDecode(caption)) })
-            },
-
-            getParticipants: async (groupJid) => {
-                try {
-                    // Fetch group metadata
-                    const metadata = await sock.groupMetadata(groupJid);
-
-                    // Find the participant by JID
-                    const participant = metadata.participants
-
-                    return participant || null; // Return participant or null if not found
-                } catch (error) {
-                    console.error('Error fetching group metadata:', error);
-                    return null;
-                }
-            },
-            getContact: async (jid) => {
-                try {
-                    // Get contact information
-                    const contact = await sock.getContact(jid);
-
-                    return contact;
-                } catch (error) {
-                    console.error('Error fetching contact:', error);
-                    return null;
-                }
-            }
-        }
-
-        // Attach middleware methods
-        registerHandlers(whatsapp)
-
-
-        // Dispatch logic
-        let handled = false
-
-
-        try {
-
-            // Command match (exact)
-            if (handlers.commands.has(text.toLowerCase())) {
-                await handlers.commands.get(text.toLowerCase())(whatsapp)
-                handled = true
+            if (msg.key && msg.key.remoteJid == 'status@broadcast') {
+                //console.log("status message")
+                continue
             }
 
-            // Regex/text match
-            for (const { regex, fn } of handlers.text) {
-                if (regex.test(text.toLowerCase())) {
-                    await fn(whatsapp)
+            if (!msg.message || msg.key.fromMe) {
+                continue
+            }
+            // Parse the message to get type and JIDs
+            const remoteJid = msg.key.remoteJid;
+            const isGroup = remoteJid.endsWith('@g.us');
+            const senderJid = isGroup ? (msg.key?.number ? msg.key?.number : msg.key?.participant) : remoteJid;
+            const sender = senderJid
+            const messageType = Object.keys(msg.message)[0]
+            const content = msg.message[messageType]
+            const text = msg.message.conversation ||
+                msg.message.extendedTextMessage?.text ||
+                msg.message.imageMessage?.caption ||
+                msg.message.videoMessage?.caption ||
+                "";
+
+
+            // Build reusable whatsapp object with proper JID information
+            const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : null
+
+            if (!senderJid || senderJid.length == 0) {
+                console.log(" ============================================================================== ")
+                console.log("no senderJid")
+                console.log(msg)
+                continue
+            }
+
+            if (isGroup) {
+                lastGroupJid = remoteJid
+            }
+            if (text.startsWith('!') && !game && messagesCount <= 0 && isGroup) {
+                await sock.sendMessage(lastGroupJid, { text: fancyTransform(' *--- Redémarrage de sécurité ---* \n\nLa relation toxique que j\'ai avec whatsapp m\'oblige à me redémarrer \n Patiente un peu'), }, { quoted: msg }).then(handler.addMessage)
+                await startBot()
+                continue
+            }
+            messagesCount--;
+            const whatsapp = {
+                ids: {
+                    lid: msg.key.participant?.endsWith('@lid') ? msg.key.participant : null,
+                    jid: senderJid,
+                },
+                isGroup,
+                remoteJid,
+                groupJid: isGroup ? remoteJid : null,
+                privateJid: isGroup ? null : remoteJid,
+                senderJid,
+                sender,
+                text,
+                game,
+                messageType: getContentType(msg.message),
+                isViewOnce: msg.message.viewOnceMessage || msg.message.viewOnceMessageV2 || msg.message.viewOnceMessageV2Extension,
+                isForward: (content?.contextInfo?.isForwarded || content?.contextInfo?.forwardingScore > 0),
+                isReaction: (msg.message.reactionMessage),
+                raw: msg,
+
+                reply: async (message, mentions = undefined) => {
+                    await sock.sendMessage(remoteJid, { text: fancyTransform(htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }, { quoted: msg }).then(handler.addMessage)
+                },
+                delete: async () => {
+                    await sock.sendMessage(remoteJid, { delete: msg.key })
+                },
+
+                sendMessage: async (jid, message, mentions = undefined) => {
+                    await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }).then(handler.addMessage)
+                },
+
+                sendImage: async (jid, buffer, caption = "", mentions = []) => {
+                    if (buffer.includes('http')) {
+                        await sock.sendMessage(jid, { image: { url: buffer }, caption: fancyTransform(htmlDecode(caption)), mentions }).then(handler.addMessage)
+                        return
+                    }
+                    /* const imagename = buffer.split('/').pop()
+                     let optimizedImage = (await optimizeGifSharp(buffer))
+                     let t = (await optimizeGifSharp(buffer, 32, 80))
+                     try {
+                         t = await extractImageThumb(optimizedImage)
+                         await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail: t.buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
+                     } catch (error) {
+                         console.log("couldn't get thumbnail")
+                     }
+                     await sock.sendMessage(jid, { image: optimizedImage, caption: htmlDecode(caption), mentions }).then(handler.addMessage)*/
+
+                    const text = "======================\n\n" +
+                        htmlDecode(caption) +
+                        "\n\n======================"
+                    await sock.sendMessage(jid, { text: fancyTransform(text), mentions: mentions }).then(handler.addMessage)
+
+                },
+
+                sendAudio: async (jid, buffer, ptt = false) => {
+                    await sock.sendMessage(jid, { audio: buffer, mimetype: "audio/mp4", ptt }).then(handler.addMessage)
+                },
+
+                sendVideo: async (jid, buffer, caption = "") => {
+                    await sock.sendMessage(jid, { video: buffer, caption: fancyTransform(htmlDecode(caption)) })
+                },
+
+                getParticipants: async (groupJid) => {
+                    try {
+                        // Fetch group metadata
+                        const metadata = await sock.groupMetadata(groupJid);
+
+                        // Find the participant by JID
+                        const participant = metadata.participants
+
+                        return participant || null; // Return participant or null if not found
+                    } catch (error) {
+                        console.error('Error fetching group metadata:', error);
+                        return null;
+                    }
+                },
+                getContact: async (jid) => {
+                    try {
+                        // Get contact information
+                        const contact = await sock.getContact(jid);
+
+                        return contact;
+                    } catch (error) {
+                        console.error('Error fetching contact:', error);
+                        return null;
+                    }
+                }
+            }
+
+            // Attach middleware methods
+            registerHandlers(whatsapp)
+
+
+            // Dispatch logic
+            let handled = false
+
+
+            try {
+
+                // Command match (exact)
+                if (handlers.commands.has(text.toLowerCase())) {
+                    await handlers.commands.get(text.toLowerCase())(whatsapp)
                     handled = true
                 }
-            }
 
-            // Fallback "any" handlers
-            if (!handled) {
-                for (const fn of handlers.any) {
-                    await fn(whatsapp)
-                    handled = true
+                // Regex/text match
+                for (const { regex, fn } of handlers.text) {
+                    if (regex.test(text.toLowerCase())) {
+                        await fn(whatsapp)
+                        handled = true
+                    }
                 }
-            }
+
+                // Fallback "any" handlers
+                if (!handled) {
+                    for (const fn of handlers.any) {
+                        await fn(whatsapp)
+                        handled = true
+                    }
+                }
 
 
-            if (handled) {
-                //console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage?.contextInfo)
-                console.log(whatsapp.senderJid, ":", text)
-                /* */
-                /*console.log("------------------------------")*/
+                if (handled) {
+                    //console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage?.contextInfo)
+                    console.log(whatsapp.senderJid, ":", text)
+                    /* */
+                    /*console.log("------------------------------")*/
+                }
+            } catch (error) {
+                //await whatsapp.reply("Donc... ta commande m'a fait crasher😐\nVas savoir pourquoi... enfin bon, pas de panique, j'ai été programmé pour gérer ça")
+                await whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur négro \n\n" + error.toString() + '\nLe dernier Message :')
+                await whatsapp.sendMessage("237676073559@s.whatsapp.net", "@" + whatsapp.sender.split('@')[0] + " : " + whatsapp.text, [whatsapp.sender])
+                console.log(error)
             }
-        } catch (error) {
-            //await whatsapp.reply("Donc... ta commande m'a fait crasher😐\nVas savoir pourquoi... enfin bon, pas de panique, j'ai été programmé pour gérer ça")
-            await whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur négro \n\n" + error.toString() + '\nLe dernier Message :')
-            await whatsapp.sendMessage("237676073559@s.whatsapp.net", "@" + whatsapp.sender.split('@')[0] + " : " + whatsapp.text, [whatsapp.sender])
-            console.log(error)
         }
 
     })
@@ -382,7 +388,7 @@ async function startBot() {
             group.sort((p1, p2) => p2.points - p1.points)
 
             await sock.sendMessage(groupJid, {
-            text: fancyTransform(`Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : (i == 3 || i == 4)? '🏅' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n'))
+                text: fancyTransform(`Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : (i == 3 || i == 4) ? '🏅' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n'))
                 , mentions: group.map((p) => p.jid)
             }).then(handler.addMessage)
 
@@ -563,7 +569,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             const player = allPlayers[playerJid];
             if (player.groups.some(gJID => gJID === groupId)) {
                 player.points = 50
-                player.games.WEREWOLF = 0 
+                player.games.WEREWOLF = 0
                 saveUser(player)
                 group.push(player)
             }
@@ -779,7 +785,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         const quizGroupJid = qm.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
         const quizFRGroupJid = qmfr.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
 
-         //console.log('type', whatsapp.messageType)
+        //console.log('type', whatsapp.messageType)
         if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
             await wwm.addUserPoints(whatsapp.sender, whatsapp, -30, "send image during game", 0)
             await whatsapp.reply('Vous avez reçu *-30 points* pour avoir envoyé une image/vidéo pendant la partie')
