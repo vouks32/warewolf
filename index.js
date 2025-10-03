@@ -192,8 +192,9 @@ async function startBot() {
     // Handle messages
     sock.ev.on("messages.upsert", async (m) => {
 
+        console.log(m)
         for (const msg of m.messages) {
-           
+
             if (msg.key && msg.key.remoteJid == 'status@broadcast') {
                 //console.log("status message")
                 continue
@@ -202,14 +203,14 @@ async function startBot() {
             if (!msg.message || msg.key.fromMe) {
                 continue
             }
-            
-            console.log('---------------------       message -----------------------------------------')    
+
+            console.log('---------------------       message -----------------------------------------')
             console.log(msg)
 
             // Parse the message to get type and JIDs
             const remoteJid = msg.key.remoteJid;
             const isGroup = remoteJid.endsWith('@g.us');
-            const senderJid = isGroup ? (msg.key?.number ? msg.key?.number : msg.key?.participant) : remoteJid;
+            const senderJid = isGroup ? (msg.key?.participantPn ? msg.key?.participantPn : msg.key?.participantLid) : remoteJid;
             const sender = senderJid
             const messageType = Object.keys(msg.message)[0]
             const content = msg.message[messageType]
