@@ -204,7 +204,7 @@ async function startBot() {
             }
             
             console.log('---------------------       message -----------------------------------------')    
-            console.log(msg.message)
+            console.log(msg)
 
             // Parse the message to get type and JIDs
             const remoteJid = msg.key.remoteJid;
@@ -224,9 +224,7 @@ async function startBot() {
             const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : null
 
             if (!senderJid || senderJid.length == 0) {
-                console.log(" ============================================================================== ")
-                console.log("no senderJid")
-                console.log(msg)
+                console.log("--> no senderJid")
                 continue
             }
 
