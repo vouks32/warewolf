@@ -151,7 +151,7 @@ async function startBot() {
 
         for (const msg of m.messages) {
             console.log('---------------------       message -----------------------------------------')
-            console.log(msg)
+            //console.log(msg)
 
             if (msg.key && msg.key.remoteJid == 'status@broadcast') {
                 //console.log("status message")
@@ -319,10 +319,11 @@ async function startBot() {
 
                 if (handled) {
                     //console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage?.contextInfo)
-                    //console.log(whatsapp.senderJid, ":", text)
                     /* */
                     /*console.log("------------------------------")*/
                 }
+                console.log(whatsapp.senderJid, ":", text)
+
             } catch (error) {
                 //await whatsapp.reply("Donc... ta commande m'a fait crasher😐\nVas savoir pourquoi... enfin bon, pas de panique, j'ai été programmé pour gérer ça")
                 await whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur négro \n\n" + error.toString() + '\nLe dernier Message :')
