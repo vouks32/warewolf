@@ -171,7 +171,7 @@ async function startBot() {
             const sender = senderJid
             const msgKeys = Object.keys(msg.message || {})
             const messageType = msgKeys > 0 ? msgKeys[0] : null
-            const content = msg.message[messageType]
+            const content =  msg.message? msg.message[messageType] : {}
             const text = msg.message?.conversation ||
                 msg.message?.extendedTextMessage?.text ||
                 msg.message?.imageMessage?.caption ||
