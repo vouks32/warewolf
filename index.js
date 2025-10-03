@@ -202,6 +202,7 @@ async function startBot() {
             if (!msg.message || msg.key.fromMe) {
                 continue
             }
+            console.log(msg.message)
             // Parse the message to get type and JIDs
             const remoteJid = msg.key.remoteJid;
             const isGroup = remoteJid.endsWith('@g.us');
