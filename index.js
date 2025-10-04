@@ -220,7 +220,7 @@ async function startBot() {
                 raw: msg,
 
                 reply: async (message, mentions = undefined) => {
-                    await sock.sendMessage(remoteJid, { text: fancyTransform(htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }, { quoted: msg }).then(handler.addMessage)
+                    await sock.sendMessage(remoteJid, { text: fancyTransform(htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }, { quoted: getContentType(msg)? msg : undefined }).then(handler.addMessage)
                 },
                 delete: async () => {
                     await sock.sendMessage(remoteJid, { delete: msg.key })
