@@ -294,6 +294,7 @@ async function startBot() {
 
             // Dispatch logic
             let handled = false
+            let process = true
 
 
             try {
@@ -305,7 +306,7 @@ async function startBot() {
                         await wwm.addUserPoints(whatsapp.sender, whatsapp, -15, "send image during game", 0)
                         await whatsapp.reply('Vous avez reçu *-15 points* pour avoir envoyé une image/vidéo pendant la partie')
                         await whatsapp.delete()
-                        handled = true
+                        process = false
                     }
                 }
                 if (whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
@@ -317,20 +318,20 @@ async function startBot() {
                         ]
                         await whatsapp.reply(ans[Math.floor(Math.random() * ans.length)], [whatsapp.sender])
                         await wwm.addUserPoints(whatsapp.sender, whatsapp, -5, "réagis étant mort", 0)
-                        handled = true
+                        process = false
                     }
                 }
 
 
                 // Command match (exact)
-                if (!handled && text.trim()> 0)
+                if (process && text.trim()> 0)
                     if (handlers.commands.has(text.toLowerCase())) {
                         await handlers.commands.get(text.toLowerCase())(whatsapp)
                         handled = true
                     }
 
                 // Regex/text match
-                if (!handled  && text.trim()> 0)
+                if (process && text.trim()> 0)
                     for (const { regex, fn } of handlers.text) {
                         if (regex.test(text.toLowerCase())) {
                             await fn(whatsapp)

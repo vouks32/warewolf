@@ -1394,7 +1394,7 @@ export class WereWolvesManager {
                 break;
             case 1:
                 if (wolfIndex >= 0) {
-                    await whatsapp.sendMessage(groupId, "*--- Indice ---*\n\nLe nom que le loup à donné à une longeur de *" + Math.max(0, game.players[wolfIndex].name.length - Math.floor(Math.random() * 2) - 1) + " à " + (game.players[wolfIndex].name.length + Math.floor(Math.random() * 1) + 1) + " charactères*")
+                    await whatsapp.sendMessage(groupId, "*--- Indice ---*\n\nLe nom que le loup à donné à une longeur de *" + Math.max(0, game.players[wolfIndex].name.length - Math.floor(Math.random() * 2) - 1) + " à " + (game.players[wolfIndex].name.length + Math.floor(Math.random() * 1) + 2) + " charactères*")
                 }
                 break;
             case 2:
