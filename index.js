@@ -834,6 +834,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
     handlers.commands.set("!werewolve", async (whatsapp) => {
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
         if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
+            console.log("Creating game...")
         await wwm.createGame(whatsapp.groupJid, whatsapp)
     })
 
