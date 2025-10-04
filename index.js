@@ -329,18 +329,18 @@ async function startBot() {
 
                 // Command match (exact)
                 if (process)
-                    if (handlers.commands.has(text.toLowerCase())) {
-                        await handlers.commands.get(text.toLowerCase())(whatsapp)
-                        console.log("Handled command", text.toLowerCase())
+                    if (handlers.commands.has(text.toLowerCase().trim())) {
+                        await handlers.commands.get(text.toLowerCase().trim())(whatsapp)
+                        console.log("Handled command", text.toLowerCase().trim())
                         handled = true
                     }
 
                 // Regex/text match
                 if (process)
                     for (const { regex, fn } of handlers.text) {
-                        if (regex.test(text.toLowerCase())) {
+                        if (regex.test(text.toLowerCase().trim())) {
                             await fn(whatsapp)
-                            console.log("regex Handled command", text.toLowerCase())
+                            console.log("regex Handled command", text.toLowerCase().trim())
                             handled = true
                         }
                     }
