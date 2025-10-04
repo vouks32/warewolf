@@ -328,7 +328,7 @@ async function startBot() {
                 }
 
                 // Command match (exact)
-                if (process && text.trim().length > 0)
+                if (process)
                     if (handlers.commands.has(text.toLowerCase())) {
                         await handlers.commands.get(text.toLowerCase())(whatsapp)
                         console.log("Handled command", text.toLowerCase())
@@ -336,7 +336,7 @@ async function startBot() {
                     }
 
                 // Regex/text match
-                if (process && text.trim().length > 0)
+                if (process)
                     for (const { regex, fn } of handlers.text) {
                         if (regex.test(text.toLowerCase())) {
                             await fn(whatsapp)
@@ -344,7 +344,7 @@ async function startBot() {
                             handled = true
                         }
                     }
-                    
+
                 if (handled) {
                     console.log('handled', whatsapp.senderJid, ":", text)
                 } else {
