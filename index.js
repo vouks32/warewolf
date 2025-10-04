@@ -150,7 +150,6 @@ async function startBot() {
     sock.ev.on("messages.upsert", async (m) => {
 
         for (const msg of m.messages) {
-            console.log('---------------------       message -----------------------------------------')
             //console.log(msg)
 
             if (msg.key && msg.key.remoteJid == 'status@broadcast') {
@@ -163,7 +162,7 @@ async function startBot() {
             }
 
 
-
+            console.log('---------------------       message -----------------------------------------')
             // Parse the message to get type and JIDs
             const remoteJid = msg.key.remoteJid;
             const isGroup = remoteJid.endsWith('@g.us');
@@ -179,7 +178,7 @@ async function startBot() {
                 msg.message?.videoMessage?.caption ||
                 "";
 
-console.log(`[DEBUG] parsed text="${text}" from=${senderJid} isGroup=${isGroup} messageType=${getContentType(msg.message)}`);
+            console.log(`[DEBUG] parsed text="${text}" from=${senderJid} isGroup=${isGroup} messageType=${getContentType(msg.message)}`);
 
 
             // Build reusable whatsapp object with proper JID information
@@ -301,11 +300,11 @@ console.log(`[DEBUG] parsed text="${text}" from=${senderJid} isGroup=${isGroup} 
                 //Check if can talk
                 const werewolfGroupJid = wwm.getPlayerGroupJid(senderJid)
                 if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || isViewOnce || whatsapp.isForward)) {
-                        await wwm.addUserPoints(whatsapp.sender, whatsapp, -15, "send image during game", 0)
-                        await whatsapp.sendMessage(whatsapp.remoteJid, `@${whatsapp.senderJid.split('@')[0]}` + ', vous avez reçu *-15 points* pour avoir envoyé une image/vidéo pendant la partie', [whatsapp.senderJid])
-                        await whatsapp.delete()
-                        process = false
-                        handled = true
+                    await wwm.addUserPoints(whatsapp.sender, whatsapp, -15, "send image during game", 0)
+                    await whatsapp.sendMessage(whatsapp.remoteJid, `@${whatsapp.senderJid.split('@')[0]}` + ', vous avez reçu *-15 points* pour avoir envoyé une image/vidéo pendant la partie', [whatsapp.senderJid])
+                    await whatsapp.delete()
+                    process = false
+                    handled = true
                 }
                 if (whatsapp.isGroup && whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
                     if (whatsapp.senderJid.includes('x650687834') || whatsapp.senderJid.includes('x676073559')) { } else {
@@ -319,11 +318,6 @@ console.log(`[DEBUG] parsed text="${text}" from=${senderJid} isGroup=${isGroup} 
                         process = false
                         handled = true
                     }
-                }
-
-                if (whatsapp.text === "!reply") {
-                    await whatsapp.reply("Je suis un bot, je ne peux pas te répondre en privé, désolé")
-                    process = false
                 }
 
                 // Command match (exact)
@@ -344,8 +338,8 @@ console.log(`[DEBUG] parsed text="${text}" from=${senderJid} isGroup=${isGroup} 
                         }
                     }
 
-                    console.log('handled', handled, "process", process, whatsapp.senderJid, ":", text)
-               
+                console.log('handled', handled, "process", process, whatsapp.senderJid, ":", text)
+
                 // Fallback "any" handlers
                 if (!handled) {
                     for (const fn of handlers.any) {
@@ -520,57 +514,57 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         await whatsapp.reply(t, mentions)
     })
 
-    
+
     handlers.commands.set("!rank", async (whatsapp) => {
-    if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+        if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
 
-    console.log('[DEBUG] !rank called by', whatsapp.senderJid, 'text:', whatsapp.text, 'group:', whatsapp.groupJid)
+        console.log('[DEBUG] !rank called by', whatsapp.senderJid, 'text:', whatsapp.text, 'group:', whatsapp.groupJid)
 
-    const participants = await whatsapp.getParticipants(whatsapp.groupJid)
-    console.log('[DEBUG] group participants:', participants.map(p => ({ id: p.id || p.jid, admin: p.admin })))
+        const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+        console.log('[DEBUG] group participants:', participants.map(p => ({ id: p.id || p.jid, admin: p.admin })))
 
-    // Détection d'admin plus robuste (compare la partie avant @)
-    const senderLocal = whatsapp.senderJid.split('@')[0]
-    const AdminParticipant = participants.find(p => {
-        const pid = (p.id || p.jid || '').toString()
-        if (!pid) return false
-        const pidLocal = pid.split('@')[0]
-        return pidLocal === senderLocal && !!p.admin
+        // Détection d'admin plus robuste (compare la partie avant @)
+        const senderLocal = whatsapp.senderJid.split('@')[0]
+        const AdminParticipant = participants.find(p => {
+            const pid = (p.id || p.jid || '').toString()
+            if (!pid) return false
+            const pidLocal = pid.split('@')[0]
+            return pidLocal === senderLocal && !!p.admin
+        })
+
+        if (!AdminParticipant) {
+            // Pour debug, on affiche quand même; si tu veux restreindre -> décommente return
+            await whatsapp.reply('Tu n\'es pas admin, j\'affiche quand même le classement (debug).')
+            // return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+        }
+
+        const groupId = whatsapp.groupJid
+        const allPlayers = getAllUsers()
+        let group = []
+        for (const playerJid in allPlayers) {
+            const player = allPlayers[playerJid];
+            if (player.groups.some(gJID => gJID === groupId))
+                group.push(player)
+        }
+
+        try {
+            const metadata = await sock.groupMetadata(groupId);
+            group.sort((p1, p2) => p2.points - p1.points)
+
+            await sock.sendMessage(groupId, {
+                text: `Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) =>
+                    (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`
+                ).join('\n'),
+                mentions: group.map((p) => p.jid)
+            }).then(handler.addMessage)
+        } catch (err) {
+            console.log('[ERROR] !rank handler', err)
+            await whatsapp.reply('Erreur lors de la récupération du classement. Check logs.')
+        }
     })
 
-    if (!AdminParticipant) {
-        // Pour debug, on affiche quand même; si tu veux restreindre -> décommente return
-        await whatsapp.reply('Tu n\'es pas admin, j\'affiche quand même le classement (debug).')
-        // return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
-    }
-
-    const groupId = whatsapp.groupJid
-    const allPlayers = getAllUsers()
-    let group = []
-    for (const playerJid in allPlayers) {
-        const player = allPlayers[playerJid];
-        if (player.groups.some(gJID => gJID === groupId))
-            group.push(player)
-    }
-
-    try {
-        const metadata = await sock.groupMetadata(groupId);
-        group.sort((p1, p2) => p2.points - p1.points)
-
-        await sock.sendMessage(groupId, {
-            text: `Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) =>
-                (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`
-            ).join('\n'),
-            mentions: group.map((p) => p.jid)
-        }).then(handler.addMessage)
-    } catch (err) {
-        console.log('[ERROR] !rank handler', err)
-        await whatsapp.reply('Erreur lors de la récupération du classement. Check logs.')
-    }
-})
-
-// Alias en français
-handlers.commands.set("!rang", handlers.commands.get("!rank"))
+    // Alias en français
+    handlers.commands.set("!rang", handlers.commands.get("!rank"))
 
 
     handlers.commands.set("!resetrank", async (whatsapp) => {
