@@ -300,13 +300,12 @@ console.log(`[DEBUG] parsed text="${text}" from=${senderJid} isGroup=${isGroup} 
 
                 //Check if can talk
                 const werewolfGroupJid = wwm.getPlayerGroupJid(senderJid)
-                if (whatsapp.isGroup && werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
-                    if (whatsapp.senderJid.includes('x650687834') || whatsapp.senderJid.includes('x676073559')) { } else {
+                if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || isViewOnce || whatsapp.isForward)) {
                         await wwm.addUserPoints(whatsapp.sender, whatsapp, -15, "send image during game", 0)
                         await whatsapp.sendMessage(whatsapp.remoteJid, `@${whatsapp.senderJid.split('@')[0]}` + ', vous avez reçu *-15 points* pour avoir envoyé une image/vidéo pendant la partie', [whatsapp.senderJid])
                         await whatsapp.delete()
                         process = false
-                    }
+                        handled = true
                 }
                 if (whatsapp.isGroup && whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
                     if (whatsapp.senderJid.includes('x650687834') || whatsapp.senderJid.includes('x676073559')) { } else {
@@ -318,6 +317,7 @@ console.log(`[DEBUG] parsed text="${text}" from=${senderJid} isGroup=${isGroup} 
                         await whatsapp.sendMessage(whatsapp.remoteJid, ans[Math.floor(Math.random() * ans.length)], [whatsapp.sender])
                         await wwm.addUserPoints(whatsapp.sender, whatsapp, -5, "réagis étant mort", 0)
                         process = false
+                        handled = true
                     }
                 }
 
