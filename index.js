@@ -344,7 +344,15 @@ async function startBot() {
                             handled = true
                         }
                     }
+                if (handled) {
+                    //console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage?.contextInfo)
+                    /* */
+                    /*console.log("------------------------------")*/
+                    console.log('handled', whatsapp.senderJid, ":", text)
+                } else {
+                    console.log('not handled', whatsapp.senderJid, ":", text)
 
+                }
                 // Fallback "any" handlers
                 if (!handled) {
                     for (const fn of handlers.any) {
@@ -354,15 +362,7 @@ async function startBot() {
                 }
 
 
-                if (handled) {
-                    //console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage?.contextInfo)
-                    /* */
-                    /*console.log("------------------------------")*/
-                    console.log('handled',whatsapp.senderJid, ":", text)
-                }else{
-                    console.log('not handled',whatsapp.senderJid, ":", text)
 
-                }
 
             } catch (error) {
                 //await whatsapp.reply("Donc... ta commande m'a fait crasher😐\nVas savoir pourquoi... enfin bon, pas de panique, j'ai été programmé pour gérer ça")
