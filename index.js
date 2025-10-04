@@ -294,19 +294,47 @@ async function startBot() {
 
             try {
 
-                // Command match (exact)
-                if (handlers.commands.has(text.toLowerCase())) {
-                    await handlers.commands.get(text.toLowerCase())(whatsapp)
-                    handled = true
-                }
+                //Check if can talk
+                const werewolfGroupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
 
-                // Regex/text match
-                for (const { regex, fn } of handlers.text) {
-                    if (regex.test(text.toLowerCase())) {
-                        await fn(whatsapp)
+                if (whatsapp.senderJid.includes('650687834') || whatsapp.senderJid.includes('676073559')) { } else {
+                    if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
+                        await wwm.addUserPoints(whatsapp.sender, whatsapp, -15, "send image during game", 0)
+                        await whatsapp.reply('Vous avez reçu *-15 points* pour avoir envoyé une image/vidéo pendant la partie')
+                        await whatsapp.delete()
                         handled = true
+                        return
+                    }
+
+                    if (whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
+                        const ans = [
+                            `@${whatsapp.sender.split('@')[0]} on est pas dans ton village ici, les morts ne réagissent pas\nVous avez reçu *-5 points*`,
+                            `@${whatsapp.sender.split('@')[0]} Tu es mort et tu envoie les réactions ehh, *-5 points*`,
+                            `@${whatsapp.sender.split('@')[0]} Si tu voulais trop réagir fallait le faire de ton vivant , *-5 points*`,
+                        ]
+                        await whatsapp.reply(ans[Math.floor(Math.random() * ans.length)], [whatsapp.sender])
+                        await wwm.addUserPoints(whatsapp.sender, whatsapp, -5, "réagis étant mort", 0)
+                        handled = true
+                        return
                     }
                 }
+
+
+                // Command match (exact)
+                if (!handled)
+                    if (handlers.commands.has(text.toLowerCase())) {
+                        await handlers.commands.get(text.toLowerCase())(whatsapp)
+                        handled = true
+                    }
+
+                // Regex/text match
+                if (!handled)
+                    for (const { regex, fn } of handlers.text) {
+                        if (regex.test(text.toLowerCase())) {
+                            await fn(whatsapp)
+                            handled = true
+                        }
+                    }
 
                 // Fallback "any" handlers
                 if (!handled) {
@@ -754,7 +782,6 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             await whatsapp.delete()
             return
         }
-
 
         if (whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
             const ans = [
