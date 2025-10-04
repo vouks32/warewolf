@@ -182,11 +182,15 @@ async function startBot() {
             // Build reusable whatsapp object with proper JID information
             const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : null
 
-            if (!senderJid || senderJid.length == 0) {
+            if (!senderJid || !remoteJid || senderJid.length == 0) {
                 console.log("--> no senderJid")
                 continue
             }
 
+            if (msg.key?.isViewOnce || msg.message?.viewOnceMessage || msg.message?.viewOnceMessageV2 || msg.message?.viewOnceMessageV2Extension) {
+                console.log("view once message, ignoring")
+            }
+            
             if (isGroup) {
                 lastGroupJid = remoteJid
             }
