@@ -358,8 +358,11 @@ async function startBot() {
                     //console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage?.contextInfo)
                     /* */
                     /*console.log("------------------------------")*/
+                    console.log('handled',whatsapp.senderJid, ":", text)
+                }else{
+                    console.log('not handled',whatsapp.senderJid, ":", text)
+
                 }
-                console.log(whatsapp.senderJid, ":", text)
 
             } catch (error) {
                 //await whatsapp.reply("Donc... ta commande m'a fait crasher😐\nVas savoir pourquoi... enfin bon, pas de panique, j'ai été programmé pour gérer ça")
