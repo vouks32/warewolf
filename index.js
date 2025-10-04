@@ -345,11 +345,8 @@ async function startBot() {
                         }
                     }
 
-                if (handled) {
-                    console.log('handled', whatsapp.senderJid, ":", text)
-                } else {
-                    console.log('not handled', whatsapp.senderJid, ":", text)
-                }
+                    console.log('handled', handled, "process", process, whatsapp.senderJid, ":", text)
+               
                 // Fallback "any" handlers
                 if (!handled) {
                     for (const fn of handlers.any) {
