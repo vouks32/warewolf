@@ -190,7 +190,7 @@ async function startBot() {
             if (msg.key?.isViewOnce || msg.message?.viewOnceMessage || msg.message?.viewOnceMessageV2 || msg.message?.viewOnceMessageV2Extension) {
                 console.log("view once message, ignoring")
             }
-            
+
             if (isGroup) {
                 lastGroupJid = remoteJid
             }
@@ -630,7 +630,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             const amount = -(parseInt(whatsapp.text.split("!removepoints")[1].trim().split(' ')[1]) || 5)
             const userjid = name.replace('@', '') + "@s.whatsapp.net"
             await wwm.addUserPoints(userjid, whatsapp, amount, "envoyé par super admin", 0)
-            whatsapp.reply(`${name} a été déduis *-${amount} points*`)
+            whatsapp.reply(`${name} a été déduis *${amount} points*`)
         }
     })
 

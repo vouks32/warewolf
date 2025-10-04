@@ -891,9 +891,9 @@ export class WereWolvesManager {
         game.seerChoice = targetJid
         this.saveGames(this.games)
 
-        const result = (target.role.includes("WEREWOLF") || (target.role.includes("TANNER") && Math.random() > 0.8) || (target.role.includes("WITCH") && Math.random() > 0.8) ||
+        const result = (target.role.includes("WEREWOLF") || (target.role.includes("TANNER") && Math.random() > 0) || (target.role.includes("WITCH") && Math.random() > 0.5) ||
             (game.seerFakeWolves && game.seerFakeWolves.includes(target.jid))) ?
-            "est un 🐺 Loup-Garou, enfin je crois..." : "n'est surement pas un Loup-Garou";
+            "😈 est un être maléfique!" : "😇 est une personne innocente.";
         await whatsapp.sendMessage(seer.jid, `🔮 Résultat: \n*${target.name}* (@${target.jid.split('@')[0]}) ${result}.`, [target.jid])
     }
 
@@ -1153,7 +1153,7 @@ export class WereWolvesManager {
         await whatsapp.sendMessage(prostituteJid, `✅ Tu as visité *${target.name}* (@${target.jid.split('@')[0]}).`, [target.jid])
 
         // If visited a wolf, prostitute dies
-        if (target.role.includes("WEREWOLF") || target.role.includes("SERIAL") || target.role.includes("PYRO") || (target.role.includes("HUNTER") && Math.random() > 0.5) || (target.role.includes("TANNER") && Math.random() > 0.75)) {
+        if (target.role.includes("WEREWOLF") || target.role.includes("SERIAL") || target.role.includes("PYRO") || (target.role.includes("HUNTER") && Math.random() > 0.5)) {
             prostitute.isDead = true
             await whatsapp.sendMessage(prostituteJid, "⚠️ Vous avez visité un client dangereux et êtes morte!")
             await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "death2.jpg"), ([`💀 Un Cadavre à été retrouvé en plein carrefour!`, `💀 Un corps sans vie à été retrouvé`])[Math.floor(Math.random() * 2)])
