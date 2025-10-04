@@ -322,6 +322,10 @@ async function startBot() {
                     }
                 }
 
+                if(whatsapp.text === "!reply"){
+                    await whatsapp.reply("Je suis un bot, je ne peux pas te répondre en privé, désolé")
+                    process = false
+                }
 
                 // Command match (exact)
                 if (process && whatsapp.text.trim() > 0)
