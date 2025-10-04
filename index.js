@@ -323,14 +323,14 @@ async function startBot() {
 
 
                 // Command match (exact)
-                if (!handled)
+                if (!handled && text.trim()> 0)
                     if (handlers.commands.has(text.toLowerCase())) {
                         await handlers.commands.get(text.toLowerCase())(whatsapp)
                         handled = true
                     }
 
                 // Regex/text match
-                if (!handled)
+                if (!handled  && text.trim()> 0)
                     for (const { regex, fn } of handlers.text) {
                         if (regex.test(text.toLowerCase())) {
                             await fn(whatsapp)
@@ -796,7 +796,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             return
         }
 
-        const t = whatsapp.text;
+        const t = whatsapp.text.trim();
         if ((t.length > 2 || Number.isNaN(parseInt(t))) && whatsapp.isGroup) {
             await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
             return
