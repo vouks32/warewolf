@@ -303,7 +303,6 @@ async function startBot() {
                         await whatsapp.reply('Vous avez reçu *-15 points* pour avoir envoyé une image/vidéo pendant la partie')
                         await whatsapp.delete()
                         handled = true
-                        return
                     }
 
                     if (whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
@@ -315,7 +314,9 @@ async function startBot() {
                         await whatsapp.reply(ans[Math.floor(Math.random() * ans.length)], [whatsapp.sender])
                         await wwm.addUserPoints(whatsapp.sender, whatsapp, -5, "réagis étant mort", 0)
                         handled = true
-                        return
+                    }
+                    if(whatsapp.text.trim().length == 0 || whatsapp.senderJid == null || whatsapp.senderJid.trim().length == 0){
+                        handled = true
                     }
                 }
 
