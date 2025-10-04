@@ -324,14 +324,14 @@ async function startBot() {
 
 
                 // Command match (exact)
-                if (process && text.trim() > 0)
+                if (process && whatsapp.text.trim() > 0)
                     if (handlers.commands.has(text.toLowerCase())) {
                         await handlers.commands.get(text.toLowerCase())(whatsapp)
                         handled = true
                     }
 
                 // Regex/text match
-                if (process && text.trim() > 0)
+                if (process && whatsapp.text.trim() > 0)
                     for (const { regex, fn } of handlers.text) {
                         if (regex.test(text.toLowerCase())) {
                             await fn(whatsapp)
