@@ -169,6 +169,7 @@ async function startBot() {
             const isGroup = remoteJid.endsWith('@g.us');
             const senderJid = isGroup ? (msg.key?.participantPn ? msg.key?.participantPn : msg.key?.participantLid) : remoteJid;
             const sender = senderJid
+            const isViewOnce = msg.key?.isViewOnce || msg.message?.viewOnceMessage || msg.message?.viewOnceMessageV2 || msg.message?.viewOnceMessageV2Extension
             const msgKeys = Object.keys(msg.message || {})
             const messageType = msgKeys > 0 ? msgKeys[0] : null
             const content = msg.message ? msg.message[messageType] : {}
@@ -177,6 +178,7 @@ async function startBot() {
                 msg.message?.imageMessage?.caption ||
                 msg.message?.videoMessage?.caption ||
                 "";
+
 console.log(`[DEBUG] parsed text="${text}" from=${senderJid} isGroup=${isGroup} messageType=${getContentType(msg.message)}`);
 
 
@@ -186,10 +188,6 @@ console.log(`[DEBUG] parsed text="${text}" from=${senderJid} isGroup=${isGroup} 
             if (!senderJid || !remoteJid || senderJid.length == 0) {
                 console.log("--> no senderJid")
                 continue
-            }
-
-            if (msg.key?.isViewOnce || msg.message?.viewOnceMessage || msg.message?.viewOnceMessageV2 || msg.message?.viewOnceMessageV2Extension) {
-                console.log("view once message, ignoring")
             }
 
             if (isGroup) {
@@ -215,7 +213,7 @@ console.log(`[DEBUG] parsed text="${text}" from=${senderJid} isGroup=${isGroup} 
                 text,
                 game,
                 messageType: getContentType(msg.message) || "",
-                isViewOnce: msg.key?.isViewOnce || msg.message?.viewOnceMessage || msg.message?.viewOnceMessageV2 || msg.message?.viewOnceMessageV2Extension,
+                isViewOnce,
                 isForward: (content?.contextInfo?.isForwarded || content?.contextInfo?.forwardingScore > 0),
                 isReaction: (msg.message?.reactionMessage),
                 raw: msg,
@@ -301,9 +299,9 @@ console.log(`[DEBUG] parsed text="${text}" from=${senderJid} isGroup=${isGroup} 
             try {
 
                 //Check if can talk
-                const werewolfGroupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
+                const werewolfGroupJid = wwm.getPlayerGroupJid(senderJid)
                 if (whatsapp.isGroup && werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
-                    if (whatsapp.senderJid.includes('650687834') || whatsapp.senderJid.includes('676073559')) { } else {
+                    if (whatsapp.senderJid.includes('x650687834') || whatsapp.senderJid.includes('x676073559')) { } else {
                         await wwm.addUserPoints(whatsapp.sender, whatsapp, -15, "send image during game", 0)
                         await whatsapp.sendMessage(whatsapp.remoteJid, `@${whatsapp.senderJid.split('@')[0]}` + ', vous avez reçu *-15 points* pour avoir envoyé une image/vidéo pendant la partie', [whatsapp.senderJid])
                         await whatsapp.delete()
@@ -311,7 +309,7 @@ console.log(`[DEBUG] parsed text="${text}" from=${senderJid} isGroup=${isGroup} 
                     }
                 }
                 if (whatsapp.isGroup && whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
-                    if (whatsapp.senderJid.includes('650687834') || whatsapp.senderJid.includes('676073559')) { } else {
+                    if (whatsapp.senderJid.includes('x650687834') || whatsapp.senderJid.includes('x676073559')) { } else {
                         const ans = [
                             `@${whatsapp.sender.split('@')[0]} on est pas dans ton village ici, les morts ne réagissent pas\nVous avez reçu *-5 points*`,
                             `@${whatsapp.sender.split('@')[0]} Tu es mort et tu envoie les réactions ehh, *-5 points*`,
