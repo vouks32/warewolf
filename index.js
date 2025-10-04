@@ -301,22 +301,22 @@ async function startBot() {
 
                 //Check if can talk
                 const werewolfGroupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
-                if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
+                if (whatsapp.isGroup && werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
                     if (whatsapp.senderJid.includes('650687834') || whatsapp.senderJid.includes('676073559')) { } else {
                         await wwm.addUserPoints(whatsapp.sender, whatsapp, -15, "send image during game", 0)
-                        await whatsapp.reply('Vous avez reçu *-15 points* pour avoir envoyé une image/vidéo pendant la partie')
+                        await whatsapp.sendMessage(whatsapp.remoteJid, `@${whatsapp.senderJid.split('@')[0]}` + ', vous avez reçu *-15 points* pour avoir envoyé une image/vidéo pendant la partie', [whatsapp.senderJid])
                         await whatsapp.delete()
                         process = false
                     }
                 }
-                if (whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
+                if (whatsapp.isGroup && whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
                     if (whatsapp.senderJid.includes('650687834') || whatsapp.senderJid.includes('676073559')) { } else {
                         const ans = [
                             `@${whatsapp.sender.split('@')[0]} on est pas dans ton village ici, les morts ne réagissent pas\nVous avez reçu *-5 points*`,
                             `@${whatsapp.sender.split('@')[0]} Tu es mort et tu envoie les réactions ehh, *-5 points*`,
                             `@${whatsapp.sender.split('@')[0]} Si tu voulais trop réagir fallait le faire de ton vivant , *-5 points*`,
                         ]
-                        await whatsapp.reply(ans[Math.floor(Math.random() * ans.length)], [whatsapp.sender])
+                        await whatsapp.sendMessage(whatsapp.remoteJid, ans[Math.floor(Math.random() * ans.length)], [whatsapp.sender])
                         await wwm.addUserPoints(whatsapp.sender, whatsapp, -5, "réagis étant mort", 0)
                         process = false
                     }
@@ -324,14 +324,14 @@ async function startBot() {
 
 
                 // Command match (exact)
-                if (process && text.trim()> 0)
+                if (process && text.trim() > 0)
                     if (handlers.commands.has(text.toLowerCase())) {
                         await handlers.commands.get(text.toLowerCase())(whatsapp)
                         handled = true
                     }
 
                 // Regex/text match
-                if (process && text.trim()> 0)
+                if (process && text.trim() > 0)
                     for (const { regex, fn } of handlers.text) {
                         if (regex.test(text.toLowerCase())) {
                             await fn(whatsapp)
