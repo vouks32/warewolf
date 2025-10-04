@@ -328,7 +328,7 @@ async function startBot() {
                 }
 
                 // Command match (exact)
-                if (process && whatsapp.text.trim() > 0)
+                if (process && text.trim().length > 0)
                     if (handlers.commands.has(text.toLowerCase())) {
                         await handlers.commands.get(text.toLowerCase())(whatsapp)
                         console.log("Handled command", text.toLowerCase())
@@ -336,7 +336,7 @@ async function startBot() {
                     }
 
                 // Regex/text match
-                if (process && whatsapp.text.trim() > 0)
+                if (process && text.trim().length > 0)
                     for (const { regex, fn } of handlers.text) {
                         if (regex.test(text.toLowerCase())) {
                             await fn(whatsapp)
@@ -344,14 +344,11 @@ async function startBot() {
                             handled = true
                         }
                     }
+                    
                 if (handled) {
-                    //console.log(whatsapp.senderJid, ":", whatsapp.raw.message?.videoMessage?.contextInfo)
-                    /* */
-                    /*console.log("------------------------------")*/
                     console.log('handled', whatsapp.senderJid, ":", text)
                 } else {
                     console.log('not handled', whatsapp.senderJid, ":", text)
-
                 }
                 // Fallback "any" handlers
                 if (!handled) {
