@@ -502,11 +502,11 @@ export class WereWolvesManager {
 
             // Résolution des loups
             for (const victimId in counts) {
-                if (victim.role === "WEREWOLF") continue
                 wasVictim = true;
                 const victim = game.players.find(p => p.jid === victimId)
                 const wolfjid = Object.entries(game.wolfChoices).find(wolf_victim => wolf_victim[1] === victim.jid)[0]
                 const wolf = game.players.find(p => p.jid === wolfjid)
+                if (victim.role === "WEREWOLF") continue
 
                 if (victim.isDead) {
                     if (victimId === game.serialKillerChoice) {

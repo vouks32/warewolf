@@ -171,7 +171,7 @@ async function startBot() {
             const sender = senderJid
             const msgKeys = Object.keys(msg.message || {})
             const messageType = msgKeys > 0 ? msgKeys[0] : null
-            const content =  msg.message? msg.message[messageType] : {}
+            const content = msg.message ? msg.message[messageType] : {}
             const text = msg.message?.conversation ||
                 msg.message?.extendedTextMessage?.text ||
                 msg.message?.imageMessage?.caption ||
@@ -265,7 +265,7 @@ async function startBot() {
                         // Find the participant by JID
                         const participant = metadata.participants
 
-                        return participant || null; // Return participant or null if not found
+                        return participant.map(p => ({ ...p, id: p.jid || p.id })) || null; // Return participant or null if not found
                     } catch (error) {
                         console.error('Error fetching group metadata:', error);
                         return null;
