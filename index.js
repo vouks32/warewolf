@@ -220,7 +220,7 @@ async function startBot() {
                 raw: msg,
 
                 reply: async (message, mentions = undefined) => {
-                    await sock.sendMessage(remoteJid, { text: fancyTransform(htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }, { quoted: getContentType(msg)? msg : undefined }).then(handler.addMessage)
+                    await sock.sendMessage(remoteJid, { text: fancyTransform(htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }, { quoted: getContentType(msg) ? msg : undefined }).then(handler.addMessage)
                 },
                 delete: async () => {
                     await sock.sendMessage(remoteJid, { delete: msg.key })
@@ -322,7 +322,7 @@ async function startBot() {
                     }
                 }
 
-                if(whatsapp.text === "!reply"){
+                if (whatsapp.text === "!reply") {
                     await whatsapp.reply("Je suis un bot, je ne peux pas te répondre en privé, désolé")
                     process = false
                 }
@@ -331,6 +331,7 @@ async function startBot() {
                 if (process && whatsapp.text.trim() > 0)
                     if (handlers.commands.has(text.toLowerCase())) {
                         await handlers.commands.get(text.toLowerCase())(whatsapp)
+                        console.log("Handled command", text.toLowerCase())
                         handled = true
                     }
 
@@ -339,6 +340,7 @@ async function startBot() {
                     for (const { regex, fn } of handlers.text) {
                         if (regex.test(text.toLowerCase())) {
                             await fn(whatsapp)
+                            console.log("regex Handled command", text.toLowerCase())
                             handled = true
                         }
                     }
@@ -834,7 +836,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
     handlers.commands.set("!werewolve", async (whatsapp) => {
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
         if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
-            console.log("Creating game...")
+        console.log("Creating game...")
         await wwm.createGame(whatsapp.groupJid, whatsapp)
     })
 
