@@ -209,7 +209,7 @@ async function startBot() {
                 sender,
                 text,
                 game,
-                messageType: getContentType(msg.message),
+                messageType: getContentType(msg.message) || "",
                 isViewOnce: msg.key?.isViewOnce || msg.message?.viewOnceMessage || msg.message?.viewOnceMessageV2 || msg.message?.viewOnceMessageV2Extension,
                 isForward: (content?.contextInfo?.isForwarded || content?.contextInfo?.forwardingScore > 0),
                 isReaction: (msg.message?.reactionMessage),
@@ -296,16 +296,16 @@ async function startBot() {
 
                 //Check if can talk
                 const werewolfGroupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
-
-                if (whatsapp.senderJid.includes('650687834') || whatsapp.senderJid.includes('676073559')) { } else {
-                    if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
+                if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
+                    if (whatsapp.senderJid.includes('650687834') || whatsapp.senderJid.includes('676073559')) { } else {
                         await wwm.addUserPoints(whatsapp.sender, whatsapp, -15, "send image during game", 0)
                         await whatsapp.reply('Vous avez reçu *-15 points* pour avoir envoyé une image/vidéo pendant la partie')
                         await whatsapp.delete()
                         handled = true
                     }
-
-                    if (whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
+                }
+                if (whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
+                    if (whatsapp.senderJid.includes('650687834') || whatsapp.senderJid.includes('676073559')) { } else {
                         const ans = [
                             `@${whatsapp.sender.split('@')[0]} on est pas dans ton village ici, les morts ne réagissent pas\nVous avez reçu *-5 points*`,
                             `@${whatsapp.sender.split('@')[0]} Tu es mort et tu envoie les réactions ehh, *-5 points*`,
@@ -313,9 +313,6 @@ async function startBot() {
                         ]
                         await whatsapp.reply(ans[Math.floor(Math.random() * ans.length)], [whatsapp.sender])
                         await wwm.addUserPoints(whatsapp.sender, whatsapp, -5, "réagis étant mort", 0)
-                        handled = true
-                    }
-                    if(whatsapp.text.trim().length == 0 || whatsapp.senderJid == null || whatsapp.senderJid.trim().length == 0){
                         handled = true
                     }
                 }
