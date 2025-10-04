@@ -177,6 +177,7 @@ async function startBot() {
                 msg.message?.imageMessage?.caption ||
                 msg.message?.videoMessage?.caption ||
                 "";
+console.log(`[DEBUG] parsed text="${text}" from=${senderJid} isGroup=${isGroup} messageType=${getContentType(msg.message)}`);
 
 
             // Build reusable whatsapp object with proper JID information
@@ -521,33 +522,57 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         await whatsapp.reply(t, mentions)
     })
 
+    
     handlers.commands.set("!rank", async (whatsapp) => {
-        if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
-        const participants = await whatsapp.getParticipants(whatsapp.groupJid)
-        console.log(participants)
-        const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
-        if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+    if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
 
-        const groupId = whatsapp.groupJid
+    console.log('[DEBUG] !rank called by', whatsapp.senderJid, 'text:', whatsapp.text, 'group:', whatsapp.groupJid)
 
-        const allPlayers = getAllUsers()
-        let group = []
-        for (const playerJid in allPlayers) {
-            const player = allPlayers[playerJid];
-            if (player.groups.some(gJID => gJID === groupId))
-                group.push(player)
-        }
+    const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+    console.log('[DEBUG] group participants:', participants.map(p => ({ id: p.id || p.jid, admin: p.admin })))
 
+    // Détection d'admin plus robuste (compare la partie avant @)
+    const senderLocal = whatsapp.senderJid.split('@')[0]
+    const AdminParticipant = participants.find(p => {
+        const pid = (p.id || p.jid || '').toString()
+        if (!pid) return false
+        const pidLocal = pid.split('@')[0]
+        return pidLocal === senderLocal && !!p.admin
+    })
+
+    if (!AdminParticipant) {
+        // Pour debug, on affiche quand même; si tu veux restreindre -> décommente return
+        await whatsapp.reply('Tu n\'es pas admin, j\'affiche quand même le classement (debug).')
+        // return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+    }
+
+    const groupId = whatsapp.groupJid
+    const allPlayers = getAllUsers()
+    let group = []
+    for (const playerJid in allPlayers) {
+        const player = allPlayers[playerJid];
+        if (player.groups.some(gJID => gJID === groupId))
+            group.push(player)
+    }
+
+    try {
         const metadata = await sock.groupMetadata(groupId);
-        const participant = metadata.participants
         group.sort((p1, p2) => p2.points - p1.points)
 
         await sock.sendMessage(groupId, {
-            text: `Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n')
-            , mentions: group.map((p) => p.jid)
+            text: `Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) =>
+                (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`
+            ).join('\n'),
+            mentions: group.map((p) => p.jid)
         }).then(handler.addMessage)
+    } catch (err) {
+        console.log('[ERROR] !rank handler', err)
+        await whatsapp.reply('Erreur lors de la récupération du classement. Check logs.')
+    }
+})
 
-    })
+// Alias en français
+handlers.commands.set("!rang", handlers.commands.get("!rank"))
 
 
     handlers.commands.set("!resetrank", async (whatsapp) => {
