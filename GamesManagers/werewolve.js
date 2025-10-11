@@ -108,7 +108,7 @@ export class WereWolvesManager {
             if (!user.groups.some(g => g === whatsapp.groupJid)) {
                 user.groups.push(whatsapp.groupJid)
             }
-            if(whatsapp.ids.lid && whatsapp.ids.lid !== user.lid){
+            if(whatsapp?.ids?.lid && whatsapp.ids?.lid !== user.lid){
                 user.lid = whatsapp.ids.lid
             }
             user.points += points
