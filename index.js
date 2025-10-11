@@ -682,7 +682,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
 
             const ids = whatsapp.mentions
-            const amount = whatsapp.text.split("!sendpoints")[1].trim().split(' ')[whatsapp.text.split("!sendpoints")[1].trim().split(' ').length - 1]
+            const amount = whatsapp.text.split("!removepoints")[1].trim().split(' ')[whatsapp.text.split("!removepoints")[1].trim().split(' ').length - 1]
 
             const allPlayers = getAllUsers()
 
