@@ -154,7 +154,7 @@ export class WereWolvesManager {
                 await this.addUserPoints(p.jid, { groupJid: game.groupId }, POINTS_LIST.WinAsVillager, "Gagné en tant que villageoi", 0)
             });
             wolves.forEach(async p => {
-                await this.addUserPoints(p.jid, { groupJid: game.groupId }, -Math.floor(POINTS_LIST.WinAsWolve / 2), "perdu en tant que loup", 0)
+                await this.addUserPoints(p.jid, { groupJid: game.groupId }, -Math.floor(POINTS_LIST.WinAsWolve), "perdu en tant que loup", 0)
             });
             return { name: "VILLAGERS", players: nonWolves }
         }
@@ -274,7 +274,7 @@ export class WereWolvesManager {
 
         await whatsapp.reply(`✅ Tu as rejoint!\n\nListe des joueurs:\n\n${names}`, mentions)
 
-        await this.addUserPoints(playerJid, whatsapp, 1, 'Rejoin une partie', 1)
+        await this.addUserPoints(playerJid, whatsapp, 0, 'Rejoin une partie', 1)
 
     }
 
@@ -604,6 +604,14 @@ export class WereWolvesManager {
                 }
             }
 
+             for (const wolf in game.wolfChoices) {
+                const target = game.wolfChoices[wolf]
+                const victim = game.players.find(p => p.jid === target)
+                const wolfPlayer = game.players.find(p => p.jid === wolf)
+                if (victim && victim.isDead && !wolfPlayer.isDead) {
+                    await this.addUserPoints(wolf, whatsapp, POINTS_LIST.wolfEat, "a mangé un villageois", 0)
+                }
+            }
 
             this.saveGames(this.games)
             if (wasHunter) {
@@ -656,7 +664,7 @@ export class WereWolvesManager {
 
         timers[groupId][1] = setTimeout(async () => {
             seconds = ((dayDuration) / (2 * 1000))
-            await this.sendTips(groupId, whatsapp)
+            //await this.sendTips(groupId, whatsapp)
             await whatsapp.sendMessage(groupId, "*⏱️ " + (seconds < 60 ? seconds + " secondes" : (seconds / 60).toFixed(0) + ":" + (seconds % 60) + " minutes") + " restante avant le coucher du soleil!*")
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
         }, dayDuration / 2)
@@ -669,7 +677,7 @@ export class WereWolvesManager {
 
         timers[groupId][3] = setTimeout(async () => {
             seconds = ((dayDuration) / (10 * 1000))
-            await this.sendTips(groupId, whatsapp)
+           // await this.sendTips(groupId, whatsapp)
             await whatsapp.sendMessage(groupId, "*📩 Il est plus que temps de voter!*")
             await whatsapp.sendMessage(groupId, "*⏱️ " + (seconds < 60 ? seconds + " secondes" : (seconds / 60).toFixed(0) + ":" + (seconds % 60) + " minutes") + " restantes avant le coucher du soleil!*")
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
@@ -1063,7 +1071,6 @@ export class WereWolvesManager {
         const target = game.players.find(p => p.jid === targetJid && !p.isDead)
         if (!target || target.jid === witch.jid) return await whatsapp.sendMessage(witch.jid, "⚠️ Cible invalide.")
 
-        game.witchPoisonAvailable = false
         if (Math.random() > 0.8) {
             await whatsapp.sendMessage(witch.jid, "🧪 Ton poison était périmé, tu t'es empoisonné toi même et tu es mort 💀")
             witch.isDead = true
@@ -1087,7 +1094,8 @@ export class WereWolvesManager {
             game.witchPoisonAvailable = true
             await whatsapp.sendMessage(witch.jid, `🧪 Ton poison n'a pas marché, c'est ton premier jour en tant que sorcière ou quoi?!`)
         } else {
-            target.isDead = true
+            target.isDead = 
+        game.witchPoisonAvailable = false111175
             if (target.role.includes("WEREWOLF")) {
                 await whatsapp.sendMessage(groupId, `🧪 La Sorcière a empoisonné un Loup Garou, *+${POINTS_LIST.witchPoisonWolf} points*`)
                 await this.addUserPoints(witch.jid, whatsapp, POINTS_LIST.witchPoisonWolf, "sorcière tue un loup", 0)
