@@ -177,6 +177,10 @@ async function startBot() {
                 msg.message?.imageMessage?.caption ||
                 msg.message?.videoMessage?.caption ||
                 "";
+            const mentions = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid ||
+                msg.message?.imageMessage?.contextInfo?.mentionedJid ||
+                msg.message?.videoMessage?.contextInfo?.mentionedJid ||
+                [];
 
             //console.log(`[DEBUG] parsed text="${text}" from=${senderJid} isGroup=${isGroup} messageType=${getContentType(msg.message)}`);
 
