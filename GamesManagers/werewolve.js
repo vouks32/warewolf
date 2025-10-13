@@ -428,6 +428,10 @@ export class WereWolvesManager {
         ]
         console.log('sending night msg')
         await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "nightfall.jpg"), nightText[Math.floor(Math.random() * nightText.length)])
+        const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
+        const mentions = game.players.map((p, i) => p.jid)
+        await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
+
         console.log('sended night msg')
 
         // Timer ends night
@@ -1080,10 +1084,10 @@ export class WereWolvesManager {
                 }
             }
         } else if (Math.random() < 0.2) {
-        game.witchPoisonAvailable = true
+            game.witchPoisonAvailable = true
             await whatsapp.sendMessage(witch.jid, `🧪 Ton poison n'a pas marché, c'est ton premier jour en tant que sorcière ou quoi?!`)
         } else {
-                target.isDead = true
+            target.isDead = true
             if (target.role.includes("WEREWOLF")) {
                 await whatsapp.sendMessage(groupId, `🧪 La Sorcière a empoisonné un Loup Garou, *+${POINTS_LIST.witchPoisonWolf} points*`)
                 await this.addUserPoints(witch.jid, whatsapp, POINTS_LIST.witchPoisonWolf, "sorcière tue un loup", 0)
