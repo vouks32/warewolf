@@ -206,7 +206,7 @@ async function startBot() {
             messagesCount--;
             const whatsapp = {
                 ids: {
-                    lid: msg.key.participant?.endsWith('@lid') ? msg.key.participant : null,
+                    lid: isGroup? ( msg.key.participantLid || msg.key.participant || null) : msg.key.senderLid || null,
                     jid: senderJid,
                 },
                 isGroup,

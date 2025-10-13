@@ -102,11 +102,14 @@ export class WereWolvesManager {
         arr[reason] = points
 
         if (!user) {
-            saveUser({ jid: playerJid, groups: [whatsapp.groupJid], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName || ' ', games: { WEREWOLF: gamescount }, points: 50, pointsTransactions: [arr] })
+            saveUser({ jid: playerJid, lid: whatsapp.ids.lid, groups: [whatsapp.groupJid], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName || ' ', games: { WEREWOLF: gamescount }, points: 50, pointsTransactions: [arr] })
             await this.sendPlayerProfil(whatsapp)
         } else {
             if (!user.groups.some(g => g === whatsapp.groupJid)) {
                 user.groups.push(whatsapp.groupJid)
+            }
+            if(whatsapp.ids.lid && whatsapp.ids.lid !== user.lid){
+                user.lid = whatsapp.ids.lid
             }
             user.points += points
             user.games.WEREWOLF += gamescount
@@ -604,7 +607,7 @@ export class WereWolvesManager {
                 }
             }
 
-             for (const wolf in game.wolfChoices) {
+            for (const wolf in game.wolfChoices) {
                 const target = game.wolfChoices[wolf]
                 const victim = game.players.find(p => p.jid === target)
                 const wolfPlayer = game.players.find(p => p.jid === wolf)
@@ -677,7 +680,7 @@ export class WereWolvesManager {
 
         timers[groupId][3] = setTimeout(async () => {
             seconds = ((dayDuration) / (10 * 1000))
-           // await this.sendTips(groupId, whatsapp)
+            // await this.sendTips(groupId, whatsapp)
             await whatsapp.sendMessage(groupId, "*📩 Il est plus que temps de voter!*")
             await whatsapp.sendMessage(groupId, "*⏱️ " + (seconds < 60 ? seconds + " secondes" : (seconds / 60).toFixed(0) + ":" + (seconds % 60) + " minutes") + " restantes avant le coucher du soleil!*")
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
@@ -1094,8 +1097,8 @@ export class WereWolvesManager {
             game.witchPoisonAvailable = true
             await whatsapp.sendMessage(witch.jid, `🧪 Ton poison n'a pas marché, c'est ton premier jour en tant que sorcière ou quoi?!`)
         } else {
-            target.isDead = 
-        game.witchPoisonAvailable = false111175
+            target.isDead =
+                game.witchPoisonAvailable = false111175
             if (target.role.includes("WEREWOLF")) {
                 await whatsapp.sendMessage(groupId, `🧪 La Sorcière a empoisonné un Loup Garou, *+${POINTS_LIST.witchPoisonWolf} points*`)
                 await this.addUserPoints(witch.jid, whatsapp, POINTS_LIST.witchPoisonWolf, "sorcière tue un loup", 0)
