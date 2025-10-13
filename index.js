@@ -178,8 +178,9 @@ async function startBot() {
                 msg.message?.videoMessage?.caption ||
                 "";
 
-            console.log(`[DEBUG] parsed text="${text}" from=${senderJid} isGroup=${isGroup} messageType=${getContentType(msg.message)}`);
+            //console.log(`[DEBUG] parsed text="${text}" from=${senderJid} isGroup=${isGroup} messageType=${getContentType(msg.message)}`);
 
+            if (text.includes('@')) console.log(msg)
 
             // Build reusable whatsapp object with proper JID information
             const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : null
@@ -328,7 +329,7 @@ async function startBot() {
                         }
                     }
 
-                console.log('handled', handled, "process", process, whatsapp.senderJid, ":", text)
+                //console.log('handled', handled, "process", process, whatsapp.senderJid, ":", text)
 
                 // Fallback "any" handlers
                 if (!handled) {
