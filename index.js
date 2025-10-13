@@ -181,6 +181,7 @@ async function startBot() {
             //console.log(`[DEBUG] parsed text="${text}" from=${senderJid} isGroup=${isGroup} messageType=${getContentType(msg.message)}`);
 
             if (text.includes('@')) console.log(msg)
+            if (text.includes('@')) console.log(msg.message.extendedTextMessage)
 
             // Build reusable whatsapp object with proper JID information
             const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : null
