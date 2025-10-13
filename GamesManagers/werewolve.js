@@ -1058,6 +1058,7 @@ export class WereWolvesManager {
         if (!witch || witch.role !== "WITCH" || !game.witchPoisonAvailable) return
         const target = game.players.find(p => p.jid === targetJid && !p.isDead)
         if (!target || target.jid === witch.jid) return await whatsapp.sendMessage(witch.jid, "⚠️ Cible invalide.")
+
         game.witchPoisonAvailable = false
         if (Math.random() > 0.8) {
             await whatsapp.sendMessage(witch.jid, "🧪 Ton poison était périmé, tu t'es empoisonné toi même et tu es mort 💀")
@@ -1079,9 +1080,10 @@ export class WereWolvesManager {
                 }
             }
         } else if (Math.random() < 0.2) {
+        game.witchPoisonAvailable = true
             await whatsapp.sendMessage(witch.jid, `🧪 Ton poison n'a pas marché, c'est ton premier jour en tant que sorcière ou quoi?!`)
         } else {
-
+                target.isDead = true
             if (target.role.includes("WEREWOLF")) {
                 await whatsapp.sendMessage(groupId, `🧪 La Sorcière a empoisonné un Loup Garou, *+${POINTS_LIST.witchPoisonWolf} points*`)
                 await this.addUserPoints(witch.jid, whatsapp, POINTS_LIST.witchPoisonWolf, "sorcière tue un loup", 0)
