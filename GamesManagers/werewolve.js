@@ -153,11 +153,17 @@ export class WereWolvesManager {
             nonWolves.forEach(async p => {
                 await this.addUserPoints(p.jid, { groupJid: game.groupId }, POINTS_LIST.WinAsVillager, "Gagné en tant que villageoi", 0)
             });
+            wolves.forEach(async p => {
+                await this.addUserPoints(p.jid, { groupJid: game.groupId }, -Math.floor(POINTS_LIST.WinAsWolve / 2), "perdu en tant que loup", 0)
+            });
             return { name: "VILLAGERS", players: nonWolves }
         }
         if (wolvesAlive.length >= nonWolvesAlive.length) {
-            wolvesAlive.forEach(async p => {
+            wolves.forEach(async p => {
                 await this.addUserPoints(p.jid, { groupJid: game.groupId }, POINTS_LIST.WinAsWolve, "Gagné en tant que Loup", 0)
+            });
+            nonWolves.forEach(async p => {
+                await this.addUserPoints(p.jid, { groupJid: game.groupId }, -Math.floor(POINTS_LIST.WinAsVillager), "Perdu en tant que villageoi", 0)
             });
             return { name: "WOLVES", players: wolves }
         }
@@ -610,7 +616,8 @@ export class WereWolvesManager {
         const { name: result, players: winners } = this.checkWin(game)
         if (result) {
             const winpoints = result === "LOVERS" ? POINTS_LIST.WinAsLover : result === "WOLVES" ? POINTS_LIST.WinAsWolve : POINTS_LIST.WinAsVillager
-            await whatsapp.sendMessage(groupId, `🏆 Partie terminée! \n*${result}* gagnent!\nLes gagnants recoivent *+${winpoints} points*`)
+            const losepoints = result === "LOVERS" ? POINTS_LIST.WinAsVillager : result === "WOLVES" ? POINTS_LIST.WinAsVillager : Math.floor(POINTS_LIST.WinAsWolve/2)
+            await whatsapp.sendMessage(groupId, `🏆 Partie terminée! \n*${result}* gagnent!\nLes gagnants recoivent *+${winpoints} points*\nLes Perdants recoivent *${-losepoints} points*`)
             const names = game.players.sort((p, q) => (winners.some(w => w.jid === q.jid) ? 1 : -1)).map((p, i) => (winners.some(w => w.jid === p.jid) ? '🏆' : '💩') + ` *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`) + ' [' + p.role + "]\n- *(" + (p.points.reduce((sum, v) => sum + v.points, 0) >= 0 ? '+' : '') + p.points.reduce((sum, v) => sum + v.points, 0) + " points)*").join("\n\n")
             const mentions = game.players.map((p, i) => p.jid)
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n" + names, mentions)
@@ -764,7 +771,6 @@ export class WereWolvesManager {
                 }
                 // await whatsapp.sendMessage(groupId, `🎭 Le village a exécuté @${victimId.split('@')[0]}. C'était un *[${victim.role}]*.`, [victimId])
                 await whatsapp.sendMessage(groupId, t)
-                await this.addUserPoints(victim.jid, whatsapp, POINTS_LIST.votedAsTanner, 'mort comme tanneur', 0)
                 // Terminer la partie - le Tanner gagne seul
                 TANNERWASVOTED = true
 
@@ -804,7 +810,8 @@ export class WereWolvesManager {
         const { name: result, players: winners } = this.checkWin(game)
         if (result) {
             const winpoints = result === "LOVERS" ? POINTS_LIST.WinAsLover : result === "WOLVES" ? POINTS_LIST.WinAsWolve : POINTS_LIST.WinAsVillager
-            await whatsapp.sendMessage(groupId, `🏆 Partie terminée! \n*${result}* gagnent!\nLes gagnants recoivent *+${winpoints} points*`)
+            const losepoints = result === "LOVERS" ? POINTS_LIST.WinAsVillager : result === "WOLVES" ? POINTS_LIST.WinAsVillager : Math.floor(POINTS_LIST.WinAsWolve/2)
+            await whatsapp.sendMessage(groupId, `🏆 Partie terminée! \n*${result}* gagnent!\nLes gagnants recoivent *+${winpoints} points*\nLes Perdants recoivent *${-losepoints} points*`)
             const names = game.players.sort((p, q) => (winners.some(w => w.jid === q.jid) ? 1 : -1)).map((p, i) => (winners.some(w => w.jid === p.jid) ? '🏆' : '💩') + ` *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`) + ' [' + p.role + "]\n- *(" + (p.points.reduce((sum, v) => sum + v.points, 0) >= 0 ? '+' : '') + p.points.reduce((sum, v) => sum + v.points, 0) + " points)*").join("\n\n")
             const mentions = game.players.map((p, i) => p.jid)
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
@@ -891,7 +898,7 @@ export class WereWolvesManager {
         game.seerChoice = targetJid
         this.saveGames(this.games)
 
-        const result = (target.role.includes("WEREWOLF") || (target.role.includes("TANNER") && Math.random() > 0) || (target.role.includes("WITCH") && Math.random() > 0.5) ||
+        const result = (target.role.includes("WEREWOLF") || (target.role.includes("TANNER") && Math.random() > 0.5) || (target.role.includes("WITCH") && Math.random() > 0.5) ||
             (game.seerFakeWolves && game.seerFakeWolves.includes(target.jid))) ?
             "😈 est un être maléfique!" : "😇 est une personne innocente.";
         await whatsapp.sendMessage(seer.jid, `🔮 Résultat: \n*${target.name}* (@${target.jid.split('@')[0]}) ${result}.`, [target.jid])

@@ -233,16 +233,6 @@ async function startBot() {
                         await sock.sendMessage(jid, { image: { url: buffer }, caption: fancyTransform(htmlDecode(caption)), mentions }).then(handler.addMessage)
                         return
                     }
-                    /* const imagename = buffer.split('/').pop()
-                     let optimizedImage = (await optimizeGifSharp(buffer))
-                     let t = (await optimizeGifSharp(buffer, 32, 80))
-                     try {
-                         t = await extractImageThumb(optimizedImage)
-                         await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail: t.buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
-                     } catch (error) {
-                         console.log("couldn't get thumbnail")
-                     }
-                     await sock.sendMessage(jid, { image: optimizedImage, caption: htmlDecode(caption), mentions }).then(handler.addMessage)*/
 
                     const text = "======================\n\n" +
                         htmlDecode(caption) +
@@ -534,8 +524,8 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
         if (!AdminParticipant) {
             // Pour debug, on affiche quand même; si tu veux restreindre -> décommente return
-            await whatsapp.reply('Tu n\'es pas admin, j\'affiche quand même le classement (debug).')
-            // return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+            //await whatsapp.reply('Tu n\'es pas admin, j\'affiche quand même le classement (debug).')
+            return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
         }
 
         const groupId = whatsapp.groupJid
@@ -607,7 +597,10 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
             console.log(participants)
             const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin) && _p.admin.includes('super'))
-            if (!AdminParticipant) return await whatsapp.reply('Mon chaud... tu n\'es pas *super admin*, donc laisse!')
+            if (!AdminParticipant) {
+                await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
+                return
+            }
 
 
             const text = whatsapp.text.slice(8)
@@ -625,7 +618,10 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
             console.log(participants)
             const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin) && _p.admin.includes('super'))
-            if (!AdminParticipant) return await whatsapp.reply('Mon chaud... tu n\'es pas *super admin*, donc laisse!')
+            if (!AdminParticipant) {
+                await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
+                return
+            }
 
 
             const name = whatsapp.text.split("!sendpoints")[1].trim().split(' ')[0]
@@ -644,7 +640,10 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
             console.log(participants)
             const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin) && _p.admin.includes('super'))
-            if (!AdminParticipant) return await whatsapp.reply('Mon chaud... tu n\'es pas *super admin*, donc laisse!')
+            if (!AdminParticipant) {
+                await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
+                return await whatsapp.reply('Mon chaud... tu n\'es pas *super admin*, donc laisse!')
+            }
 
 
             const name = whatsapp.text.split("!removepoints")[1].trim().split(' ')[0]
@@ -684,7 +683,10 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
             console.log(participants)
             const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin && _p.admin.includes('super')))
-            if (!AdminParticipant) return await whatsapp.reply('Seule le *SUPER ADMIN* peut faire ça! donc calme toi')
+            if (!AdminParticipant) {
+                await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
+                return await whatsapp.reply('Mon chaud... tu n\'es pas *super admin*, donc laisse!')
+            }
 
             if (whatsapp.game === null) return await whatsapp.reply('persone n\'est entrain de jouer à un jeu! tu es attardé?')
             else if (whatsapp.game === 'QUIZ')
