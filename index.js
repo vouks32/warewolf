@@ -393,7 +393,7 @@ async function startBot() {
                         console.log(p.jid, p.pushName, "is no more in group but top 3")
                     }
                 } else {
-                    if (groupParticipant?.admin === "admin" && !p.jid.includes('650687834')) {
+                    if (groupParticipant?.admin && !p.jid.includes('650687834')) {
                         await sock.groupParticipantsUpdate(
                             groupJid,
                             [p.jid],
