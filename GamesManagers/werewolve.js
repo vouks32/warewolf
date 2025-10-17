@@ -401,13 +401,13 @@ export class WereWolvesManager {
                     //await whatsapp.sendMessage(p.jid, `🎭 Ton rôle est: *${p.fakeRole}*`)
                     // Envoyer les instructions en fonction du faux rôle
                     if (p.fakeRole === "SEER") {
-                        await whatsapp.sendMessage(p.jid, "🔮 Nuit: \nEnvoie *!see _numéro victime_* pour voir si il est un loup")
+                        await whatsapp.sendMessage(p.jid, "🔮 Nuit: \nEnvoie *!see _numéro victime_* pour voir si il est un loup.")
                     } else if (p.fakeRole === "PROSTITUTE") {
-                        await whatsapp.sendMessage(p.jid, "💄 Nuit: \nEnvoie *!visit numéro client* pour visiter quelqu'un")
+                        await whatsapp.sendMessage(p.jid, "💄 Nuit: \nEnvoie *!visit numéro client* pour visiter quelqu'un.")
                     } else if (p.fakeRole === "MAYOR") {
-                        await whatsapp.sendMessage(p.jid, "🤵 Tu peux stopper les votes en journée en envoyant *!stopvote*")
+                        await whatsapp.sendMessage(p.jid, "🤵 Tu peux stopper les votes en journée en envoyant *!stopvote*.")
                     } else if (p.fakeRole === "TANNER") {
-                        await whatsapp.sendMessage(p.jid, "🎭 Ton objectif est de te faire voter par le village. Si tu réussis, tu gagnes la partie!")
+                        await whatsapp.sendMessage(p.jid, "🎭 Ton objectif est de te faire voter par le village. Si tu réussis, tu gagnes la partie!.")
                     }
                     // ... autres faux rôles ...
                 } else {
