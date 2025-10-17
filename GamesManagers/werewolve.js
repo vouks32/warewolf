@@ -102,7 +102,7 @@ export class WereWolvesManager {
         arr[reason] = points
 
         if (!user) {
-            saveUser({ jid: playerJid, lid: whatsapp.ids.lid, groups: [whatsapp.groupJid], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName || ' ', games: { WEREWOLF: gamescount }, points: 50, pointsTransactions: [arr] })
+            saveUser({ jid: playerJid, lid: whatsapp.ids?.lid, groups: [whatsapp.groupJid], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName || ' ', games: { WEREWOLF: gamescount }, points: 50, pointsTransactions: [arr] })
             await this.sendPlayerProfil(whatsapp)
         } else {
             if (!user.groups.some(g => g === whatsapp.groupJid)) {
