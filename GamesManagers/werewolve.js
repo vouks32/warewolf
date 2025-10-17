@@ -1426,6 +1426,7 @@ export class WereWolvesManager {
         const game = this.games[groupId]
         if (!game || game.state !== "DAY") return
         let user = getUser(voterJid)
+        if (!user) return
 
         const voter = game.players.find(p => p.jid === voterJid)
         const target = game.players.find(p => p.jid === targetJid && !p.isDead)
