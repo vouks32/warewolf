@@ -96,7 +96,7 @@ export class WereWolvesManager {
 
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
-        if (!playerJid || !whatsapp || !reason || !points) return
+        if (!playerJid || !whatsapp || !reason || !points) return false
         let user = getUser(playerJid)
         let arr = {}
         arr[reason] = points
@@ -117,11 +117,12 @@ export class WereWolvesManager {
         }
 
         const game = this.games[(this.getPlayerGroupJid(playerJid) || ' ')]
-        if (!game) return
+        if (!game) return true
         const Player = game.players.find(p => p.jid === playerJid)
         if (Player)
             Player.points.push({ points, reason })
 
+        return true
     }
 
 
@@ -272,6 +273,11 @@ export class WereWolvesManager {
             return
         }
 
+        if((await this.addUserPoints(playerJid, whatsapp, 0, 'Rejoin une partie', 1)) === false) {
+            await whatsapp.reply("⚠️ Une erreur est survenue lors de l'ajout de tes points utilisateur. Rejoins la partie à nouveau.")
+            return
+        }
+
         game.players.push({ ids: whatsapp.ids, jid: playerJid, name, isPlaying: true, isDead: false, hasSpokenDeathCount: 0, role: null, points: [], note: "INCONNU", alphaWerewolfHasEaten: false, alphaWerewolfHasConverted: false })
         this.saveGames(this.games)
 
@@ -279,9 +285,6 @@ export class WereWolvesManager {
         const mentions = game.players.map((p, i) => p.jid)
 
         await whatsapp.reply(`✅ Tu as rejoint!\n\nListe des joueurs:\n\n${names}`, mentions)
-
-        await this.addUserPoints(playerJid, whatsapp, 0, 'Rejoin une partie', 1)
-
     }
 
     async startGame(groupId, whatsapp) {
