@@ -21,7 +21,7 @@ export const POINTS_LIST = {
     doctorProtected: killWithPowers,
     witchProtected: killWithPowers,
     cupidonlinkWolf: killWithPowers,
-    votedAsTanner : 10,
+    votedAsTanner : 5,
 }
 
 export function saveUser(user) {
