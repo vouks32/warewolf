@@ -251,6 +251,11 @@ export class WereWolvesManager {
     }
 
     async joinGame(groupId, playerJid, name, whatsapp) {
+
+        if (!groupId || !playerJid || !name) {
+            return
+        }
+
         const game = this.games[groupId]
         if (!game || game.state !== "WAITING_PLAYERS") {
             await whatsapp.reply("⚠️ Aucune partie dans laquelle tu peux entrer pour l'instant frangin.")
