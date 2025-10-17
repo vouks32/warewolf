@@ -96,7 +96,8 @@ export class WereWolvesManager {
 
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
-        if (!playerJid || !whatsapp || !reason || !points) return false
+        if (!playerJid || !whatsapp || !reason ) return false
+        console.log(`Adding ${points} points to ${playerJid} for ${reason}`, whatsapp?.ids)
         let user = getUser(playerJid)
         let arr = {}
         arr[reason] = points
