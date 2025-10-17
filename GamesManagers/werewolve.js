@@ -319,7 +319,7 @@ export class WereWolvesManager {
             // Conversion Alpha Werewolf
             if (p.role === "WEREWOLF" && !game.alphaWerewolfWasConverted) {
                 // Convertir un villageois en loup avec une certaine probabilité
-                if ((Math.random() < 0.6 && game.players.length < 10 && game.players.length > 7) || (Math.random() < 0.5 && game.players.length > 9)) {
+                if ((Math.random() < 1 && game.players.length < 10 && game.players.length >= 7) || (Math.random() < 0.7 && game.players.length > 9)) {
                     p.role = "ALPHAWEREWOLF"
                     game.alphaWerewolfWasConverted = true
                 }
