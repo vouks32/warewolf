@@ -102,13 +102,13 @@ export class WereWolvesManager {
         arr[reason] = points
 
         if (!user) {
-            saveUser({ jid: playerJid, lid: whatsapp.ids?.lid, groups: [whatsapp.groupJid], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName || ' ', games: { WEREWOLF: gamescount }, points: 50, pointsTransactions: [arr] })
+            saveUser({ jid: playerJid, lid: whatsapp.ids?.lid || null, groups: [whatsapp.groupJid], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName || ' ', games: { WEREWOLF: gamescount }, points: 50, pointsTransactions: [arr] })
             await this.sendPlayerProfil(whatsapp)
         } else {
             if (!user.groups.some(g => g === whatsapp.groupJid)) {
                 user.groups.push(whatsapp.groupJid)
             }
-            if(whatsapp?.ids?.lid && whatsapp.ids?.lid !== user.lid){
+            if(whatsapp?.ids?.lid && whatsapp.ids?.lid !== user.lid && whatsapp.sender === playerJid) {
                 user.lid = whatsapp.ids.lid
             }
             user.points += points
@@ -1074,7 +1074,7 @@ export class WereWolvesManager {
         const target = game.players.find(p => p.jid === targetJid && !p.isDead)
         if (!target || target.jid === witch.jid) return await whatsapp.sendMessage(witch.jid, "⚠️ Cible invalide.")
 
-        if (Math.random() > 0.95) {
+        if (Math.random() > 0.9) {
             await whatsapp.sendMessage(witch.jid, "🧪 Ton poison était périmé, tu t'es empoisonné toi même et tu es mort 💀")
             witch.isDead = true
             await whatsapp.sendMessage(groupId, `🧪 La Sorcière s'est empoisoné par accident *${witch.name}* (@${witch.jid.split('@')[0]}) est mort!`, [witch.jid])
@@ -1462,7 +1462,7 @@ export class WereWolvesManager {
                 `Parties joués :\n ${Object.entries(user.games).map(([gameName, number]) => gameName + ' : *' + number + ' Parties joués*').join('\n')}`, [user.jid])
         //saveUser({ jid: playerJid, groups: [groupId], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName, points: 100, pointsTransactions: [{ "nouveau joueur": 100 }] })
         else {
-            await whatsapp.reply(`🚫 Tu n'es pas encore enregistré, joue d'abord à une partie!`)
+            await whatsapp?.reply(`🚫 Tu n'es pas encore enregistré, joue d'abord à une partie!`)
         }
     }
 
