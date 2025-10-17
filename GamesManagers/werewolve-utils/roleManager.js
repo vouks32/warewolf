@@ -25,8 +25,8 @@ class RoleManager {
         distribution.VILLAGER = Math.max(0, playerCount - specialRolesCount);
 
         if (playerCount > 6) {
-            const randomRole = specialRolesNAMES[Math.floor(Math.random() * specialRolesNAMES.length)]
-            if (!randomRole.includes("WEREWOLF") && Math.random() > 0.5 && distribution[randomRole] > 0 && playerCount > 7) {
+            const randomRole = "VILLAGER"
+            if (distribution[randomRole] > 0 && playerCount > 5 && Math.random() < 0.5) {
                 distribution[randomRole] -= 1
                 distribution.MADMAN += 1
             }

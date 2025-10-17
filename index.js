@@ -935,6 +935,20 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         }
     })
 
+    // Wolves transform (private DM only)
+    handlers.text.push({
+        regex: /^!wolf\s+(\S+)/,
+        fn: async (whatsapp) => {
+            if (whatsapp.isGroup) return await whatsapp.reply("Cette action en peut être éffectué que dans l'intimité de notre conversation")
+            const groupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
+            if (!groupJid) return await whatsapp.reply("Tu n'es dans aucune partie dont j'ai connaissance")
+            const target = parseInt(whatsapp.text.split(" ")[1]) - 1
+            const targetJid = wwm.getPlayerJidFromNumber(groupJid, target)
+            console.log("wolf ---- ", groupJid, whatsapp.sender, targetJid, whatsapp)
+            await wwm.wolfTransform(groupJid, whatsapp.sender, targetJid, whatsapp)
+        }
+    })
+
     // Village vote (group) [DAY]
     handlers.text.push({
         regex: /^!vote\s+(\S+)/,
