@@ -1074,7 +1074,7 @@ export class WereWolvesManager {
         const target = game.players.find(p => p.jid === targetJid && !p.isDead)
         if (!target || target.jid === witch.jid) return await whatsapp.sendMessage(witch.jid, "⚠️ Cible invalide.")
 
-        if (Math.random() > 0.8) {
+        if (Math.random() > 0.95) {
             await whatsapp.sendMessage(witch.jid, "🧪 Ton poison était périmé, tu t'es empoisonné toi même et tu es mort 💀")
             witch.isDead = true
             await whatsapp.sendMessage(groupId, `🧪 La Sorcière s'est empoisoné par accident *${witch.name}* (@${witch.jid.split('@')[0]}) est mort!`, [witch.jid])
@@ -1093,7 +1093,7 @@ export class WereWolvesManager {
                     }
                 }
             }
-        } else if (Math.random() < 0.2) {
+        } else if (Math.random() < 0.3) {
             game.witchPoisonAvailable = true
             await whatsapp.sendMessage(witch.jid, `🧪 Ton poison n'a pas marché, c'est ton premier jour en tant que sorcière ou quoi?!`)
         } else {
