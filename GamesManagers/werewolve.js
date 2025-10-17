@@ -1098,7 +1098,7 @@ export class WereWolvesManager {
             await whatsapp.sendMessage(witch.jid, `🧪 Ton poison n'a pas marché, c'est ton premier jour en tant que sorcière ou quoi?!`)
         } else {
             target.isDead =
-                game.witchPoisonAvailable = false111175
+                game.witchPoisonAvailable = false
             if (target.role.includes("WEREWOLF")) {
                 await whatsapp.sendMessage(groupId, `🧪 La Sorcière a empoisonné un Loup Garou, *+${POINTS_LIST.witchPoisonWolf} points*`)
                 await this.addUserPoints(witch.jid, whatsapp, POINTS_LIST.witchPoisonWolf, "sorcière tue un loup", 0)
