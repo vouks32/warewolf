@@ -6,7 +6,7 @@ import { getUser, saveUser } from "../userStorage.js";
 
 
 const DATA_FILE = path.join(process.cwd(), "games/pendu.json")
-const WORDS_FILE = path.join(process.cwd(), "games/pendu.json")
+const WORDS_FILE = path.join(process.cwd(), "GamesManagers/mots.json")
 
 const HANGMANPICS = [`
   +---+
@@ -144,7 +144,7 @@ export class PenduManager {
             await whatsapp.reply("🔄️ la partie va être réinitialisée !")
         }
 
-        const words = fs.readJSONSync(DATA_FILE).filter(w => w.label.length > 3)
+        const words = fs.readJSONSync(WORDS_FILE).filter(w => w.label.length > 3)
         const word = words[Math.floor(Math.random() * words.length)].normalize('NFD').replace(/[\u0300-\u036f]/g, '').tolowerCase();
 
         if (!word) {
