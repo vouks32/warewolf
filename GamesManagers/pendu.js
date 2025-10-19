@@ -189,9 +189,9 @@ export class PenduManager {
 
             return { jid: p.jid, correctCount, incorrectCount }
         })
-        await whatsapp.sendMessage(groupId, `Scores:\n\n${playerScores.map(p => `@${p.jid.split('@')[0]}:\n✅ *${p.correctCount}* lettres correctes\n❌ *${p.incorrectCount}* lettres incorrectes \n *+${(p.correctCount * 2) - p.incorrectCount} points*`).join('\n')}`, playerScores.map(p => p.jid))
+        await whatsapp.sendMessage(groupId, `Scores:\n\n${playerScores.map(p => `@${p.jid.split('@')[0]}:\n✅ *${p.correctCount}* lettres correctes\n❌ *${p.incorrectCount}* lettres incorrectes \n *+${(p.correctCount) - p.incorrectCount} points*`).join('\n\n')}`, playerScores.map(p => p.jid))
         for (let p of playerScores) {
-            const points = (p.correctCount * 2) - p.incorrectCount
+            const points = (p.correctCount) - p.incorrectCount
             await this.addUserPoints(p.jid, whatsapp, points, "PENDU", 1)
         }
         await whatsapp.sendMessage(groupId, `envoie *"!pendu"* Pour jouer à nouveau`)

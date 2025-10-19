@@ -417,6 +417,7 @@ async function startBot() {
                 }
             }
         }
+        return true
 
     }
 
