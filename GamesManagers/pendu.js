@@ -145,10 +145,10 @@ export class PenduManager {
         }
 
         const words = fs.readJSONSync(WORDS_FILE).filter(w => w.label.length > 3)
-        const word = words[Math.floor(Math.random() * words.length)].label.toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').tolowerCase();
-         
+        const word = words[Math.floor(Math.random() * words.length)].label
+        
     
-        return console.log(word);
+       console.log(word);
         if (!word) {
             await whatsapp.reply("❌ Une erreur est survenue lors de la création du mot. Veuillez réessayer.")
             return
