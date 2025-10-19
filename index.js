@@ -855,7 +855,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
 
     ////////////////////////////              PENDU               //////////////////
-    handlers.commands.set("!quizfr", async (whatsapp) => {
+    handlers.commands.set("!pendu", async (whatsapp) => {
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
         if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
         await pendum.createGame(whatsapp.groupJid, whatsapp)
