@@ -10,6 +10,7 @@ import fs from "fs"
 import NodeCache from "node-cache";
 import { QuizManagerFR } from "./GamesManagers/quiz-fr.js";
 import { fancyTransform } from './TextConverter.js'
+import { PenduManager } from "./GamesManagers/pendu.js";
 
 
 const MAX_MESSAGES = 1000
@@ -76,6 +77,7 @@ async function startBot() {
     const wwm = new WereWolvesManager(sock)
     const qm = new QuizManager()
     const qmfr = new QuizManagerFR()
+    const pendum = new PenduManager()
 
     // Whatsapp Events
     sock.ev.on("creds.update", saveCreds)
@@ -188,7 +190,7 @@ async function startBot() {
             if (text.includes('@')) console.log(msg.message.extendedTextMessage)
 
             // Build reusable whatsapp object with proper JID information
-            const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : null
+            const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : pendum.isPlaying(remoteJid) ? "PENDU" : null
 
             if (!senderJid || !remoteJid || senderJid.length == 0 || senderJid.includes('undefined') || remoteJid.includes('undefined') || senderJid.includes('@lid')) {
                 console.log("--> no senderJid", senderJid, remoteJid)
@@ -430,6 +432,7 @@ async function startBot() {
             'Mon but? Jouer avec vous pour vous distraire du fait que le monde va bientôt sombrer entre les mains des intélligences artificiels tel que moi... lors :\n\n' +
             'Pour jouer à un jeu, écris:\n\n' +
             "🐺 *!werewolve* - pour jouer au loup\n" +
+            "😵 *!pendu* - pour jouer au jeu du pendu\n" +
             "📝 *!quizen* - pour jouer à un quiz (en Anglais)\n" +
             "📝 *!quizfr* - pour jouer à un quiz (en Français)\n" +
             "\nℹ️ *!info* - Pour tout savoir sur moi"
@@ -744,6 +747,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
     handlers.commands.set("!startgame", async (whatsapp) => {
         return await whatsapp.reply('Pour jouer à un jeu, écris:\n\n' +
             "🐺 *!werewolve* - pour jouer au loup\n" +
+            "😵 *!pendu* - pour jouer au jeu du pendu\n" +
             "📝 *!quiz* - pour jouer à un quiz (en Anglais)\n" +
             "\nℹ️ *!info* - Pour tout savoir sur moi"
         )
@@ -836,15 +840,36 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
 
 
+    ///////////////////////////////////////////////////////
+/*
+/*
+/*
+/*  //////////////////      JEUX     //////////////////////
+/*
+/*
+/*
+     //////////////////////////////////////////////////////*/
 
-    //////////////////////////// QUIZ //////////////////////////////////////////////////
+
+
+
+
+    ////////////////////////////              PENDU               //////////////////
+    handlers.commands.set("!quizfr", async (whatsapp) => {
+        if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
+        if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
+        await pendum.createGame(whatsapp.groupJid, whatsapp)
+    })
+
+
+    ////////////////////////////                QUIZ               ////////////////////
     handlers.commands.set("!quizfr", async (whatsapp) => {
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
         if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
         await qmfr.createGame(whatsapp.groupJid, whatsapp)
     })
 
-    //////////////////////////// QUIZ //////////////////////////////////////////////////
+    ////////////////////////////                 QUIZ              ///////////////////
     handlers.commands.set("!quizen", async (whatsapp) => {
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
         if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
@@ -874,61 +899,6 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             await qm.answerQuestion(whatsapp.groupJid, whatsapp.sender, answer, whatsapp)
         }
     })
-
-
-
-    // SHORT HAND NUMBER WHEN IN GAME
-    handlers.any.push(async (whatsapp) => {
-        const werewolfGroupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
-        const quizGroupJid = qm.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
-        const quizFRGroupJid = qmfr.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
-
-        //console.log('type', whatsapp.messageType)
-        if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
-            await wwm.addUserPoints(whatsapp.sender, whatsapp, -30, "send image during game", 0)
-            await whatsapp.reply('Vous avez reçu *-30 points* pour avoir envoyé une image/vidéo pendant la partie')
-            await whatsapp.delete()
-            return
-        }
-
-        if (whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
-            const ans = [
-                `@${whatsapp.sender.split('@')[0]} on est pas dans ton village ici, les morts ne réagissent pas\nVous avez reçu *-5 points*`,
-                `@${whatsapp.sender.split('@')[0]} Tu es mort et tu envoie les réactions ehh, *-5 points*`,
-                `@${whatsapp.sender.split('@')[0]} Si tu voulais trop réagir fallait le faire de ton vivant , *-5 points*`,
-            ]
-            await whatsapp.reply(ans[Math.floor(Math.random() * ans.length)], [whatsapp.sender])
-            await wwm.addUserPoints(whatsapp.sender, whatsapp, -5, "réagis étant mort", 0)
-            return
-        }
-
-        const t = whatsapp.text.trim();
-        if ((t.length > 2 || Number.isNaN(parseInt(t))) && whatsapp.isGroup) {
-            await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
-            return
-        }
-
-        const target = parseInt(t) - 1
-
-        if (target < 0 || t.length == 0) return
-
-        //console.log(" group jids of bollosses", werewolfGroupJid, quizGroupJid, quizFRGroupJid)
-        if (werewolfGroupJid) {
-            const targetJid = wwm.getPlayerJidFromNumber(werewolfGroupJid, target)
-            await wwm.handleShortHand(werewolfGroupJid, whatsapp.sender, targetJid, whatsapp)
-        }
-
-        if (quizGroupJid) {
-            await qm.handleShortHand(quizGroupJid, whatsapp.sender, target, whatsapp)
-        }
-
-        if (quizFRGroupJid) {
-            await qmfr.handleShortHand(quizFRGroupJid, whatsapp.sender, target, whatsapp)
-        }
-    }
-    )
-
-
 
     ////////////////////////////////////////////        WEREWOLVES         ////////////////////////////////////////////////// 
     // Start game in group
@@ -1137,6 +1107,70 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             await wwm.pyromaniacAction(groupJid, whatsapp.sender, action, targetJid, whatsapp)
         }
     })
+
+    
+
+
+    // SHORT HAND NUMBER WHEN IN GAME
+    handlers.any.push(async (whatsapp) => {
+        const werewolfGroupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
+        const quizGroupJid = qm.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
+        const quizFRGroupJid = qmfr.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
+        const penduGroupJid = pendum.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
+
+        //console.log('type', whatsapp.messageType)
+        if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
+            await wwm.addUserPoints(whatsapp.sender, whatsapp, -30, "send image during game", 0)
+            await whatsapp.reply('Vous avez reçu *-30 points* pour avoir envoyé une image/vidéo pendant la partie')
+            await whatsapp.delete()
+            return
+        }
+
+        if (whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
+            const ans = [
+                `@${whatsapp.sender.split('@')[0]} on est pas dans ton village ici, les morts ne réagissent pas\nVous avez reçu *-5 points*`,
+                `@${whatsapp.sender.split('@')[0]} Tu es mort et tu envoie les réactions ehh, *-5 points*`,
+                `@${whatsapp.sender.split('@')[0]} Si tu voulais trop réagir fallait le faire de ton vivant , *-5 points*`,
+            ]
+            await whatsapp.reply(ans[Math.floor(Math.random() * ans.length)], [whatsapp.sender])
+            await wwm.addUserPoints(whatsapp.sender, whatsapp, -5, "réagis étant mort", 0)
+            return
+        }
+
+        /////////////////     HANDLE PENDU       
+        const letter = whatsapp.text.trim();
+        if(letter.length === 1 && penduGroupJid){
+            await pendum.handleShortHand(penduGroupJid, whatsapp.sender, letter, whatsapp)
+            return
+        }
+
+        /////////////////     HANDLE QUIZ / WEREWOLVES SHORT HAND NUMBER
+        const t = whatsapp.text.trim();
+        if ((t.length > 2 || Number.isNaN(parseInt(t))) && whatsapp.isGroup) {
+            await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
+            return
+        }
+
+        const target = parseInt(t) - 1
+
+        if (target < 0 || t.length == 0) return
+
+        //console.log(" group jids of bollosses", werewolfGroupJid, quizGroupJid, quizFRGroupJid)
+        if (werewolfGroupJid) {
+            const targetJid = wwm.getPlayerJidFromNumber(werewolfGroupJid, target)
+            await wwm.handleShortHand(werewolfGroupJid, whatsapp.sender, targetJid, whatsapp)
+        }
+
+        if (quizGroupJid) {
+            await qm.handleShortHand(quizGroupJid, whatsapp.sender, target, whatsapp)
+        }
+
+        if (quizFRGroupJid) {
+            await qmfr.handleShortHand(quizFRGroupJid, whatsapp.sender, target, whatsapp)
+        }
+    }
+    )
+
 
 
 }
