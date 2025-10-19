@@ -8,7 +8,7 @@ import { getUser, saveUser } from "../userStorage.js";
 const DATA_FILE = path.join(process.cwd(), "games/pendu.json")
 const WORDS_FILE = path.join(process.cwd(), "games/pendu.json")
 
-HANGMANPICS = [`
+const HANGMANPICS = [`
   +---+
   |   |
       |
