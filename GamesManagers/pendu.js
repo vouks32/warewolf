@@ -86,10 +86,10 @@ export class PenduManager {
         this.games = loadGames()
     }
 
-    
+
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
-        if (!playerJid || !whatsapp || !reason ) return false
+        if (!playerJid || !whatsapp || !reason) return false
         console.log(`Adding ${points} points to ${playerJid} for ${reason}`, whatsapp?.ids)
         let user = getUser(playerJid)
         let arr = {}
@@ -146,9 +146,9 @@ export class PenduManager {
 
         const words = fs.readJSONSync(WORDS_FILE).filter(w => w.label.length > 3)
         const word = words[Math.floor(Math.random() * words.length)].label
-        
-    
-       console.log(word);
+
+
+        console.log(word);
         if (!word) {
             await whatsapp.reply("❌ Une erreur est survenue lors de la création du mot. Veuillez réessayer.")
             return
@@ -157,7 +157,7 @@ export class PenduManager {
             state: "SET_WORD",
             creator: whatsapp.sender,
             players: [],
-            word: word,
+            word: (new String(word)).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(),
             displayWord: "_".repeat(word.length),
             guessedLetters: [],
             wrongLetters: [],
@@ -177,6 +177,25 @@ export class PenduManager {
         game.state = "PLAYING"
 
         await whatsapp.sendMessage(groupId, `La partie commence !\n\n${HANGMANPICS[0]}\n\nMot à deviner :\n ${game.displayWord.split("").join(" ")}\n\nEnvoyez une lettre pour commencer à jouer !`)
+
+    }
+
+    async resolveGame(groupId, whatsapp) {
+        const game = this.games[groupId]
+        if (!game) return
+        const playerScores = game.players.map(p => {
+            const correctCount = p.answers.reduce((sum, a) => sum += a.correct ? 1 : 0, 0)
+            const incorrectCount = p.answers.reduce((sum, a) => sum += !a.correct ? 1 : 0, 0)
+
+            return { jid: p.jid, correctCount, incorrectCount }
+        })
+        await whatsapp.sendMessage(groupId, `Scores:\n\n${playerScores.map(p => `@${p.jid.split('@')[0]}:\n✅ *${p.correctCount}* lettres correctes\n❌ *${p.incorrectCount}* lettres incorrectes \n *+${(p.correctCount * 2) - p.incorrectCount} points*`).join('\n')}`, playerScores.map(p => p.jid))
+        for (let p of playerScores) {
+            const points = (p.correctCount * 2) - p.incorrectCount
+            await this.addUserPoints(p.jid, whatsapp, points, "PENDU", 1)
+        }
+        await whatsapp.sendMessage(groupId, `envoie *"!pendu"* Pour jouer à nouveau`)
+        delete this.games[groupId]
 
     }
 
@@ -225,25 +244,13 @@ export class PenduManager {
         }
         if (game.displayWord === game.word) {
             await whatsapp.sendMessage(groupId, `🏆 Félicitations ! Le mot *${game.word}* a été deviné correctement !`)
-            delete this.games[groupId]
-            saveGames(this.games)
+            await this.resolveGame(groupId, whatsapp)
             return
         }
         if (game.wrongLetters.length >= HANGMANPICS.length - 1) {
             await whatsapp.sendMessage(groupId, `💀 La partie est terminée ! Le mot était *${game.word}*.\n\n${HANGMANPICS[HANGMANPICS.length - 1]}`)
-            const playerScores = game.players.map(p => {
-                const correctCount = p.answers.reduce((sum, a) => sum += a.correct ? 1 : 0, 0)
-                const incorrectCount = p.answers.reduce((sum, a) => sum += !a.correct ? 1 : 0, 0)
-
-                return { jid: p.jid, correctCount, incorrectCount }
-            })
-            await whatsapp.sendMessage(groupId, `Scores:\n\n${playerScores.map(p => `@${p.jid.split('@')[0]}:\n✅ *${p.correctCount}* lettres correctes\n❌ *${p.incorrectCount}* lettres incorrectes \n *+${(p.correctCount * 2) - p.incorrectCount} points*`).join('\n')}`, playerScores.map(p => p.jid))
-            for (let p of playerScores) {
-                const points = (p.correctCount * 2) - p.incorrectCount
-                await this.addUserPoints(p.jid, whatsapp, points, "PENDU", 1)
-            }
-            await whatsapp.sendMessage(groupId, `envoie *"!pendu"* Pour jouer à nouveau`)
-            delete this.games[groupId]
+            await this.resolveGame(groupId, whatsapp)
+            return
         }
 
         saveGames(this.games)
