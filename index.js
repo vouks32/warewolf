@@ -235,16 +235,24 @@ async function startBot() {
                     await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }).then(handler.addMessage)
                 },
 
-                sendImage: async (jid, buffer, caption = "", mentions = []) => {
-                    if (buffer.includes('http')) {
-                        await sock.sendMessage(jid, { image: { url: buffer }, caption: fancyTransform(htmlDecode(caption)), mentions }).then(handler.addMessage)
+                sendImage: async (jid, img, caption = "", mentions = []) => {
+                    if (img.includes('http')) {
+                        await sock.sendMessage(jid, { image: { url: img }, caption: fancyTransform(htmlDecode(caption)), mentions }).then(handler.addMessage)
                         return
                     }
 
-                    const text = "======================\n\n" +
+                    await sock.sendMessage(jid, {
+                        image: {
+                            url: img
+                        },
+                        caption: caption,
+                        mentions: mentions
+                    }).then(handler.addMessage)
+
+                    /*const text = "======================\n\n" +
                         htmlDecode(caption) +
                         "\n\n======================"
-                    await sock.sendMessage(jid, { text: fancyTransform(text), mentions: mentions }).then(handler.addMessage)
+                    await sock.sendMessage(jid, { text: fancyTransform(text), mentions: mentions }).then(handler.addMessage)*/
 
                 },
 
