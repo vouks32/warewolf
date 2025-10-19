@@ -782,6 +782,8 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                 await qmfr.stopGame(whatsapp.groupJid, whatsapp)
             else if (whatsapp.game === 'WEREWOLVE')
                 await wwm.stopGame(whatsapp.groupJid, whatsapp)
+            else if (whatsapp.game === 'PENDU')
+                await pendum.stopGame(whatsapp.groupJid, whatsapp)
         }
     })
 
