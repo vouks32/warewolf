@@ -689,7 +689,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             for (let i = 0; i < ids.length; i++) {
                 const id = ids[i];
                 const ppUrl = await sock.profilePictureUrl(id)
-                await whatsapp.sendMessage(whatsapp.senderJid, ppUrl + `\n\nVoici la photo de profil de @${id.split('@')[0]}`, [id])
+                await whatsapp.sendImage(whatsapp.senderJid, ppUrl, `Voici la photo de profil de @${id.split('@')[0]}`, [id])
             }
 
         }
