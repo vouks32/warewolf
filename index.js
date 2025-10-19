@@ -769,10 +769,10 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
             //console.log(participants)
-            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin && _p.admin.includes('super')))
+            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin ))
             if (!AdminParticipant) {
                 await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
-                return await whatsapp.reply('Mon chaud... tu n\'es pas *super admin*, donc laisse!')
+                return await whatsapp.reply('Mon chaud... tu n\'es pas *admin*, donc laisse!')
             }
 
             if (whatsapp.game === null) return await whatsapp.reply('persone n\'est entrain de jouer à un jeu! tu es attardé?')
