@@ -392,7 +392,7 @@ async function startBot() {
                 if (index < 3 && groupParticipant) {
 
                     console.log(`Num ${index + 1}`, p.jid, groupParticipant)
-                    
+
                     if (groupParticipant.admin === null || groupParticipant.admin === undefined) {
                         await sock.groupParticipantsUpdate(
                             groupJid,
@@ -613,6 +613,17 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             , mentions: group.map((p) => p.jid)
         }).then(handler.addMessage)
 
+    })
+
+
+    handlers.commands.set("!setranking", async (whatsapp) => {
+        if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+        const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+        //console.log(participants)
+        const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.toLowerCase().includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin) && _p.admin.toLowerCase().includes('super'))
+        if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es SUPER Admin?!')
+
+        await repeatFunction()
     })
 
 
