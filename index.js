@@ -389,8 +389,11 @@ async function startBot() {
             for (let index = 0; index < group.length; index++) {
                 const p = group[index];
                 const groupParticipant = participant.find(gp => gp.jid === p.jid || gp.id === p.jid)
-                if (index < 3) {
-                    if (!groupParticipant?.admin) {
+                if (index < 3 && groupParticipant) {
+
+                    console.log(`Num ${index + 1}`, p.jid, groupParticipant)
+                    
+                    if (groupParticipant.admin === null || groupParticipant.admin === undefined) {
                         await sock.groupParticipantsUpdate(
                             groupJid,
                             [p.jid],
@@ -417,11 +420,12 @@ async function startBot() {
 
     }
 
+    let hr = 60 * 60 * 9
 
-    let timetilNext3hr = (60 * 60 * 3) - (Math.floor((new Date()).valueOf() / 1000) % (60 * 60 * 3))
+    let timetilNext3hr = (hr) - (Math.floor((new Date()).valueOf() / 1000) % (hr))
     setTimeout(() => {
-        //repeatFunction()
-        Interval = setInterval(() => repeatFunction(), 60 * 60 * 3 * 1000)
+        repeatFunction()
+        Interval = setInterval(() => repeatFunction(), hr * 1000)
     }, timetilNext3hr * 1000)
 
 
@@ -769,7 +773,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
             //console.log(participants)
-            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin ))
+            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
             if (!AdminParticipant) {
                 await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
                 return await whatsapp.reply('Mon chaud... tu n\'es pas *admin*, donc laisse!')
@@ -843,14 +847,14 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
 
     ///////////////////////////////////////////////////////
-/*
-/*
-/*
-/*  //////////////////      JEUX     //////////////////////
-/*
-/*
-/*
-     //////////////////////////////////////////////////////*/
+    /*
+    /*
+    /*
+    /*  //////////////////      JEUX     //////////////////////
+    /*
+    /*
+    /*
+         //////////////////////////////////////////////////////*/
 
 
 
@@ -1110,7 +1114,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         }
     })
 
-    
+
 
 
     // SHORT HAND NUMBER WHEN IN GAME
@@ -1141,7 +1145,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
         /////////////////     HANDLE PENDU       
         const letter = whatsapp.text.trim();
-        if(letter.length === 1 && penduGroupJid){
+        if (letter.length === 1 && penduGroupJid) {
             await pendum.handleShortHand(penduGroupJid, whatsapp.sender, letter, whatsapp)
             return
         }
