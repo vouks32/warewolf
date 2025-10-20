@@ -96,7 +96,7 @@ export class WereWolvesManager {
 
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
-        if (!playerJid || !whatsapp || !reason ) return false
+        if (!playerJid || !whatsapp || !reason) return false
         console.log(`Adding ${points} points to ${playerJid} for ${reason}`, whatsapp?.ids)
         let user = getUser(playerJid)
         let arr = {}
@@ -191,6 +191,77 @@ export class WereWolvesManager {
         return game?.players[parseInt(number)]?.jid
     }
 
+    // Dans la classe WereWolvesManager, ajoutez ces méthodes :
+
+    // Méthode pour mettre à jour l'historique des rôles
+    async updateRoleHistory(playerJid, groupId, role, whatsapp) {
+        const user = getUser(playerJid)
+        if (!user) return
+
+        if (!user.roleHistory) {
+            user.roleHistory = {}
+        }
+
+        if (!user.roleHistory[groupId]) {
+            user.roleHistory[groupId] = []
+        }
+
+        // Ajouter le nouveau rôle au début de l'historique
+        user.roleHistory[groupId].unshift(role)
+
+        // Garder seulement les 10 derniers rôles
+        if (user.roleHistory[groupId].length > 10) {
+            user.roleHistory[groupId] = user.roleHistory[groupId].slice(0, 10)
+        }
+
+        saveUser(user)
+    }
+
+    // Méthode pour obtenir les rôles récents d'un joueur dans un groupe
+    getRecentRoles(playerJid, groupId) {
+        const user = getUser(playerJid)
+        if (!user || !user.roleHistory || !user.roleHistory[groupId]) {
+            return []
+        }
+        return user.roleHistory[groupId]
+    }
+
+    // Méthode pour ajuster l'attribution des rôles en fonction de l'historique
+    adjustRolesBasedOnHistory(groupId, roles, whatsapp) {
+        const game = this.games[groupId]
+        if (!game) return roles
+
+        const adjustedRoles = [...roles]
+        const players = [...game.players]
+
+        // Pour chaque joueur, vérifier l'historique des rôles
+        players.forEach((player, index) => {
+            const recentRoles = this.getRecentRoles(player.jid, groupId)
+
+            // Si le rôle actuel est dans les 3 derniers rôles, essayer de l'échanger
+            if (recentRoles.length >= 2 && recentRoles.slice(0, 2).includes(adjustedRoles[index])) {
+                // Chercher un joueur avec lequel échanger le rôle
+                for (let i = 0; i < players.length; i++) {
+                    if (i !== index) {
+                        const otherRecentRoles = this.getRecentRoles(players[i].jid, groupId)
+
+                        // Échanger si l'autre joueur n'a pas eu ce rôle récemment
+                        // et si le rôle actuel du joueur n'est pas dans l'historique de l'autre joueur
+                        if (!otherRecentRoles.slice(0, 2).includes(adjustedRoles[index]) &&
+                            !recentRoles.slice(0, 2).includes(adjustedRoles[i])) {
+
+                            // Échanger les rôles
+                            [adjustedRoles[index], adjustedRoles[i]] = [adjustedRoles[i], adjustedRoles[index]]
+                            break
+                        }
+                    }
+                }
+            }
+        })
+
+        return adjustedRoles
+    }
+
     //////////////////////////////////////////               GAME LOGIC                     ////////////////////////////////////////////
 
     async createGame(groupId, whatsapp) {
@@ -274,7 +345,7 @@ export class WereWolvesManager {
             return
         }
 
-        if((await this.addUserPoints(playerJid, whatsapp, 0, 'Rejoin une partie', 1)) === false) {
+        if ((await this.addUserPoints(playerJid, whatsapp, 0, 'Rejoin une partie', 1)) === false) {
             await whatsapp.reply("⚠️ Une erreur est survenue lors de l'ajout de tes points utilisateur. Rejoins la partie à nouveau.")
             return
         }
@@ -301,9 +372,12 @@ export class WereWolvesManager {
         }
 
         game.state = "ASSIGNING_ROLES"
-        //const roles = pickRandomRoles(game.players)
 
-        const roles = RoleManager.generateRoles(game.players.length);
+        // Générer les rôles normalement
+        let roles = RoleManager.generateRoles(game.players.length);
+
+        // Ajuster les rôles en fonction de l'historique
+        roles = this.adjustRolesBasedOnHistory(groupId, roles, whatsapp)
 
         if (!RoleManager.validateRoleDistribution(roles)) {
             await whatsapp.sendMessage(groupId, "⚠️ Une erreur lors de l'assignation des rôles, my bad ✋😐🤚. Jeu annulé.");
@@ -316,6 +390,9 @@ export class WereWolvesManager {
         for (let i = 0; i < game.players.length; i++) {
             const p = game.players[i];
             p.role = roles[i]
+
+            // Mettre à jour l'historique des rôles
+            await this.updateRoleHistory(p.jid, groupId, p.role, whatsapp)
 
             // Assigner un faux rôle au MadMan
             if (p.role === "MADMAN") {

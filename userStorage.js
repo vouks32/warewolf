@@ -26,12 +26,20 @@ export const POINTS_LIST = {
 
 export function saveUser(user) {
     if (!fs.existsSync(path.join(USER_FOLDER, user.jid + '.json'))) {
-        fs.writeFileSync(path.join(USER_FOLDER, user.jid + '.json'), JSON.stringify(user, null, 2))
+        fs.writeFileSync(path.join(USER_FOLDER, user.jid + '.json'), JSON.stringify({
+            ...user,
+            roleHistory: {} // Nouveau champ pour l'historique des rôles par groupe
+        }, null, 2))
         return user
     }
 
     const SavedUser = JSON.parse(fs.readFileSync(path.join(USER_FOLDER, user.jid + '.json')))
-    fs.writeFileSync(path.join(USER_FOLDER, user.jid + '.json'), JSON.stringify({ ...SavedUser, ...user }, null, 2))
+    fs.writeFileSync(path.join(USER_FOLDER, user.jid + '.json'), JSON.stringify({ 
+        ...SavedUser, 
+        ...user,
+        // Conserver l'historique des rôles lors des mises à jour
+        roleHistory: SavedUser.roleHistory || {}
+    }, null, 2))
     return JSON.parse(fs.readFileSync(path.join(USER_FOLDER, user.jid + '.json')))
 }
 
