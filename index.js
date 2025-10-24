@@ -873,6 +873,15 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
 
 
+    ////////////////////////////              WORD CREATE               //////////////////
+    handlers.commands.set("!mots", async (whatsapp) => {
+        if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
+        if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
+        await word.createGame(whatsapp.groupJid, whatsapp)
+    })
+
+
+
     ////////////////////////////              PENDU               //////////////////
     handlers.commands.set("!pendu", async (whatsapp) => {
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
