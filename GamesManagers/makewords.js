@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { getUser, saveUser } from "../userStorage.js";
+import { parseWiktionary } from "./guessword-utils/checkword.js";
 
 const DATA_FILE = path.join(process.cwd(), "games/wordgame.json");
 
@@ -223,7 +224,7 @@ export class WordGameManager {
             letters.splice(idx, 1);
         }
 
-        if (!(await global.checkword(word))) {
+        if (!(await parseWiktionary(word)).found) {
             await whatsapp.reply(`❌ Le mot "${word}" n'existe ni en anglais, ni en français, fallait faire l'école.`);
             return;
         }

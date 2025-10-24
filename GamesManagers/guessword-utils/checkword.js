@@ -1,7 +1,7 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
 
-async function parseWiktionary(word, lang = ["Français", "Anglais"]) {
+export async function parseWiktionary(word, lang = ["Français", "Anglais"]) {
     const url = `https://fr.wiktionary.org/wiki/${encodeURIComponent(word)}`;
     console.log(`Fetching: ${url}`);
 
@@ -21,7 +21,7 @@ async function parseWiktionary(word, lang = ["Français", "Anglais"]) {
             if (sectionTitle !== "Sommaire")
                 sections.push({ sectionTitle, sectionId });
         });
-        
+
         return {
             title,
             url,
