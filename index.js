@@ -191,7 +191,7 @@ async function startBot() {
             if (text.includes('@')) console.log(msg.message.extendedTextMessage)
 
             // Build reusable whatsapp object with proper JID information
-            const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : pendum.isPlaying(remoteJid) ? "PENDU" : word.isPlaying(remoteJid) ? "WORDCREATE" : null
+            const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : pendum.isPlaying(remoteJid) ? "PENDU" : word.isPlaying(remoteJid) ? "WORD" : null
 
             if (!senderJid || !remoteJid || senderJid.length == 0 || senderJid.includes('undefined') || remoteJid.includes('undefined') || senderJid.includes('@lid')) {
                 console.log("--> no senderJid", senderJid, remoteJid)
@@ -439,8 +439,9 @@ async function startBot() {
             'Pour jouer à un jeu, écris:\n\n' +
             "🐺 *!werewolve* - pour jouer au loup\n" +
             "😵 *!pendu* - pour jouer au jeu du pendu\n" +
-            "📝 *!quizen* - pour jouer à un quiz (en Anglais)\n" +
-            "📝 *!quizfr* - pour jouer à un quiz (en Français)\n" +
+            "💬 *!mots* - pour jouer au jeu des mots\n" +
+            "📝🇬🇧 *!quizen* - pour jouer à un quiz (en Anglais)\n" +
+            "📝🇫🇷 *!quizfr* - pour jouer à un quiz (en Français)\n" +
             "\nℹ️ *!info* - Pour tout savoir sur moi"
             , ['237676073559@s.whatsapp.net'])
     })
@@ -801,6 +802,8 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                 await wwm.stopGame(whatsapp.groupJid, whatsapp)
             else if (whatsapp.game === 'PENDU')
                 await pendum.stopGame(whatsapp.groupJid, whatsapp)
+            else if (whatsapp.game === 'WORD')
+                await word.stopGame(whatsapp.groupJid, whatsapp)
         }
     })
 

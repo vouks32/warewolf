@@ -39,7 +39,7 @@ export class WordGameManager {
             return v.splice(n, 1)[0]
         }
         );
-        const consonants = Array.from({ length: consonantCount }, () =>{
+        const consonants = Array.from({ length: consonantCount }, () => {
             let n = Math.floor(Math.random() * c.length)
             return c.splice(n, 1)[0]
         }
@@ -310,6 +310,10 @@ export class WordGameManager {
 
         await this.addPoints(winner.jid, whatsapp, pointsToAdd, "Gagnant du jeu de mots");
 
+        await whatsapp.sendMessage(
+            groupId,
+            `Envoie *"!mots"* pour jouer à nouveau !`,
+        );
         delete this.games[groupId];
         this.saveGames();
     }
@@ -317,4 +321,17 @@ export class WordGameManager {
     isPlaying(groupId) {
         return !!this.games[groupId];
     }
+
+
+    async stopGame(groupId, whatsapp) {
+        const game = this.games[groupId]
+        if (!game) return
+
+        await whatsapp.sendMessage(groupId, `*🏆 Partie annulé!*`)
+        await whatsapp.sendMessage(groupId, `envoie *"!mots"* pour jouer à nouveau`)
+        delete this.games[groupId]
+        saveGames(this.games)
+        return
+    }
+
 }
