@@ -159,6 +159,11 @@ export class WordGameManager {
         const game = this.games[groupId];
         if (!game || game.state !== "PLAYING") return;
 
+
+        const letters = this.generateLetters();
+        game.letters = letters;
+        this.saveGames();
+
         await whatsapp.sendMessage(
             groupId,
             `🔄 *Manche ${game.currentRound}/${game.totalRounds}*\n\nVous avez 30 secondes pour proposer un mot !\n\nLettres : *${game.letters.join(" ")}*`
@@ -175,6 +180,10 @@ export class WordGameManager {
         game.roundTimer = setTimeout(async () => {
             await this.endRound(groupId, whatsapp);
         }, 30 * 1000);
+         // Timer de la manche (30 secondes)
+        game.roundTimer = setTimeout(async () => {
+            await whatsapp.sendMessage(groupId, `⏰ 10 secondes restantes !\n\nLettres : *${game.letters.join(" ")}*`);
+        }, 20 * 1000);
     }
 
     async endRound(groupId, whatsapp) {
@@ -210,7 +219,7 @@ export class WordGameManager {
 
         // Vérifier que le joueur est dans la partie
         if (!game.players[whatsapp.senderJid]) {
-            await whatsapp.reply("❌ Tu n'es pas dans cette partie !");
+           // await whatsapp.reply("❌ Tu n'es pas dans cette partie !");
             return;
         }
 
@@ -218,10 +227,16 @@ export class WordGameManager {
         for (const char of word) {
             const idx = letters.indexOf(char);
             if (idx === -1) {
-                await whatsapp.reply(`❌ Lettre "${char}" non disponible !`);
+                await whatsapp.reply(`❌ @${player.jid.split('@')[0]} la Lettre "${char}" n'est pas parmit les lettres que tu peux utiliser !`);
                 return;
             }
             letters.splice(idx, 1);
+        }
+
+
+        if(Object.values(game.players).some(p => p.currentWord === word)) {
+            await whatsapp.reply(`❌ Le mot *"${word}"* a déjà été proposé par un autre joueur dans cette manche! remet toi en question!`);
+            return;
         }
 
         const wordDef = await parseWiktionary(word);
@@ -235,9 +250,9 @@ export class WordGameManager {
         const player = game.players[whatsapp.senderJid];
 
         if (player.currentWord) {
-            await whatsapp.reply(`🔄️ Tu as remplacé ton mot actuel *"${player.currentWord}"* par *"${word}"*`);
+            await whatsapp.reply(`🔄️ @${player.jid.split('@')[0]} a remplacé *"${player.currentWord}"* par *"${word}"*`);
         } else {
-            await whatsapp.reply(`✅ Mot *"${word}"* accepté pour cette manche (+${score} points)`);
+            await whatsapp.reply(`✅ @${player.jid.split('@')[0]} a proposé *"${word}"* (+${score} points)`);
         }
         // Remplacer le mot actuel du joueur
         player.currentWord = word;
@@ -260,13 +275,6 @@ export class WordGameManager {
                 words: data.words
             }))
             .sort((a, b) => b.score - a.score);
-
-        if (results.length === 0) {
-            await whatsapp.sendMessage(groupId, "😴 Aucun mot proposé...");
-            delete this.games[groupId];
-            this.saveGames();
-            return;
-        }
 
         // Préparer le podium
         const podium = results
