@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { getUser, saveUser } from "../userStorage.js";
+import { getUser, saveUser, getAllUsers } from "../userStorage.js";
 import { parseWiktionary } from "./guessword-utils/checkword.js";
 
 const DATA_FILE = path.join(process.cwd(), "games/wordgame.json");
@@ -89,7 +89,8 @@ export class WordGameManager {
 
         await whatsapp.sendMessage(
             groupId,
-            `🎮 *Début du jeu de lettres !*\n\nRejoignez la partie avec *!play _pseudo_* dans les prochains 120 secondes !`
+            `🎮 *Début du jeu de lettres !*\n\nRejoignez la partie avec *!play _pseudo_* dans les prochains 120 secondes !`,
+            Object.keys(getAllUsers())
         );
 
         // Timer de 90 secondes pour rejoindre
@@ -174,7 +175,8 @@ export class WordGameManager {
 
         await whatsapp.sendMessage(
             groupId,
-            `🔄 *Manche ${game.currentRound}/${game.totalRounds}*\n\nVous avez 90 secondes pour proposer un mot !\n\nLettres : \n*${game.letters.join(" ")}*`
+            `🔄 *Manche ${game.currentRound}/${game.totalRounds}*\n\nVous avez 90 secondes pour proposer un mot !\n\nLettres : \n*${game.letters.join(" ")}*`,
+            Object.keys(game.players)
         );
 
         // Réinitialiser les mots actuels pour cette manche
@@ -312,9 +314,9 @@ export class WordGameManager {
 
         await whatsapp.sendMessage(
             groupId,
-            `🎉 @${winner.jid.split('@')[0]} reçoit *${pointsToAdd} points* !\n` + 
-            `🎉 @${winner2.jid.split('@')[0]} reçoit *${pointsToAdd2} points* !\n` + 
-            `🎉 @${winner3.jid.split('@')[0]} reçoit *${pointsToAdd3} points* !\n` 
+            `🎉 @${winner.jid.split('@')[0]} reçoit *${pointsToAdd} points* !\n` +
+            `🎉 @${winner2.jid.split('@')[0]} reçoit *${pointsToAdd2} points* !\n` +
+            `🎉 @${winner3.jid.split('@')[0]} reçoit *${pointsToAdd3} points* !\n`
             ,
             [winner.jid]
         );
