@@ -5,7 +5,7 @@ import { parseWiktionary } from "./guessword-utils/checkword.js";
 
 const DATA_FILE = path.join(process.cwd(), "games/wordgame.json");
 
-const VOWELS = ["A", "E", "I", "O", "U", "Y", "A", "E", "I", "O", "U", "Y", "È", "É", "È", "É", "Ê", "Ê"];
+const VOWELS = ["A", "E", "I", "O", "U", "Y", "A", "E", "I", "O", "U", "Y", "È", "É", "Ê",];
 const CONSONANTS = "BCÇDFGHJKLMNPQRSTVWXZBCDFGHJKLMNPQRSTVWXZÇ".split("");
 
 export class WordGameManager {
@@ -29,7 +29,7 @@ export class WordGameManager {
 
     generateLetters() {
         const vowelCount = Math.floor(Math.random() * 3) + 6; // entre 6 et 8 voyelles
-        const consonantCount = 15 - vowelCount;
+        const consonantCount = 18 - vowelCount;
 
         const v = [...VOWELS]
         const c = [...CONSONANTS]
@@ -89,26 +89,26 @@ export class WordGameManager {
 
         await whatsapp.sendMessage(
             groupId,
-            `🎮 *Début du jeu de lettres !*\n\nRejoignez la partie avec *!play _pseudo_* dans les prochains 60 secondes !`
+            `🎮 *Début du jeu de lettres !*\n\nRejoignez la partie avec *!play _pseudo_* dans les prochains 120 secondes !`
         );
 
         // Timer de 90 secondes pour rejoindre
         this.games[groupId].timer = setTimeout(async () => {
             await this.startGame(groupId, whatsapp);
-        }, 60 * 1000);
+        }, 120 * 1000);
 
         // Rappels
         setTimeout(async () => {
             if (this.games[groupId]?.state === "WAITING_PLAYERS") {
-                await whatsapp.sendMessage(groupId, "⏰ 30 secondes restantes pour rejoindre !");
+                await whatsapp.sendMessage(groupId, "⏰ 60 secondes restantes pour rejoindre !");
             }
-        }, 30 * 1000);
+        }, 60 * 1000);
 
         setTimeout(async () => {
             if (this.games[groupId]?.state === "WAITING_PLAYERS") {
-                await whatsapp.sendMessage(groupId, "⏰ 15 secondes restantes pour rejoindre !");
+                await whatsapp.sendMessage(groupId, "⏰ 30 secondes restantes pour rejoindre !");
             }
-        }, 45 * 1000);
+        }, 90 * 1000);
     }
 
     async joinGame(groupId, playerJid, pseudo, whatsapp) {
@@ -174,7 +174,7 @@ export class WordGameManager {
 
         await whatsapp.sendMessage(
             groupId,
-            `🔄 *Manche ${game.currentRound}/${game.totalRounds}*\n\nVous avez 30 secondes pour proposer un mot !\n\nLettres : *${game.letters.join(" ")}*`
+            `🔄 *Manche ${game.currentRound}/${game.totalRounds}*\n\nVous avez 90 secondes pour proposer un mot !\n\nLettres : \n*${game.letters.join(" ")}*`
         );
 
         // Réinitialiser les mots actuels pour cette manche
@@ -187,11 +187,15 @@ export class WordGameManager {
         // Timer de la manche (30 secondes)
         game.roundTimer = setTimeout(async () => {
             await this.endRound(groupId, whatsapp);
-        }, 30 * 1000);
+        }, 90 * 1000);
         // Timer de la manche (30 secondes)
         game.roundTimer = setTimeout(async () => {
-            await whatsapp.sendMessage(groupId, `⏰ 10 secondes restantes !\n\nLettres : *${game.letters.join(" ")}*`);
-        }, 20 * 1000);
+            await whatsapp.sendMessage(groupId, `⏰ 30 secondes restantes !\n\nLettres : \n*${game.letters.join(" ")}*`);
+        }, 60 * 1000);
+        // Timer de la manche (30 secondes)
+        game.roundTimer = setTimeout(async () => {
+            await whatsapp.sendMessage(groupId, `⏰ 15 secondes restantes !\n\nLettres : \n*${game.letters.join(" ")}*`);
+        }, 75 * 1000);
     }
 
     async endRound(groupId, whatsapp) {
