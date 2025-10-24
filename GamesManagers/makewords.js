@@ -214,6 +214,7 @@ export class WordGameManager {
         const groupId = whatsapp.groupJid;
         const word = whatsapp.text.trim().toUpperCase();
         const game = this.games[groupId];
+        const player = game.players[whatsapp.senderJid];
 
         if (!game || game.state !== "PLAYING") return;
 
@@ -247,7 +248,6 @@ export class WordGameManager {
         }
 
         const score = word.length; // 1 point par lettre
-        const player = game.players[whatsapp.senderJid];
 
         if (player.currentWord) {
             await whatsapp.reply(`🔄️ @${player.jid.split('@')[0]} a remplacé *"${player.currentWord}"* par *"${word}"*`);
