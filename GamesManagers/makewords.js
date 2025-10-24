@@ -224,7 +224,9 @@ export class WordGameManager {
             letters.splice(idx, 1);
         }
 
-        if (!(await parseWiktionary(word)).found) {
+        const wordDef = await parseWiktionary(word);
+
+        if (!wordDef || !wordDef.found) {
             await whatsapp.reply(`❌ Le mot "${word}" n'existe ni en anglais, ni en français, fallait faire l'école.`);
             return;
         }

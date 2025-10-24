@@ -2,7 +2,7 @@ import axios from "axios";
 import * as cheerio from "cheerio";
 
 export async function parseWiktionary(word, lang = ["Français", "Anglais"]) {
-    const url = `https://fr.wiktionary.org/wiki/${encodeURIComponent(word)}`;
+    const url = `https://fr.wiktionary.org/wiki/${encodeURIComponent(word.toLowerCase())}`;
     console.log(`Fetching: ${url}`);
 
     try {
