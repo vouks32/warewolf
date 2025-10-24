@@ -144,7 +144,7 @@ export class WordGameManager {
         if (!game || game.state !== "WAITING_PLAYERS") return;
 
         const playerCount = Object.keys(game.players).length;
-        if (playerCount <= 0) {
+        if (playerCount <= 3) {
             await whatsapp.sendMessage(groupId, "❌ Pas assez de joueurs pour commencer la partie !");
             delete this.games[groupId];
             this.saveGames();
