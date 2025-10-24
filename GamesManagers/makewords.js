@@ -149,7 +149,7 @@ export class WordGameManager {
 
         await whatsapp.sendMessage(
             groupId,
-            `🎮 *Début de la partie !*\n\nLettres disponibles : *${game.letters.join(" ")}*\n\n${playerCount} joueur(s) participant(s) !`
+            `🎮 *Début de la partie !*`
         );
 
         await this.startRound(groupId, whatsapp);
