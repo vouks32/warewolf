@@ -5,8 +5,8 @@ import { parseWiktionary } from "./guessword-utils/checkword.js";
 
 const DATA_FILE = path.join(process.cwd(), "games/wordgame.json");
 
-const VOWELS = ["A", "E", "I", "O", "U", "Y"];
-const CONSONANTS = "BCDFGHJKLMNPQRSTVWXZ".split("");
+const VOWELS = ["A", "E", "I", "O", "U", "Y", "A", "E", "I", "O", "U", "Y", "È", "É", "È", "É", "Ê", "Ê"];
+const CONSONANTS = "BCÇDFGHJKLMNPQRSTVWXZBCDFGHJKLMNPQRSTVWXZÇ".split("");
 
 export class WordGameManager {
     constructor() {
@@ -28,8 +28,8 @@ export class WordGameManager {
     }
 
     generateLetters() {
-        const vowelCount = Math.floor(Math.random() * 3) + 3; // entre 3 et 5 voyelles
-        const consonantCount = 9 - vowelCount;
+        const vowelCount = Math.floor(Math.random() * 3) + 6; // entre 6 et 8 voyelles
+        const consonantCount = 15 - vowelCount;
 
         const v = [...VOWELS]
         const c = [...CONSONANTS]
