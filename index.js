@@ -11,7 +11,7 @@ import NodeCache from "node-cache";
 import { QuizManagerFR } from "./GamesManagers/quiz-fr.js";
 import { fancyTransform } from './TextConverter.js'
 import { PenduManager } from "./GamesManagers/pendu.js";
-
+import { WordGameManager } from "./GamesManagers/makewords.js";
 
 const MAX_MESSAGES = 1000
 
@@ -78,6 +78,7 @@ async function startBot() {
     const qm = new QuizManager()
     const qmfr = new QuizManagerFR()
     const pendum = new PenduManager()
+    const word = new WordGameManager()
 
     // Whatsapp Events
     sock.ev.on("creds.update", saveCreds)
@@ -190,7 +191,7 @@ async function startBot() {
             if (text.includes('@')) console.log(msg.message.extendedTextMessage)
 
             // Build reusable whatsapp object with proper JID information
-            const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : pendum.isPlaying(remoteJid) ? "PENDU" : null
+            const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : pendum.isPlaying(remoteJid) ? "PENDU" : word.isPlaying(remoteJid) ? "WORDCREATE" : null
 
             if (!senderJid || !remoteJid || senderJid.length == 0 || senderJid.includes('undefined') || remoteJid.includes('undefined') || senderJid.includes('@lid')) {
                 console.log("--> no senderJid", senderJid, remoteJid)
@@ -935,7 +936,11 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             if (whatsapp.text.split(" ").length == 1 || whatsapp.text.split(" ")[1].trim().length == 0) return await whatsapp.reply('You didn\'t provide any name... Send *!play _pseudo_* to join !')
 
             const name = whatsapp.text.split(" ")[1]
-            await wwm.joinGame(whatsapp.groupJid, whatsapp.senderJid, name, whatsapp)
+
+            if (word.isPlaying(whatsapp.groupJid)) {
+                await word.joinGame(whatsapp.groupJid, whatsapp.senderJid, name, whatsapp)
+            } else
+                await wwm.joinGame(whatsapp.groupJid, whatsapp.senderJid, name, whatsapp)
         }
     })
 
@@ -1152,6 +1157,13 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             ]
             await whatsapp.reply(ans[Math.floor(Math.random() * ans.length)], [whatsapp.sender])
             await wwm.addUserPoints(whatsapp.sender, whatsapp, -5, "réagis étant mort", 0)
+            return
+        }
+
+        /////////////////     HANDLE WORDCREATE       
+        const text = whatsapp.text.trim();
+        if (/^[A-Za-z]+$/.test(text) && text.length > 2 && text.split(' ').length === 1 && word.isPlaying(whatsapp.groupJid)) {
+            await word.handleWord(whatsapp)
             return
         }
 
