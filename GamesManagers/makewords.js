@@ -292,7 +292,7 @@ export class WordGameManager {
         const podium = results
             .map(
                 (data, i) =>
-                    `${i + 1}. @${data.jid.split('@')[0]} — *${data.score} lettres*`
+                    (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + '] - ') + ` @${data.jid.split('@')[0]} — *${data.score} lettres*`
             )
             .join("\n\n");
 
@@ -304,15 +304,24 @@ export class WordGameManager {
 
         // Donner les points au gagnant
         const winner = results[0];
+        const winner2 = results[1];
+        const winner3 = results[2];
         const pointsToAdd = Object.values(game.players).length * 2 - Math.round(Object.values(game.players).length / 2);
+        const pointsToAdd2 = Math.round(pointsToAdd / 2);
+        const pointsToAdd3 = Math.round(pointsToAdd / 3);
 
         await whatsapp.sendMessage(
             groupId,
-            `🎉 @${winner.jid.split('@')[0]} reçoit *${pointsToAdd} points* !`,
+            `🎉 @${winner.jid.split('@')[0]} reçoit *${pointsToAdd} points* !\n` + 
+            `🎉 @${winner2.jid.split('@')[0]} reçoit *${pointsToAdd2} points* !\n` + 
+            `🎉 @${winner3.jid.split('@')[0]} reçoit *${pointsToAdd3} points* !\n` 
+            ,
             [winner.jid]
         );
 
         await this.addPoints(winner.jid, whatsapp, pointsToAdd, "Gagnant du jeu de mots");
+        await this.addPoints(winner2.jid, whatsapp, pointsToAdd2, "2eme Gagnant du jeu de mots");
+        await this.addPoints(winner3.jid, whatsapp, pointsToAdd3, "3eme Gagnant du jeu de mots");
 
         await whatsapp.sendMessage(
             groupId,
@@ -334,7 +343,7 @@ export class WordGameManager {
         await whatsapp.sendMessage(groupId, `*🏆 Partie annulé!*`)
         await whatsapp.sendMessage(groupId, `envoie *"!mots"* pour jouer à nouveau`)
         delete this.games[groupId]
-        saveGames(this.games)
+        this.saveGames(this.games)
         return
     }
 
