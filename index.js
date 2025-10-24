@@ -1174,7 +1174,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
         /////////////////     HANDLE WORDCREATE       
         const text = whatsapp.text.trim();
-        if (/^[A-Za-z]+$/.test(text) && text.length > 2 && text.split(' ').length === 1 && word.isPlaying(whatsapp.groupJid)) {
+        if ( /^[\p{L}]+$/u.test(text) && text.length > 2 && text.split(' ').length === 1 && word.isPlaying(whatsapp.groupJid)) {
             await word.handleWord(whatsapp)
             return
         }
