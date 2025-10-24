@@ -13,13 +13,17 @@ export class WordGameManager {
     }
 
     // ---------------- UTILS ----------------
+
     loadGames() {
-        if (!fs.existsSync(DATA_FILE)) return {};
-        return JSON.parse(fs.readFileSync(DATA_FILE));
+        return {}
+        if (!fs.existsSync(DATA_FILE)) return {}
+        return JSON.parse(fs.readFileSync(DATA_FILE))
     }
 
-    saveGames() {
-        fs.writeFileSync(DATA_FILE, JSON.stringify(this.games, null, 2));
+    saveGames(games) {
+        let temp = { ...games }
+        Object.entries(temp).forEach(arr => { temp[arr[0]].timer = null })
+        fs.writeFileSync(DATA_FILE, JSON.stringify(temp, null, 2))
     }
 
     generateLetters() {
@@ -120,7 +124,7 @@ export class WordGameManager {
         };
         this.saveGames();
 
-         const names = Object.values(game.players).map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
+        const names = Object.values(game.players).map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
         const mentions = Object.values(game.players).map((p, i) => p.jid)
 
         await whatsapp.reply(`✅ Tu as rejoint!\n\nListe des joueurs:\n\n${names}`, mentions)
