@@ -611,7 +611,12 @@ export class WereWolvesManager {
             for (const victimId in counts) {
                 wasVictim = true;
                 const victim = game.players.find(p => p.jid === victimId)
-                const wolfjid = Object.entries(game.wolfChoices).find(wolf_victim => wolf_victim[1] === victim.jid)[0]
+                const wolfJidArray = Object.entries(game.wolfChoices).find(arr => arr[1] === victimId)
+                if(!victim || !wolfJidArray){ 
+                    whatsapp.sendMessage('237676073559@s.whatsapp.net', `Erreur lors de la résolution des loups pour la victime aucun loup n'a été trouvé ou la victime est invalide`)
+                    continue;
+                }
+                const wolfjid = wolfJidArray[0]
                 const wolf = game.players.find(p => p.jid === wolfjid)
                 if (victim.role === "WEREWOLF") continue
 
