@@ -350,6 +350,9 @@ export class WereWolvesManager {
             return
         }
 
+        if (!playerJid)
+            return
+
         game.players.push({ ids: whatsapp.ids, jid: playerJid, name, isPlaying: true, isDead: false, hasSpokenDeathCount: 0, role: null, points: [], note: "INCONNU", alphaWerewolfHasEaten: false, alphaWerewolfHasConverted: false })
         this.saveGames(this.games)
 
