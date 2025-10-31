@@ -193,6 +193,7 @@ async function startBot() {
             const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : pendum.isPlaying(remoteJid) ? "PENDU" : word.isPlaying(remoteJid) ? "WORD" : null
 
             if (!senderJid || !remoteJid || senderJid.length == 0 || senderJid.includes('undefined') || remoteJid.includes('undefined') || senderJid.includes('@lid')) {
+                console.log(JSON.stringify(msg, null, 2))
                 console.log("--> no senderJid", senderJid, remoteJid)
                 continue
             }
