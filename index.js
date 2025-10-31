@@ -168,7 +168,7 @@ async function startBot() {
             // Parse the message to get type and JIDs
             const remoteJid = msg.key.remoteJid;
             const isGroup = remoteJid.endsWith('@g.us');
-            const senderJid = isGroup ? (msg.key?.participantPn ? msg.key?.participantPn : msg.key?.participantLid) : remoteJid;
+            const senderJid = isGroup ? (msg.key?.participantAlt ? msg.key?.participantAlt : msg.key?.participant) : remoteJid;
             const sender = senderJid
             const isViewOnce = msg.key?.isViewOnce || msg.message?.viewOnceMessage || msg.message?.viewOnceMessageV2 || msg.message?.viewOnceMessageV2Extension
             const msgKeys = Object.keys(msg.message || {})
@@ -209,7 +209,7 @@ async function startBot() {
             messagesCount--;
             const whatsapp = {
                 ids: {
-                    lid: isGroup ? (msg.key.participantLid || msg.key.participant || null) : msg.key.senderLid || null,
+                    lid: isGroup ? (msg.key.participant || null) : msg.key.senderLid || null,
                     jid: senderJid,
                 },
                 isGroup,
