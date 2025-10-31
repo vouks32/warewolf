@@ -68,7 +68,6 @@ async function startBot() {
     const sock = makeWASocket({
         version,
         auth: state,
-        browser: Browsers.macOS('Desktop'),
         markOnlineOnConnect: true,
         getMessage: handler.getHandler,
         cachedGroupMetadata: async (jid) => groupCache.get(jid)
