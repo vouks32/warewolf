@@ -70,6 +70,7 @@ async function startBot() {
         auth: state,
         markOnlineOnConnect: true,
         getMessage: handler.getHandler,
+        Browsers : Browsers.macOS('Desktop'),
         cachedGroupMetadata: async (jid) => groupCache.get(jid)
     })
 
