@@ -153,7 +153,7 @@ async function startBot() {
     sock.ev.on("messages.upsert", async (m) => {
 
         for (const msg of m.messages) {
-            console.log(msg, msg?.message)
+            //console.log(msg, msg?.message)
 
             if (msg.key && msg.key.remoteJid == 'status@broadcast') {
                 //console.log("status message")
@@ -185,10 +185,8 @@ async function startBot() {
                 msg.message?.videoMessage?.contextInfo?.mentionedJid ||
                 [];
 
-            //console.log(`[DEBUG] parsed text="${text}" from=${senderJid} isGroup=${isGroup} messageType=${getContentType(msg.message)}`);
-
-            if (text.includes('@')) console.log(msg)
-            if (text.includes('@')) console.log(msg.message.extendedTextMessage)
+            //if (text.includes('@')) console.log(msg)
+            //if (text.includes('@')) console.log(msg.message.extendedTextMessage)
 
             // Build reusable whatsapp object with proper JID information
             const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : pendum.isPlaying(remoteJid) ? "PENDU" : word.isPlaying(remoteJid) ? "WORD" : null
@@ -518,7 +516,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
     handlers.commands.set("!tag", async (whatsapp) => {
         if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
         const participants = await whatsapp.getParticipants(whatsapp.groupJid)
-        console.log(participants)
+       // console.log(participants)
         const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
         if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
 
