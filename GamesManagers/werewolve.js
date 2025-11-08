@@ -95,7 +95,7 @@ export class WereWolvesManager {
     //////////////////////////////////////////               UTILITIES                     ////////////////////////////////////////////
 
 
-    async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
+    async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0, msg = false) {
         if (!playerJid || !whatsapp || !reason) return false
         console.log(`Adding ${points} points to ${playerJid} for ${reason}`, whatsapp?.ids)
         let user = getUser(playerJid)
@@ -104,6 +104,7 @@ export class WereWolvesManager {
 
         if (!user) {
             saveUser({ jid: playerJid, lid: whatsapp.ids?.lid || null, groups: [whatsapp.groupJid], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName || ' ', games: { WEREWOLF: gamescount }, points: 50, pointsTransactions: [arr] })
+
         } else {
             if (!user.groups.some(g => g === whatsapp.groupJid)) {
                 user.groups.push(whatsapp.groupJid)
@@ -612,7 +613,7 @@ export class WereWolvesManager {
                 wasVictim = true;
                 const victim = game.players.find(p => p.jid === victimId)
                 const wolfJidArray = Object.entries(game.wolfChoices).find(arr => arr[1] === victimId)
-                if(!victim || !wolfJidArray){ 
+                if (!victim || !wolfJidArray) {
                     whatsapp.sendMessage('237676073559@s.whatsapp.net', `Erreur lors de la résolution des loups pour la victime aucun loup n'a été trouvé ou la victime est invalide`)
                     continue;
                 }
@@ -1625,7 +1626,9 @@ export class WereWolvesManager {
         //saveUser({ jid: playerJid, groups: [groupId], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName, points: 100, pointsTransactions: [{ "nouveau joueur": 100 }] })
         else {
             await this.addUserPoints(whatsapp.sender, whatsapp, 50, 'new player', 0)
-            await whatsapp?.reply(`🚫 Tu n'es pas encore enregistré, joue d'abord à une partie!`)
+            await whatsapp.reply(`Profil de @${whatsapp.sender.split('@')[0]}\n\n` +
+                `Nom : *${(whatsapp.raw?.pushName || ' ').trim()}*\n` +
+                `points : *${50} points*\n\n`, [whatsapp.sender])
         }
     }
 
