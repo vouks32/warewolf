@@ -169,7 +169,7 @@ async function startBot() {
             // Parse the message to get type and JIDs
             const remoteJid = msg.key.remoteJid;
             const isGroup = remoteJid.endsWith('@g.us');
-            const senderJid = isGroup ? (msg.key?.participantAlt ? msg.key?.participantAlt : msg.key?.participant) : remoteJid;
+            const senderJid = isGroup ? ((msg.key?.participantAlt || msg.key?.participantPn) ? msg.key?.participantAlt || msg.key?.participantPn : msg.key?.participant || msg.key?.participantLid ) : remoteJid;
             const sender = senderJid
             const isViewOnce = msg.key?.isViewOnce || msg.message?.viewOnceMessage || msg.message?.viewOnceMessageV2 || msg.message?.viewOnceMessageV2Extension
             const msgKeys = Object.keys(msg.message || {})
@@ -210,7 +210,7 @@ async function startBot() {
             messagesCount--;
             const whatsapp = {
                 ids: {
-                    lid: isGroup ? (msg.key.participant || null) : msg.key.senderLid || null,
+                    lid: isGroup ? (msg.key.participant || msg.key?.participantLid || null) : msg.key.senderLid || null,
                     jid: senderJid,
                 },
                 isGroup,
@@ -518,7 +518,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
     handlers.commands.set("!tag", async (whatsapp) => {
         if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
         const participants = await whatsapp.getParticipants(whatsapp.groupJid)
-        //console.log(participants)
+        console.log(participants)
         const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
         if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
 
