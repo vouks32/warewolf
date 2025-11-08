@@ -153,7 +153,7 @@ async function startBot() {
     sock.ev.on("messages.upsert", async (m) => {
 
         for (const msg of m.messages) {
-            //console.log(msg)
+            console.log(msg, msg?.message)
 
             if (msg.key && msg.key.remoteJid == 'status@broadcast') {
                 //console.log("status message")
