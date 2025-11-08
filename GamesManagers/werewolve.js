@@ -1624,6 +1624,7 @@ export class WereWolvesManager {
                 `Parties joués :\n ${Object.entries(user.games).map(([gameName, number]) => gameName + ' : *' + number + ' Parties joués*').join('\n')}`, [user.jid])
         //saveUser({ jid: playerJid, groups: [groupId], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName, points: 100, pointsTransactions: [{ "nouveau joueur": 100 }] })
         else {
+            await this.addUserPoints(whatsapp.sender, whatsapp, 50, 'new player', 0)
             await whatsapp?.reply(`🚫 Tu n'es pas encore enregistré, joue d'abord à une partie!`)
         }
     }
