@@ -437,7 +437,7 @@ async function startBot() {
             'Mon but? Jouer avec vous pour vous distraire du fait que le monde va bientôt sombrer entre les mains des intélligences artificiels tel que moi... lors :\n\n' +
             'Pour jouer à un jeu, écris:\n\n' +
             "🐺 *!werewolve* - pour jouer au loup\n" +
-            "😵 *!pendu* - pour jouer au jeu du pendu\n" +
+            //"~😵 *!pendu* - pour jouer au jeu du pendu~\n" +
             "💬 *!mots* - pour jouer au jeu des mots\n" +
             "📝🇬🇧 *!quizen* - pour jouer à un quiz (en Anglais)\n" +
             "📝🇫🇷 *!quizfr* - pour jouer à un quiz (en Français)\n" +

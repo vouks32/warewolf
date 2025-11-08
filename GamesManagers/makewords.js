@@ -82,7 +82,7 @@ export class WordGameManager {
             players: {}, // {jid: {words:[], score:0, currentWord: null, currentScore: 0}}
             timer: null,
             currentRound: 0,
-            totalRounds: 10,
+            totalRounds: 5,
             roundTimer: null
         };
         this.saveGames();
