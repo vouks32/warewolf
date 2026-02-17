@@ -940,7 +940,14 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         console.log("Creating game...")
         await wwm.createGame(whatsapp.groupJid, whatsapp)
     })
-
+    handlers.commands.set("!werewolf", async (whatsapp) => {
+        const handler = handlers.commands.get("!werewolve")
+        if (handler) {
+            await handler(whatsapp)
+        } else {
+            await whatsapp.reply("Commande non disponible.")
+        }
+    })
     // join
     handlers.text.push({
         regex: /^!play/,
