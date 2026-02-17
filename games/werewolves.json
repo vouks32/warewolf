@@ -1,1 +1,29 @@
-{}
+{
+  "237691275096-1575829539@g.us": {
+    "groupId": "237691275096-1575829539@g.us",
+    "state": "WAITING_PLAYERS",
+    "players": [],
+    "votes": {},
+    "wolfChoices": {},
+    "seerChoice": null,
+    "lastPlayerList": 1771332098577,
+    "doctorChoice": null,
+    "witchHealAvailable": true,
+    "witchPoisonAvailable": true,
+    "nights": 0,
+    "timer": null,
+    "prostituteChoice": null,
+    "mayorPowerAvailable": true,
+    "votesStopped": false,
+    "cupidHasLinked": false,
+    "playerChangeVoteCounts": {},
+    "madProstituteChoice": false,
+    "madSeerSaw": false,
+    "serialKillerChoice": null,
+    "pyromaniacOiled": [],
+    "pyromaniacOiledTonight": false,
+    "pyromaniacChoice": null,
+    "madManFakeRole": null,
+    "alphaWerewolfInGame": false
+  }
+}

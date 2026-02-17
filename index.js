@@ -437,8 +437,8 @@ async function startBot() {
             'Mon but? Jouer avec vous pour vous distraire du fait que le monde va bientôt sombrer entre les mains des intélligences artificiels tel que moi... lors :\n\n' +
             'Pour jouer à un jeu, écris:\n\n' +
             "🐺 *!werewolve* - pour jouer au loup\n" +
-            //"~😵 *!pendu* - pour jouer au jeu du pendu~\n" +
-            "💬 *!mots* - pour jouer au jeu des mots\n" +
+            "😵 *!pendu* - pour jouer au jeu du pendu (en maintenance)\n" +
+            "💬 *!mots* - pour jouer au jeu des mots (en maintenance)\n" +
             "📝🇬🇧 *!quizen* - pour jouer à un quiz (en Anglais)\n" +
             "📝🇫🇷 *!quizfr* - pour jouer à un quiz (en Français)\n" +
             "\nℹ️ *!info* - Pour tout savoir sur moi"
@@ -878,6 +878,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
     ////////////////////////////              WORD CREATE               //////////////////
     handlers.commands.set("!mots", async (whatsapp) => {
+        return await whatsapp.reply('Le jeu des mots n\'est pas disponible pour l\'instant!')
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
         if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
         await word.createGame(whatsapp.groupJid, whatsapp)
