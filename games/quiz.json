@@ -1,1 +1,337 @@
-{}
+{
+  "237691275096-1575829539@g.us": {
+    "state": "ANSWERING",
+    "creator": "237659092461@s.whatsapp.net",
+    "players": [
+      {
+        "jid": "237659092461@s.whatsapp.net",
+        "answers": [
+          {
+            "questionIndex": 0,
+            "answerIndex": 1,
+            "correct": false
+          }
+        ]
+      },
+      {
+        "jid": "237654030277@s.whatsapp.net",
+        "answers": [
+          {
+            "questionIndex": 1,
+            "answerIndex": 2,
+            "correct": false
+          }
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "question": "Calvin Cordozar Broadus, Jr. est le véritable nom de quel rappeur Américain ?",
+        "answer": "Snoop Dogg",
+        "badAnswers": [
+          "Dr. DRE",
+          "Coolio",
+          "2Pac"
+        ],
+        "category": "musique",
+        "difficulty": "difficile",
+        "answers": [
+          {
+            "correct": false,
+            "answer": "Coolio"
+          },
+          {
+            "correct": false,
+            "answer": "2Pac"
+          },
+          {
+            "correct": true,
+            "answer": "Snoop Dogg"
+          },
+          {
+            "correct": false,
+            "answer": "Dr. DRE"
+          }
+        ]
+      },
+      {
+        "_id": "65326603e4123c9a1476ba85",
+        "question": "Quelle chanteuse québécoise a connu le succès avec 'Come To Me' ?",
+        "answer": "France Joli",
+        "badAnswers": [
+          "Tabitha Lemaire",
+          "Fanny Bloom",
+          "Chantal Renaud"
+        ],
+        "category": "musique",
+        "difficulty": "normal",
+        "answers": [
+          {
+            "correct": false,
+            "answer": "Tabitha Lemaire"
+          },
+          {
+            "correct": false,
+            "answer": "Chantal Renaud"
+          },
+          {
+            "correct": false,
+            "answer": "Fanny Bloom"
+          },
+          {
+            "correct": true,
+            "answer": "France Joli"
+          }
+        ]
+      },
+      {
+        "_id": "65328759e4123c9a1476bb1a",
+        "question": "Dans quelle ville se déroule chaque année le Festival interceltique ?",
+        "answer": "Lorient",
+        "badAnswers": [
+          "Brest",
+          "Mulhouse",
+          "Cahors"
+        ],
+        "category": "musique",
+        "difficulty": "normal",
+        "answers": [
+          {
+            "correct": false,
+            "answer": "Mulhouse"
+          },
+          {
+            "correct": true,
+            "answer": "Lorient"
+          },
+          {
+            "correct": false,
+            "answer": "Cahors"
+          },
+          {
+            "correct": false,
+            "answer": "Brest"
+          }
+        ]
+      },
+      {
+        "question": "A quel groupe musical international doit-on la bande originale du film 'Flash Gordon ?",
+        "answer": "Queen",
+        "badAnswers": [
+          "Yes",
+          "Led Zeppelin",
+          "The Doors"
+        ],
+        "category": "musique",
+        "difficulty": "difficile",
+        "answers": [
+          {
+            "correct": true,
+            "answer": "Queen"
+          },
+          {
+            "correct": false,
+            "answer": "The Doors"
+          },
+          {
+            "correct": false,
+            "answer": "Led Zeppelin"
+          },
+          {
+            "correct": false,
+            "answer": "Yes"
+          }
+        ]
+      },
+      {
+        "_id": "642438e068d7ea9aa9527865",
+        "question": "Quel est le nom du premier album des Black Eyed Peas ?",
+        "answer": "Behind the Front",
+        "badAnswers": [
+          "Bridging the Gap",
+          "Elephunk",
+          "Monkey Business"
+        ],
+        "category": "musique",
+        "difficulty": "difficile",
+        "answers": [
+          {
+            "correct": false,
+            "answer": "Monkey Business"
+          },
+          {
+            "correct": true,
+            "answer": "Behind the Front"
+          },
+          {
+            "correct": false,
+            "answer": "Bridging the Gap"
+          },
+          {
+            "correct": false,
+            "answer": "Elephunk"
+          }
+        ]
+      },
+      {
+        "_id": "642438e068d7ea9aa9527868",
+        "question": "Qui a écrit 'Comme un boomerang', interprété par Etienne Daho et Dani en 2001 ?",
+        "answer": "Serges Gainsbourg",
+        "badAnswers": [
+          "Jean-Jacques Goldman",
+          "Patrick Bruel",
+          "Nicola Sirkis"
+        ],
+        "category": "musique",
+        "difficulty": "normal",
+        "answers": [
+          {
+            "correct": true,
+            "answer": "Serges Gainsbourg"
+          },
+          {
+            "correct": false,
+            "answer": "Nicola Sirkis"
+          },
+          {
+            "correct": false,
+            "answer": "Jean-Jacques Goldman"
+          },
+          {
+            "correct": false,
+            "answer": "Patrick Bruel"
+          }
+        ]
+      },
+      {
+        "question": "Quel était le surnom donné à Michael Jackson ?",
+        "answer": "King of the Pop",
+        "badAnswers": [
+          "King of Rock",
+          "King of Music",
+          "King of Danse"
+        ],
+        "category": "musique",
+        "difficulty": "facile",
+        "answers": [
+          {
+            "correct": false,
+            "answer": "King of Danse"
+          },
+          {
+            "correct": false,
+            "answer": "King of Music"
+          },
+          {
+            "correct": true,
+            "answer": "King of the Pop"
+          },
+          {
+            "correct": false,
+            "answer": "King of Rock"
+          }
+        ]
+      },
+      {
+        "question": "Quel compositeur, né à Hambourg et mort à Vienne, est parfois considéré comme le « successeur » de Beethoven ?",
+        "answer": "Johannes Brahms",
+        "badAnswers": [
+          "Wolfgang Amadeus Mozart",
+          "Jean-Sébastien Bach",
+          "Frédéric Chopin"
+        ],
+        "category": "musique",
+        "difficulty": "normal",
+        "answers": [
+          {
+            "correct": true,
+            "answer": "Johannes Brahms"
+          },
+          {
+            "correct": false,
+            "answer": "Frédéric Chopin"
+          },
+          {
+            "correct": false,
+            "answer": "Wolfgang Amadeus Mozart"
+          },
+          {
+            "correct": false,
+            "answer": "Jean-Sébastien Bach"
+          }
+        ]
+      },
+      {
+        "_id": "65326751e4123c9a1476ba93",
+        "question": "Dans quel album de Mike Oldfied un des titres est consacré au mont Saint-Michel ?",
+        "answer": "Voyager",
+        "badAnswers": [
+          "Amarok",
+          "Discovery",
+          "Crises"
+        ],
+        "category": "musique",
+        "difficulty": "difficile",
+        "answers": [
+          {
+            "correct": false,
+            "answer": "Crises"
+          },
+          {
+            "correct": false,
+            "answer": "Amarok"
+          },
+          {
+            "correct": true,
+            "answer": "Voyager"
+          },
+          {
+            "correct": false,
+            "answer": "Discovery"
+          }
+        ]
+      },
+      {
+        "question": "En quelle année est sorti le premier album du groupe Indochine, 'L'aventurier' ?",
+        "answer": "1982",
+        "badAnswers": [
+          "1983",
+          "1985",
+          "1980"
+        ],
+        "category": "musique",
+        "difficulty": "normal",
+        "answers": [
+          {
+            "correct": false,
+            "answer": "1983"
+          },
+          {
+            "correct": true,
+            "answer": "1982"
+          },
+          {
+            "correct": false,
+            "answer": "1980"
+          },
+          {
+            "correct": false,
+            "answer": "1985"
+          }
+        ]
+      }
+    ],
+    "categoryVotes": {
+      "237659092461@s.whatsapp.net": {
+        "name": "musique",
+        "slug": "musique"
+      }
+    },
+    "rounds": 2,
+    "timer": [
+      null,
+      null,
+      null
+    ]
+  }
+}

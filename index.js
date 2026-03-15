@@ -70,7 +70,7 @@ async function startBot() {
         auth: state,
         markOnlineOnConnect: true,
         getMessage: handler.getHandler,
-        Browsers : Browsers.macOS('Desktop'),
+        Browsers: Browsers.macOS('Desktop'),
         cachedGroupMetadata: async (jid) => groupCache.get(jid)
     })
 
@@ -103,30 +103,31 @@ async function startBot() {
 
             // init games
             setTimeout(async () => {
-                await wwm.init({
+
+                const iniWha = {
                     sender: null,
                     sendMessage: async (jid, message, mentions = undefined) => {
                         await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }).then(handler.addMessage)
                     },
-                    sendImage: async (jid, buffer, caption = "", mentions = []) => {
-                        if (buffer.includes('http')) {
-                            await sock.sendMessage(jid, { image: { url: buffer }, caption: fancyTransform(htmlDecode(caption)), mentions }).then(handler.addMessage)
+                    sendImage: async (jid, img, caption = "", mentions = []) => {
+                        if (img.includes('http')) {
+                            await sock.sendMessage(jid, { image: { url: img }, caption: fancyTransform(htmlDecode(caption)), mentions }).then(handler.addMessage)
                             return
                         }
-                        /* const imagename = buffer.split('/').pop()
-                 let optimizedImage = (await optimizeGifSharp(buffer))
-                 let t = (await optimizeGifSharp(buffer, 32, 80))
-                 try {
-                     t = await extractImageThumb(optimizedImage)
-                     await sock.sendMessage(jid, { image: optimizedImage, jpegThumbnail: t.buffer, caption: htmlDecode(caption), mentions }).then(handler.addMessage)
-                 } catch (error) {
-                     console.log("couldn't get thumbnail")
-                 }
-                 await sock.sendMessage(jid, { image: optimizedImage, caption: htmlDecode(caption), mentions }).then(handler.addMessage)*/
-                        await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(caption) + (caption.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }).then(handler.addMessage)
+
+                        await sock.sendMessage(jid, {
+                            image: {
+                                url: img
+                            },
+                            caption: caption,
+                            mentions: mentions
+                        }).then(handler.addMessage)
                     }
-                })
-            }, 2000)
+                }
+
+                await wwm.init(iniWha)
+                await word.init(iniWha)
+            }, 1000)
         }
 
         if (qr) {
@@ -141,10 +142,13 @@ async function startBot() {
         const metadata = await sock.groupMetadata(event.id)
         groupCache.set(event.id, metadata)
 
+        console.log('---------------------       group-participants.update -----------------------------------------')
+        console.log(event)
+
         for (const p of event.participants) {
             if (event.action === "add") {
-                const text = `Bienvenue @${p.split('@')[0]},\n\nJe suis un bot donc pas la peine de me repondre, je m'en fou\n\nIci personne ne se connait donc ne soit pas peur, parle nous\n\nIci il y a plein de jeux mais on joue tout le temps au jeu du loups donc...\n\nEnvoie *!info* pour en savoir plus`
-                await sock.sendMessage(event.id, { text: fancyTransform(text), mentions: [p, '237676073559@s.whatsapp.net'] })
+                const text = `Bienvenue @${p.phoneNumber.split('@')[0]},\n\nJe suis un bot donc pas la peine de me repondre, je m'en fou\n\nIci personne ne se connait donc ne soit pas peur, parle nous\n\nIci il y a plein de jeux mais on joue tout le temps au jeu du loups donc...\n\nEnvoie *!info* pour en savoir plus`
+                await sock.sendMessage(event.id, { text: fancyTransform(text), mentions: [p.phoneNumber, '237676073559@s.whatsapp.net'] }).then(handler.addMessage)
             }
         }
 
@@ -166,11 +170,12 @@ async function startBot() {
 
 
             console.log('---------------------       message -----------------------------------------')
+            console.log(msg)
             // Parse the message to get type and JIDs
             const remoteJid = msg.key.remoteJid;
             const isGroup = remoteJid.endsWith('@g.us');
-            const senderJid = isGroup ? ((msg.key?.participantAlt || msg.key?.participantPn) ? msg.key?.participantAlt || msg.key?.participantPn : msg.key?.participant || msg.key?.participantLid ) : remoteJid;
-            const sender = senderJid
+            const senderJid = isGroup ? ((msg.key?.participantAlt || msg.key?.participantPn) ? msg.key?.participantAlt || msg.key?.participantPn : msg.key?.participant || msg.key?.participantLid) : (msg.key.remoteJid.includes('@lid') ? msg.key.remoteJidAlt : msg.key.remoteJid) || null;
+            const sender = senderJid   
             const isViewOnce = msg.key?.isViewOnce || msg.message?.viewOnceMessage || msg.message?.viewOnceMessageV2 || msg.message?.viewOnceMessageV2Extension
             const msgKeys = Object.keys(msg.message || {})
             const messageType = msgKeys > 0 ? msgKeys[0] : null
@@ -185,15 +190,12 @@ async function startBot() {
                 msg.message?.videoMessage?.contextInfo?.mentionedJid ||
                 [];
 
-            //if (text.includes('@')) console.log(msg)
-            //if (text.includes('@')) console.log(msg.message.extendedTextMessage)
 
             // Build reusable whatsapp object with proper JID information
             const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : pendum.isPlaying(remoteJid) ? "PENDU" : word.isPlaying(remoteJid) ? "WORD" : null
 
-            if (!senderJid || !remoteJid || senderJid.length == 0 || senderJid.includes('undefined') || remoteJid.includes('undefined') || senderJid.includes('@lid')) {
-                console.log(JSON.stringify(msg, null, 2))
-                console.log("--> no senderJid", senderJid, remoteJid)
+            if (!senderJid || !remoteJid || senderJid.length == 0 || senderJid.includes('undefined') || remoteJid.includes('undefined') || senderJid.includes('@lid') || senderJid.includes('@g.us')) {
+                console.log("[ERROR] --> no senderJid or remoteJid", senderJid, remoteJid)
                 continue
             }
 
@@ -296,6 +298,15 @@ async function startBot() {
             // Attach middleware methods
             registerHandlers(whatsapp)
 
+            console.log(
+                {
+                    name: msg.pushName || whatsapp.senderJid.split('@')[0],
+                    senderJid: whatsapp.senderJid,
+                    remoteJid: whatsapp.remoteJid,
+                    text: whatsapp.text,
+                    isGroup: whatsapp.isGroup,
+                }
+            )
 
             // Dispatch logic
             let handled = false
@@ -345,7 +356,6 @@ async function startBot() {
                         }
                     }
 
-                //console.log('handled', handled, "process", process, whatsapp.senderJid, ":", text)
 
                 // Fallback "any" handlers
                 if (!handled) {
@@ -438,7 +448,7 @@ async function startBot() {
             'Pour jouer à un jeu, écris:\n\n' +
             "🐺 *!werewolve* - pour jouer au loup\n" +
             "😵 *!pendu* - pour jouer au jeu du pendu (en maintenance)\n" +
-            "💬 *!mots* - pour jouer au jeu des mots (en maintenance)\n" +
+            "💬 *!mots* - pour jouer au jeu des mots \n" +
             "📝🇬🇧 *!quizen* - pour jouer à un quiz (en Anglais)\n" +
             "📝🇫🇷 *!quizfr* - pour jouer à un quiz (en Français)\n" +
             "\nℹ️ *!info* - Pour tout savoir sur moi"
@@ -516,7 +526,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
     handlers.commands.set("!tag", async (whatsapp) => {
         if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
         const participants = await whatsapp.getParticipants(whatsapp.groupJid)
-       // console.log(participants)
+        // console.log(participants)
         const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
         if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
 
@@ -541,7 +551,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         console.log('[DEBUG] !rank called by', whatsapp.senderJid, 'text:', whatsapp.text, 'group:', whatsapp.groupJid)
 
         const participants = await whatsapp.getParticipants(whatsapp.groupJid)
-        console.log('[DEBUG] group participants:', participants.map(p => ({ id: p.id || p.jid, admin: p.admin })))
+        console.log('[DEBUG] group participants:', participants)
 
         // Détection d'admin plus robuste (compare la partie avant @)
         const senderLocal = whatsapp.senderJid.split('@')[0]
@@ -878,7 +888,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
     ////////////////////////////              WORD CREATE               //////////////////
     handlers.commands.set("!mots", async (whatsapp) => {
-        return await whatsapp.reply('Le jeu des mots n\'est pas disponible pour l\'instant!')
+        //return await whatsapp.reply('Le jeu des mots n\'est pas disponible pour l\'instant!')
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
         if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
         await word.createGame(whatsapp.groupJid, whatsapp)
@@ -888,7 +898,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
     ////////////////////////////              PENDU               //////////////////
     handlers.commands.set("!pendu", async (whatsapp) => {
-        return await whatsapp.reply('Le jeu du pendu est désactivé pour le moment !')
+        //return await whatsapp.reply('Le jeu du pendu est désactivé pour le moment !')
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
         if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
         await pendum.createGame(whatsapp.groupJid, whatsapp)
@@ -1183,7 +1193,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
         /////////////////     HANDLE WORDCREATE       
         const text = whatsapp.text.trim();
-        if ( /^[\p{L}]+$/u.test(text) && text.length > 2 && text.split(' ').length === 1 && word.isPlaying(whatsapp.groupJid)) {
+        if (/^[\p{L}]+$/u.test(text) && text.length > 2 && text.split(' ').length === 1 && word.isPlaying(whatsapp.groupJid)) {
             await word.handleWord(whatsapp)
             return
         }

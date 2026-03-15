@@ -13,6 +13,53 @@ export class WordGameManager {
         this.games = this.loadGames();
     }
 
+    async init(whatsapp) {
+        for (const groupId in this.games) {
+            if (timers[groupId])
+                for (let i = 0; i < timers[groupId].length; i++) {
+                    const timer = timers[groupId][i];
+                    if (!timer) continue
+                    try {
+                        clearTimeout(timer)
+                    } catch (e) {
+                    }
+                }
+            else
+                timers[groupId] = [null, null, null, null, null, null, null]
+
+            const game = this.games[groupId]
+            await whatsapp.sendMessage(groupId, "*--- Partie en cours ---*\n\nUne partie de *!mots* était en cours avant que le bot ne redémarre. Reprise de la partie")
+            whatsapp.groupJid = groupId
+            switch (game.state) {
+                case "WAITING_PLAYERS":
+                    await whatsapp.sendMessage(groupId, "🎮 60 secs restantes pour rejoindre la partie! \nEnvoie *!play _pseudo_*")
+                    timers[groupId][0] = setTimeout(async () => {
+                        await this.startGame(groupId, whatsapp)
+                    }, 1 * 60 * 1000)
+                    timers[groupId][1] = setTimeout(async () => {
+                        await whatsapp.sendMessage(groupId, "🎮 30 secs restantes pour rejoindre la partie! \nEnvoie *!play _pseudo_*")
+                    }, 30 * 1000)
+                    timers[groupId][2] = setTimeout(async () => {
+                        await whatsapp.sendMessage(groupId, "🎮 15 secs restante pour rejoindre la partie! \nEnvoie *!play _pseudo_*")
+                    }, 45 * 1000)
+                    break;
+                case "PLAYING":
+                    game.state = "PLAYING"
+                    await this.startRound(groupId, whatsapp)
+                    break;
+                case "ENDED":
+                    game.state = "PLAYING"
+                    await this.endGame(groupId, whatsapp)
+                    break;
+                default:
+                    whatsapp.sendMessage(groupId, 'Partie annulé, veillez envoyer *!makewords* pour relancer une partie')
+                    delete this.games[groupId]
+                    this.saveGames(this.games)
+                    break;
+            }
+        }
+    }
+
     // ---------------- UTILS ----------------
 
     loadGames() {
@@ -72,6 +119,26 @@ export class WordGameManager {
         if (this.games[groupId]) {
             await whatsapp.reply("🧩 Une partie est déjà en cours !");
             return;
+        }
+
+        let user = getUser(whatsapp.senderJid);
+        if (user) {
+            if (user.LastWordGame && Date.now() - user.LastWordGame < 24 * 60 * 60 * 1000) {
+                if (user.wordGameCreated && user.wordGameCreated > 0) {
+                    user.wordGameCreated = (user.wordGameCreated) - 1;
+                } else if (user.wordGameCreated && user.wordGameCreated <= 0) {
+                    const nextCreationTime = user.LastWordGame + 24 * 60 * 60 * 1000;
+                    const nextCreationDate = new Date(nextCreationTime);
+                    await whatsapp.reply("🧩 Tu as déjà créé trop de parties de mots ! Tu dois attendre jusqu'au "+ nextCreationDate.toLocaleString() +" avant d'en créer une autre.");
+                    return;
+                } else {
+                    user.wordGameCreated = 4; // 5 créations autorisées par jour
+                }
+            } else {
+                user.LastWordGame = Date.now();
+                user.wordGameCreated = 4;
+            }
+            saveUser(user);
         }
 
         const letters = this.generateLetters();

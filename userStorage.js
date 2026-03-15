@@ -45,7 +45,7 @@ export function saveUser(user) {
 
 export function getUser(jid) {
     if (!fs.existsSync(USER_FOLDER)) fs.mkdirSync(USER_FOLDER, { recursive: true })
-
+    if(!jid) return null
     if (!fs.existsSync(path.join(USER_FOLDER, jid + '.json'))) return null
     try {
         return JSON.parse(fs.readFileSync(path.join(USER_FOLDER, jid + '.json')))

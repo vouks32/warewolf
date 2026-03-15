@@ -58,7 +58,7 @@ export class WereWolvesManager {
                 timers[groupId] = [null, null, null, null, null, null, null]
 
             const game = this.games[groupId]
-            await whatsapp.sendMessage(groupId, "*--- Partie en cours ---*\n\nUne partie était en cours avant que le bot ne redémarre. Reprise de la partie")
+            await whatsapp.sendMessage(groupId, "*--- Partie en cours ---*\n\nUne partie de *!werewolves* était en cours avant que le bot ne redémarre. Reprise de la partie")
             switch (game.state) {
                 case "WAITING_PLAYERS":
                     timers[groupId][0] = setTimeout(async () => {
@@ -1622,6 +1622,7 @@ export class WereWolvesManager {
             await whatsapp.reply(`Profil de @${user.jid.split('@')[0]}\n\n` +
                 `Nom : *${user.pushName.trim()}*\n` +
                 `points : *${user.points} points*\n\n` +
+                 ( !user.wordGameCreated? `` :  `Parties Mots restants : *${user.wordGameCreated} parties*\n\n` ) +
                 `Parties joués :\n ${Object.entries(user.games).map(([gameName, number]) => gameName + ' : *' + number + ' Parties joués*').join('\n')}`, [user.jid])
         //saveUser({ jid: playerJid, groups: [groupId], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName, points: 100, pointsTransactions: [{ "nouveau joueur": 100 }] })
         else {

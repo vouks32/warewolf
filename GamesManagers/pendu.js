@@ -144,6 +144,27 @@ export class PenduManager {
             await whatsapp.reply("🔄️ la partie va être réinitialisée !")
         }
 
+
+        let user = getUser(whatsapp.senderJid);
+        if (user) {
+            if (user.LastHangGame && Date.now() - user.LastHangGame < 24 * 60 * 60 * 1000) {
+                if (user.hangGameCreated && user.hangGameCreated > 0) {
+                    user.hangGameCreated = (user.hangGameCreated) - 1;
+                } else if (user.hangGameCreated && user.hangGameCreated <= 0) {
+                    const nextCreationTime = user.LastHangGame + 24 * 60 * 60 * 1000;
+                    const nextCreationDate = new Date(nextCreationTime);
+                    await whatsapp.reply("🧩 Tu as déjà créé trop de parties de mots ! Tu dois attendre jusqu'au "+ nextCreationDate.toLocaleString() +" avant d'en créer une autre.");
+                    return;
+                } else {
+                    user.hangGameCreated = 4; // 5 créations autorisées par jour
+                }
+            } else {
+                user.LastHangGame = Date.now();
+                user.hangGameCreated = 4;
+            }
+            saveUser(user);
+        }
+
         const words = fs.readJSONSync(WORDS_FILE).filter(w => w.label.length > 3)
         const word = words[Math.floor(Math.random() * words.length)].label
 

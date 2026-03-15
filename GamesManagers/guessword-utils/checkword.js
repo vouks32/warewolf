@@ -6,14 +6,22 @@ export async function parseWiktionary(word, lang = ["Français", "Anglais"]) {
     console.log(`Fetching: ${url}`);
 
     try {
-        // Fetch the page
-        const { data: html } = await axios.get(url);
-        // Load HTML into cheerio
+        const { data: html } = await axios.get(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Referer': 'https://www.google.com/',
+                'DNT': '1', // Do Not Track
+                'Connection': 'keep-alive',
+                'Upgrade-Insecure-Requests': '1'
+            },
+            timeout: 10000 // 10 seconds timeout
+        });
+
         const $ = cheerio.load(html);
-        // Retrieve the title
         const title = $("#firstHeading").text().trim();
 
-        // Retrieve all section headers (e.g., Étymologie, Prononciation, Verbe, etc.)
         const sections = [];
         $("h2").each((_, el) => {
             const sectionTitle = $(el).text().trim();
@@ -38,7 +46,10 @@ export async function parseWiktionary(word, lang = ["Français", "Anglais"]) {
 (async () => {
     const word = process.argv[2] || "food";
     const wiktionary = await parseWiktionary(word);
-    if (!wiktionary) return;
+    if (!wiktionary){
+        console.log("Word not found or error occurred.");
+        return;
+    }
 
     console.log("Title:", wiktionary.title);
      console.log("Corresponds:", wiktionary.found);
