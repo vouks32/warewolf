@@ -12,6 +12,7 @@ import { QuizManagerFR } from "./GamesManagers/quiz-fr.js";
 import { fancyTransform } from './TextConverter.js'
 import { PenduManager } from "./GamesManagers/pendu.js";
 import { WordGameManager } from "./GamesManagers/makewords.js";
+import { GroupManager } from "./GroupManager/groupManager.js";
 
 const MAX_MESSAGES = 1000
 
@@ -79,6 +80,7 @@ async function startBot() {
     const qmfr = new QuizManagerFR()
     const pendum = new PenduManager()
     const word = new WordGameManager()
+    const group = new GroupManager()
 
     // Whatsapp Events
     sock.ev.on("creds.update", saveCreds)
@@ -175,7 +177,7 @@ async function startBot() {
             const remoteJid = msg.key.remoteJid;
             const isGroup = remoteJid.endsWith('@g.us');
             const senderJid = isGroup ? ((msg.key?.participantAlt || msg.key?.participantPn) ? msg.key?.participantAlt || msg.key?.participantPn : msg.key?.participant || msg.key?.participantLid) : (msg.key.remoteJid.includes('@lid') ? msg.key.remoteJidAlt : msg.key.remoteJid) || null;
-            const sender = senderJid   
+            const sender = senderJid
             const isViewOnce = msg.key?.isViewOnce || msg.message?.viewOnceMessage || msg.message?.viewOnceMessageV2 || msg.message?.viewOnceMessageV2Extension
             const msgKeys = Object.keys(msg.message || {})
             const messageType = msgKeys > 0 ? msgKeys[0] : null
@@ -375,6 +377,9 @@ async function startBot() {
 
     })
 
+
+
+    ////////////////////////////////////////////////  RANKING FUNCTION     ////////////////////////////////////////////////////////////////
     const repeatFunction = async () => {
         const allPlayers = getAllUsers()
         let groups = {}
@@ -431,14 +436,22 @@ async function startBot() {
 
     }
 
-    let hr = 60 * 60 * 9
-
+    let hr = 60 * 60 * 6
     let timetilNext3hr = (hr) - (Math.floor((new Date()).valueOf() / 1000) % (hr))
     setTimeout(() => {
         repeatFunction()
         Interval = setInterval(() => repeatFunction(), hr * 1000)
     }, timetilNext3hr * 1000)
 
+
+    /*
+    let hr2 = 60 * 60 * 1
+    let timetilNext3hr2 = (hr) - (Math.floor((new Date()).valueOf() / 1000) % (hr))
+    setTimeout(() => {
+        repeatFunction()
+        Interval = setInterval(() => repeatFunction(), hr2 * 1000)
+    }, timetilNext3hr2 * 1000)
+*/
 
 
     //////////////////////////// UTILITIES //////////////////////////////////////////////////
@@ -544,7 +557,6 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         await whatsapp.reply(t, mentions)
     })
 
-
     handlers.commands.set("!rank", async (whatsapp) => {
         if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
 
@@ -592,10 +604,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             await whatsapp.reply('Erreur lors de la récupération du classement. Check logs.')
         }
     })
-
-    // Alias en français
     handlers.commands.set("!rang", handlers.commands.get("!rank"))
-
 
     handlers.commands.set("!resetrank", async (whatsapp) => {
         if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
@@ -627,7 +636,6 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         }).then(handler.addMessage)
 
     })
-
 
     handlers.commands.set("!setranking", async (whatsapp) => {
         if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
@@ -844,7 +852,6 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             Insult1(whatsapp.groupJid, user, whatsapp)
         }
     })
-
 
     // NOTE player
     handlers.text.push({
@@ -1162,9 +1169,6 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         }
     })
 
-
-
-
     // SHORT HAND NUMBER WHEN IN GAME
     handlers.any.push(async (whatsapp) => {
         const werewolfGroupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
@@ -1233,6 +1237,125 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
     )
 
 
+    //////////////////// GROUP OPTIONS
+
+    // initiate group création
+    handlers.text.push({
+        regex: /^!initgroups/,
+        fn: async (whatsapp) => {
+            if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+            const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+            //console.log(participants)
+            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin) && _p.admin.includes('super'))
+            if (!AdminParticipant) {
+                await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
+                return await whatsapp.reply('Mon chaud... tu n\'es pas *super admin*, donc laisse!')
+            }
+
+            await group.initGroups(whatsapp)
+        }
+    })
+
+    handlers.text.push({
+        regex: /^!group\s+(\w+)(?:\s+(\S+))?/,
+        fn: async (whatsapp) => {
+            if (whatsapp.isGroup) {
+                return await whatsapp.reply("❌ Cette commande doit être utilisée en privé avec moi.");
+            }
+
+            const args = whatsapp.text.trim().split(/\s+/);
+            const subcmd = args[1]?.toLowerCase();
+            const target = args[2]; // phone number or group name
+
+            try {
+                switch (subcmd) {
+                    case 'sms':
+                        if (!args[2]) return whatsapp.reply("Usage: !group sms <message>");
+                        const smsText = args.slice(2).join(' ');
+                        await group.sendGroupMessage(whatsapp, smsText);
+                        break;
+
+                    case 'kick':
+                        if (!target) return whatsapp.reply("Usage: !group kick <numéro>");
+                        const kickJid = target.includes('@') ? target : target + '@s.whatsapp.net';
+                        await group.kick(whatsapp, kickJid);
+                        break;
+
+                    case 'invite':
+                        if (!target) return whatsapp.reply("Usage: !group invite <numéro>");
+                        const inviteJid = target.includes('@') ? target : target + '@s.whatsapp.net';
+                        await group.invite(whatsapp, inviteJid);
+                        break;
+
+                    case 'accept':
+                        // Accept invitation (no target needed)
+                        await group.acceptInvite(whatsapp);
+                        break;
+
+                    case 'refuse':
+                        // Refuse invitation
+                        await group.refuseInvite(whatsapp);
+                        break;
+
+                    case 'join':
+                        if (!target) return whatsapp.reply("Usage: !group join <nom du groupe>");
+                        await group.requestJoin(whatsapp, target);
+                        break;
+
+                    case 'accept-request':
+                    case 'acceptrequest':
+                        if (!target) return whatsapp.reply("Usage: !group accept-request <numéro>");
+                        const reqJid = target.includes('@') ? target : target + '@s.whatsapp.net';
+                        await group.acceptRequest(whatsapp, reqJid);
+                        break;
+
+                    case 'refuse-request':
+                    case 'refuserequest':
+                        if (!target) return whatsapp.reply("Usage: !group refuse-request <numéro>");
+                        const refJid = target.includes('@') ? target : target + '@s.whatsapp.net';
+                        await group.refuseRequest(whatsapp, refJid);
+                        break;
+
+                    case 'list':
+                        await group.listGroups(whatsapp);
+                        break;
+                    case 'startvote':
+                        // start leader vote (cost 50 points)
+                        const userPoints = getUser(whatsapp.senderJid)?.points || 0;
+                        if (userPoints < 50) return whatsapp.reply("❌ Vous n'avez pas assez de points (50 requis).");
+                        await wwm.addUserPoints(whatsapp.senderJid, whatsapp, -50, "initiated leader vote", 0);
+                        await group.initiateLeaderVote(whatsapp);
+                        break;
+
+                    case 'vote':
+                        // cast vote (yes/no)
+                        const voteChoice = args[2]?.toLowerCase();
+                        if (!voteChoice || (voteChoice !== 'yes' && voteChoice !== 'no'))
+                            return whatsapp.reply("Usage: !group vote yes  ou  !group vote no");
+                        await group.castLeaderVote(whatsapp, voteChoice);
+                        break;
+                    default:
+                        await whatsapp.reply(
+                            "Commandes disponibles :\n" +
+                            "• !group kick <numéro> – exclure un membre (chef)\n" +
+                            "• !group invite <numéro> – inviter quelqu'un (chef)\n" +
+                            "• !group accept – accepter une invitation\n" +
+                            "• !group refuse – refuser une invitation\n" +
+                            "• !group join <nom> – demander à rejoindre un groupe\n" +
+                            "• !group accept-request <numéro> – accepter une demande (chef)\n" +
+                            "• !group refuse-request <numéro> – refuser une demande (chef)\n" +
+                            "• !group sms <message> – envoyer un message à tous les membres (chef)\n" +
+                            "• !group startvote – lancer un vote pour devenir chef (50 points)\n" +
+                            "• !group vote yes/no – voter (pendant un vote)\n" +
+                            "• !group list – lister les groupes"
+                        );
+                }
+            } catch (error) {
+                console.error("Erreur dans !group", error);
+                await whatsapp.reply("Une erreur est survenue. Vérifie les logs.");
+            }
+        }
+    });
 
 }
 

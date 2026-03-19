@@ -1,24 +1,34 @@
 {
   "237691275096-1575829539@g.us": {
     "state": "ANSWERING",
-    "creator": "237659092461@s.whatsapp.net",
+    "creator": "237654030277@s.whatsapp.net",
     "players": [
-      {
-        "jid": "237659092461@s.whatsapp.net",
-        "answers": [
-          {
-            "questionIndex": 0,
-            "answerIndex": 1,
-            "correct": false
-          }
-        ]
-      },
       {
         "jid": "237654030277@s.whatsapp.net",
         "answers": [
           {
             "questionIndex": 1,
+            "answerIndex": 3,
+            "correct": false
+          },
+          {
+            "questionIndex": 2,
+            "answerIndex": 3,
+            "correct": false
+          },
+          {
+            "questionIndex": 3,
+            "answerIndex": 3,
+            "correct": true
+          },
+          {
+            "questionIndex": 4,
             "answerIndex": 2,
+            "correct": false
+          },
+          {
+            "questionIndex": 5,
+            "answerIndex": 0,
             "correct": false
           }
         ]
@@ -26,238 +36,90 @@
     ],
     "questions": [
       {
-        "question": "Calvin Cordozar Broadus, Jr. est le véritable nom de quel rappeur Américain ?",
-        "answer": "Snoop Dogg",
+        "question": "Le film 'Quatre garçons dans le vent' met en scène quel groupe de musique ?",
+        "answer": "Les Beatles",
         "badAnswers": [
-          "Dr. DRE",
-          "Coolio",
-          "2Pac"
-        ],
-        "category": "musique",
-        "difficulty": "difficile",
-        "answers": [
-          {
-            "correct": false,
-            "answer": "Coolio"
-          },
-          {
-            "correct": false,
-            "answer": "2Pac"
-          },
-          {
-            "correct": true,
-            "answer": "Snoop Dogg"
-          },
-          {
-            "correct": false,
-            "answer": "Dr. DRE"
-          }
-        ]
-      },
-      {
-        "_id": "65326603e4123c9a1476ba85",
-        "question": "Quelle chanteuse québécoise a connu le succès avec 'Come To Me' ?",
-        "answer": "France Joli",
-        "badAnswers": [
-          "Tabitha Lemaire",
-          "Fanny Bloom",
-          "Chantal Renaud"
-        ],
-        "category": "musique",
-        "difficulty": "normal",
-        "answers": [
-          {
-            "correct": false,
-            "answer": "Tabitha Lemaire"
-          },
-          {
-            "correct": false,
-            "answer": "Chantal Renaud"
-          },
-          {
-            "correct": false,
-            "answer": "Fanny Bloom"
-          },
-          {
-            "correct": true,
-            "answer": "France Joli"
-          }
-        ]
-      },
-      {
-        "_id": "65328759e4123c9a1476bb1a",
-        "question": "Dans quelle ville se déroule chaque année le Festival interceltique ?",
-        "answer": "Lorient",
-        "badAnswers": [
-          "Brest",
-          "Mulhouse",
-          "Cahors"
-        ],
-        "category": "musique",
-        "difficulty": "normal",
-        "answers": [
-          {
-            "correct": false,
-            "answer": "Mulhouse"
-          },
-          {
-            "correct": true,
-            "answer": "Lorient"
-          },
-          {
-            "correct": false,
-            "answer": "Cahors"
-          },
-          {
-            "correct": false,
-            "answer": "Brest"
-          }
-        ]
-      },
-      {
-        "question": "A quel groupe musical international doit-on la bande originale du film 'Flash Gordon ?",
-        "answer": "Queen",
-        "badAnswers": [
-          "Yes",
-          "Led Zeppelin",
-          "The Doors"
-        ],
-        "category": "musique",
-        "difficulty": "difficile",
-        "answers": [
-          {
-            "correct": true,
-            "answer": "Queen"
-          },
-          {
-            "correct": false,
-            "answer": "The Doors"
-          },
-          {
-            "correct": false,
-            "answer": "Led Zeppelin"
-          },
-          {
-            "correct": false,
-            "answer": "Yes"
-          }
-        ]
-      },
-      {
-        "_id": "642438e068d7ea9aa9527865",
-        "question": "Quel est le nom du premier album des Black Eyed Peas ?",
-        "answer": "Behind the Front",
-        "badAnswers": [
-          "Bridging the Gap",
-          "Elephunk",
-          "Monkey Business"
-        ],
-        "category": "musique",
-        "difficulty": "difficile",
-        "answers": [
-          {
-            "correct": false,
-            "answer": "Monkey Business"
-          },
-          {
-            "correct": true,
-            "answer": "Behind the Front"
-          },
-          {
-            "correct": false,
-            "answer": "Bridging the Gap"
-          },
-          {
-            "correct": false,
-            "answer": "Elephunk"
-          }
-        ]
-      },
-      {
-        "_id": "642438e068d7ea9aa9527868",
-        "question": "Qui a écrit 'Comme un boomerang', interprété par Etienne Daho et Dani en 2001 ?",
-        "answer": "Serges Gainsbourg",
-        "badAnswers": [
-          "Jean-Jacques Goldman",
-          "Patrick Bruel",
-          "Nicola Sirkis"
-        ],
-        "category": "musique",
-        "difficulty": "normal",
-        "answers": [
-          {
-            "correct": true,
-            "answer": "Serges Gainsbourg"
-          },
-          {
-            "correct": false,
-            "answer": "Nicola Sirkis"
-          },
-          {
-            "correct": false,
-            "answer": "Jean-Jacques Goldman"
-          },
-          {
-            "correct": false,
-            "answer": "Patrick Bruel"
-          }
-        ]
-      },
-      {
-        "question": "Quel était le surnom donné à Michael Jackson ?",
-        "answer": "King of the Pop",
-        "badAnswers": [
-          "King of Rock",
-          "King of Music",
-          "King of Danse"
+          "Les Rolling stones",
+          "The Animals",
+          "Evanescence"
         ],
         "category": "musique",
         "difficulty": "facile",
         "answers": [
           {
             "correct": false,
-            "answer": "King of Danse"
+            "answer": "The Animals"
           },
           {
             "correct": false,
-            "answer": "King of Music"
+            "answer": "Les Rolling stones"
           },
           {
             "correct": true,
-            "answer": "King of the Pop"
+            "answer": "Les Beatles"
           },
           {
             "correct": false,
-            "answer": "King of Rock"
+            "answer": "Evanescence"
           }
         ]
       },
       {
-        "question": "Quel compositeur, né à Hambourg et mort à Vienne, est parfois considéré comme le « successeur » de Beethoven ?",
-        "answer": "Johannes Brahms",
+        "question": "Quel groupe chante 'Roxanne ?",
+        "answer": "Police",
         "badAnswers": [
-          "Wolfgang Amadeus Mozart",
-          "Jean-Sébastien Bach",
-          "Frédéric Chopin"
+          "INXS",
+          "Nirvana",
+          "Scorpion"
+        ],
+        "category": "musique",
+        "difficulty": "facile",
+        "answers": [
+          {
+            "correct": false,
+            "answer": "Scorpion"
+          },
+          {
+            "correct": true,
+            "answer": "Police"
+          },
+          {
+            "correct": false,
+            "answer": "INXS"
+          },
+          {
+            "correct": false,
+            "answer": "Nirvana"
+          }
+        ]
+      },
+      {
+        "_id": "653283c9e4123c9a1476bae7",
+        "question": "Avec quelle chanson le groupe ABBA remporte-t-il le concours de l’Eurovision en 1974 ?",
+        "answer": "Waterloo",
+        "badAnswers": [
+          "Dancing Queen",
+          "Mamma Mia",
+          "The Winner Takes It All"
         ],
         "category": "musique",
         "difficulty": "normal",
         "answers": [
           {
+            "correct": false,
+            "answer": "Mamma Mia"
+          },
+          {
             "correct": true,
-            "answer": "Johannes Brahms"
+            "answer": "Waterloo"
           },
           {
             "correct": false,
-            "answer": "Frédéric Chopin"
+            "answer": "The Winner Takes It All"
           },
           {
             "correct": false,
-            "answer": "Wolfgang Amadeus Mozart"
-          },
-          {
-            "correct": false,
-            "answer": "Jean-Sébastien Bach"
+            "answer": "Dancing Queen"
           }
         ]
       },
@@ -282,12 +144,12 @@
             "answer": "Amarok"
           },
           {
-            "correct": true,
-            "answer": "Voyager"
-          },
-          {
             "correct": false,
             "answer": "Discovery"
+          },
+          {
+            "correct": true,
+            "answer": "Voyager"
           }
         ]
       },
@@ -303,31 +165,179 @@
         "difficulty": "normal",
         "answers": [
           {
-            "correct": false,
-            "answer": "1983"
-          },
-          {
             "correct": true,
             "answer": "1982"
           },
           {
             "correct": false,
-            "answer": "1980"
+            "answer": "1985"
           },
           {
             "correct": false,
-            "answer": "1985"
+            "answer": "1983"
+          },
+          {
+            "correct": false,
+            "answer": "1980"
+          }
+        ]
+      },
+      {
+        "question": "A quel groupe musical international doit-on la bande originale du film 'Flash Gordon ?",
+        "answer": "Queen",
+        "badAnswers": [
+          "Yes",
+          "Led Zeppelin",
+          "The Doors"
+        ],
+        "category": "musique",
+        "difficulty": "difficile",
+        "answers": [
+          {
+            "correct": false,
+            "answer": "Yes"
+          },
+          {
+            "correct": false,
+            "answer": "Led Zeppelin"
+          },
+          {
+            "correct": false,
+            "answer": "The Doors"
+          },
+          {
+            "correct": true,
+            "answer": "Queen"
+          }
+        ]
+      },
+      {
+        "_id": "642438e068d7ea9aa9527866",
+        "question": "Qui a chanté Joe le taxi ?",
+        "answer": "Vanessa Paradis",
+        "badAnswers": [
+          "Lio",
+          "Mylène Farmer",
+          "Brigitte Bardot"
+        ],
+        "category": "musique",
+        "difficulty": "facile",
+        "answers": [
+          {
+            "correct": true,
+            "answer": "Vanessa Paradis"
+          },
+          {
+            "correct": false,
+            "answer": "Brigitte Bardot"
+          },
+          {
+            "correct": false,
+            "answer": "Mylène Farmer"
+          },
+          {
+            "correct": false,
+            "answer": "Lio"
+          }
+        ]
+      },
+      {
+        "_id": "642438e068d7ea9aa9527868",
+        "question": "Qui a écrit 'Comme un boomerang', interprété par Etienne Daho et Dani en 2001 ?",
+        "answer": "Serges Gainsbourg",
+        "badAnswers": [
+          "Jean-Jacques Goldman",
+          "Patrick Bruel",
+          "Nicola Sirkis"
+        ],
+        "category": "musique",
+        "difficulty": "normal",
+        "answers": [
+          {
+            "correct": false,
+            "answer": "Nicola Sirkis"
+          },
+          {
+            "correct": false,
+            "answer": "Patrick Bruel"
+          },
+          {
+            "correct": false,
+            "answer": "Jean-Jacques Goldman"
+          },
+          {
+            "correct": true,
+            "answer": "Serges Gainsbourg"
+          }
+        ]
+      },
+      {
+        "question": "Calvin Cordozar Broadus, Jr. est le véritable nom de quel rappeur Américain ?",
+        "answer": "Snoop Dogg",
+        "badAnswers": [
+          "Dr. DRE",
+          "Coolio",
+          "2Pac"
+        ],
+        "category": "musique",
+        "difficulty": "difficile",
+        "answers": [
+          {
+            "correct": false,
+            "answer": "2Pac"
+          },
+          {
+            "correct": false,
+            "answer": "Dr. DRE"
+          },
+          {
+            "correct": false,
+            "answer": "Coolio"
+          },
+          {
+            "correct": true,
+            "answer": "Snoop Dogg"
+          }
+        ]
+      },
+      {
+        "_id": "65328759e4123c9a1476bb1a",
+        "question": "Dans quelle ville se déroule chaque année le Festival interceltique ?",
+        "answer": "Lorient",
+        "badAnswers": [
+          "Brest",
+          "Mulhouse",
+          "Cahors"
+        ],
+        "category": "musique",
+        "difficulty": "normal",
+        "answers": [
+          {
+            "correct": false,
+            "answer": "Cahors"
+          },
+          {
+            "correct": false,
+            "answer": "Mulhouse"
+          },
+          {
+            "correct": true,
+            "answer": "Lorient"
+          },
+          {
+            "correct": false,
+            "answer": "Brest"
           }
         ]
       }
     ],
     "categoryVotes": {
-      "237659092461@s.whatsapp.net": {
+      "237654030277@s.whatsapp.net": {
         "name": "musique",
         "slug": "musique"
       }
     },
-    "rounds": 2,
+    "rounds": 9,
     "timer": [
       null,
       null,
