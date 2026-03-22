@@ -1334,6 +1334,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                             return whatsapp.reply("Usage: !group vote yes  ou  !group vote no");
                         await group.castLeaderVote(whatsapp, voteChoice);
                         break;
+                    case 'help':
                     default:
                         await whatsapp.reply(
                             "Commandes disponibles :\n" +

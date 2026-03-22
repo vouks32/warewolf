@@ -276,9 +276,13 @@ export class GroupManager {
             message += `Membres :\n`
             for (let member of group.members) {
                 message += `- @${players[member].jid.split('@')[0]}\n`
+            }
+
+            for (let member of group.members) {
                 await whatsapp.sendMessage(players[member].jid, message, group.members.map(jid => jid))
                 await delay(1000)
             }
+
         }
 
         this._save();

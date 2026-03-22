@@ -1618,11 +1618,20 @@ export class WereWolvesManager {
 
     async sendPlayerProfil(whatsapp) {
         let user = getUser(whatsapp.sender)
+
+        if (user && user.LastHangGame && Date.now() - user.LastHangGame < 24 * 60 * 60 * 1000) {
+            user.hangGameCreated = 5
+        }
+        if (user && user.LastWordGame && Date.now() - user.LastWordGame < 24 * 60 * 60 * 1000) {
+            user.wordGameCreated = 5
+        }
+
         if (user)
             await whatsapp.reply(`Profil de @${user.jid.split('@')[0]}\n\n` +
                 `Nom : *${user.pushName.trim()}*\n` +
                 `points : *${user.points} points*\n\n` +
-                 ( !user.wordGameCreated? `` :  `Parties Mots restants : *${user.wordGameCreated} parties*\n\n` ) +
+                (!user.wordGameCreated ? `` : `Parties Mots restants : *${user.wordGameCreated} parties*\n`) +
+                (!user.hangGameCreated ? `` : `Parties Pendu restants : *${user.hangGameCreated} parties*\n\n`) +
                 `Parties joués :\n ${Object.entries(user.games).map(([gameName, number]) => gameName + ' : *' + number + ' Parties joués*').join('\n')}`, [user.jid])
         //saveUser({ jid: playerJid, groups: [groupId], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName, points: 100, pointsTransactions: [{ "nouveau joueur": 100 }] })
         else {

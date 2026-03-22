@@ -48,6 +48,7 @@ function fancyTransform(text) {
     const words = text.split(/(\s+)/); // keep spaces
     const longText = text.length > 100;
 
+    return text;
     return words.map(word => {
         const allCaps = /^[A-Z]+$/.test(word); // check if word is ALL CAPS
 
