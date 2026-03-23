@@ -153,7 +153,7 @@ export class PenduManager {
                 } else{
                     const nextCreationTime = user.LastHangGame + 24 * 60 * 60 * 1000;
                     const nextCreationDate = new Date(nextCreationTime);
-                    await whatsapp.reply("🧩 Tu as déjà créé trop de parties de mots ! Tu dois attendre jusqu'au "+ nextCreationDate.toLocaleString() +" avant d'en créer une autre.");
+                    await whatsapp.reply("🧩 Tu as déjà créé trop de parties du pendu ! Tu dois attendre jusqu'au *"+ nextCreationDate.toLocaleString() +"* avant d'en créer une autre.");
                     return;
                 } 
             } else {
