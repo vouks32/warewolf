@@ -147,17 +147,15 @@ export class PenduManager {
 
         let user = getUser(whatsapp.senderJid);
         if (user) {
-            if (user.LastHangGame && Date.now() - user.LastHangGame < 24 * 60 * 60 * 1000) {
-                if (user.hangGameCreated && user.hangGameCreated > 0) {
+            if ((user.LastHangGame && Date.now() - user.LastHangGame < 24 * 60 * 60 * 1000)) {
+                if (user.hangGameCreated > 0) {
                     user.hangGameCreated = (user.hangGameCreated) - 1;
-                } else if (user.hangGameCreated && user.hangGameCreated <= 0) {
+                } else if ( user.hangGameCreated <= 0) {
                     const nextCreationTime = user.LastHangGame + 24 * 60 * 60 * 1000;
                     const nextCreationDate = new Date(nextCreationTime);
                     await whatsapp.reply("🧩 Tu as déjà créé trop de parties de mots ! Tu dois attendre jusqu'au "+ nextCreationDate.toLocaleString() +" avant d'en créer une autre.");
                     return;
-                } else {
-                    user.hangGameCreated = 4; // 5 créations autorisées par jour
-                }
+                } 
             } else {
                 user.LastHangGame = Date.now();
                 user.hangGameCreated = 4;
