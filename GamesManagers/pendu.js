@@ -150,7 +150,7 @@ export class PenduManager {
             if ((user.LastHangGame && Date.now() - user.LastHangGame < 24 * 60 * 60 * 1000)) {
                 if (user.hangGameCreated > 0) {
                     user.hangGameCreated = (user.hangGameCreated) - 1;
-                } else if ( user.hangGameCreated <= 0) {
+                } else{
                     const nextCreationTime = user.LastHangGame + 24 * 60 * 60 * 1000;
                     const nextCreationDate = new Date(nextCreationTime);
                     await whatsapp.reply("🧩 Tu as déjà créé trop de parties de mots ! Tu dois attendre jusqu'au "+ nextCreationDate.toLocaleString() +" avant d'en créer une autre.");
@@ -158,7 +158,7 @@ export class PenduManager {
                 } 
             } else {
                 user.LastHangGame = Date.now();
-                user.hangGameCreated = 4;
+                user.hangGameCreated = 2;
             }
             saveUser(user);
         }

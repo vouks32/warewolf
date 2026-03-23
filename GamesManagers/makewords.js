@@ -124,19 +124,17 @@ export class WordGameManager {
         let user = getUser(whatsapp.senderJid);
         if (user) {
             if (user.LastWordGame && Date.now() - user.LastWordGame < 24 * 60 * 60 * 1000) {
-                if (user.wordGameCreated && user.wordGameCreated > 0) {
+                if (user.wordGameCreated > 0) {
                     user.wordGameCreated = (user.wordGameCreated) - 1;
-                } else if (user.wordGameCreated && user.wordGameCreated <= 0) {
+                } else  {
                     const nextCreationTime = user.LastWordGame + 24 * 60 * 60 * 1000;
                     const nextCreationDate = new Date(nextCreationTime);
                     await whatsapp.reply("🧩 Tu as déjà créé trop de parties de mots ! Tu dois attendre jusqu'au "+ nextCreationDate.toLocaleString() +" avant d'en créer une autre.");
                     return;
-                } else {
-                    user.wordGameCreated = 4; // 5 créations autorisées par jour
-                }
+                } 
             } else {
                 user.LastWordGame = Date.now();
-                user.wordGameCreated = 4;
+                user.wordGameCreated = 2;
             }
             saveUser(user);
         }

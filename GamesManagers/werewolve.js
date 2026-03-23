@@ -1620,10 +1620,12 @@ export class WereWolvesManager {
         let user = getUser(whatsapp.sender)
 
         if (user && user.LastHangGame && Date.now() - user.LastHangGame > 24 * 60 * 60 * 1000) {
-            user.hangGameCreated = 5
+            user.hangGameCreated = 3
+            user.LastHangGame = Date.now();
         }
         if (user && user.LastWordGame && Date.now() - user.LastWordGame > 24 * 60 * 60 * 1000) {
-            user.wordGameCreated = 5
+            user.wordGameCreated = 3
+            user.LastWordGame = Date.now();
         }
 
         if (user)
