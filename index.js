@@ -568,7 +568,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         // Détection d'admin plus robuste (compare la partie avant @)
         const senderLocal = whatsapp.senderJid.split('@')[0]
         const AdminParticipant = participants.find(p => {
-            const pid = (p.id || p.jid || '').toString()
+            const pid = (p.phoneNumber || p.jid || p.id || '').toString()
             if (!pid) return false
             const pidLocal = pid.split('@')[0]
             return pidLocal === senderLocal && !!p.admin
@@ -610,8 +610,20 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
         const participants = await whatsapp.getParticipants(whatsapp.groupJid)
         //console.log(participants)
-        const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.toLowerCase().includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin) && _p.admin.toLowerCase().includes('super'))
-        if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es SUPER Admin?!')
+        // Détection d'admin plus robuste (compare la partie avant @)
+        const senderLocal = whatsapp.senderJid.split('@')[0]
+        const AdminParticipant = participants.find(p => {
+            const pid = (p.phoneNumber || p.jid || p.id || '').toString()
+            if (!pid) return false
+            const pidLocal = pid.split('@')[0]
+            return pidLocal === senderLocal && !!p.admin
+        })
+
+        if (!AdminParticipant) {
+            // Pour debug, on affiche quand même; si tu veux restreindre -> décommente return
+            //await whatsapp.reply('Tu n\'es pas admin, j\'affiche quand même le classement (debug).')
+            return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+        }
 
         const groupId = whatsapp.groupJid
 
@@ -623,6 +635,10 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                 player.points = 0
                 player.games.WEREWOLF = 0
                 player.games.WORDGAME = 0
+                player.LastHangGame = Date.now();
+                player.hangGameCreated = 10;
+                player.LastWordGame = Date.now();
+                player.wordGameCreated = 10;
                 saveUser(player)
                 group.push(player)
             }
@@ -641,8 +657,20 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
         const participants = await whatsapp.getParticipants(whatsapp.groupJid)
         //console.log(participants)
-        const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.toLowerCase().includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin) && _p.admin.toLowerCase().includes('super'))
-        if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es SUPER Admin?!')
+        // Détection d'admin plus robuste (compare la partie avant @)
+        const senderLocal = whatsapp.senderJid.split('@')[0]
+        const AdminParticipant = participants.find(p => {
+            const pid = (p.phoneNumber || p.jid || p.id || '').toString()
+            if (!pid) return false
+            const pidLocal = pid.split('@')[0]
+            return pidLocal === senderLocal && !!p.admin
+        })
+
+        if (!AdminParticipant) {
+            // Pour debug, on affiche quand même; si tu veux restreindre -> décommente return
+            //await whatsapp.reply('Tu n\'es pas admin, j\'affiche quand même le classement (debug).')
+            return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+        }
 
         await repeatFunction()
     })
@@ -656,8 +684,18 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
             //console.log(participants)
-            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin) && _p.admin.includes('super'))
+            // Détection d'admin plus robuste (compare la partie avant @)
+            const senderLocal = whatsapp.senderJid.split('@')[0]
+            const AdminParticipant = participants.find(p => {
+                const pid = (p.phoneNumber || p.jid || p.id || '').toString()
+                if (!pid) return false
+                const pidLocal = pid.split('@')[0]
+                return pidLocal === senderLocal && !!p.admin
+            })
+
             if (!AdminParticipant) {
+                // Pour debug, on affiche quand même; si tu veux restreindre -> décommente return
+                //await whatsapp.reply('Tu n\'es pas admin, j\'affiche quand même le classement (debug).')
                 await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
                 return
             }
@@ -677,10 +715,19 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
             //console.log(participants)
-            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin) && _p.admin.includes('super'))
+            // Détection d'admin plus robuste (compare la partie avant @)
+            const senderLocal = whatsapp.senderJid.split('@')[0]
+            const AdminParticipant = participants.find(p => {
+                const pid = (p.phoneNumber || p.jid || p.id || '').toString()
+                if (!pid) return false
+                const pidLocal = pid.split('@')[0]
+                return pidLocal === senderLocal && !!p.admin
+            })
+
             if (!AdminParticipant) {
-                await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
-                return
+                // Pour debug, on affiche quand même; si tu veux restreindre -> décommente return
+                //await whatsapp.reply('Tu n\'es pas admin, j\'affiche quand même le classement (debug).')
+                return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
             }
 
 
@@ -742,16 +789,24 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
             //console.log(participants)
-            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin) && _p.admin.includes('super'))
+            // Détection d'admin plus robuste (compare la partie avant @)
+            const senderLocal = whatsapp.senderJid.split('@')[0]
+            const AdminParticipant = participants.find(p => {
+                const pid = (p.phoneNumber || p.jid || p.id || '').toString()
+                if (!pid) return false
+                const pidLocal = pid.split('@')[0]
+                return pidLocal === senderLocal && !!p.admin
+            })
+
             if (!AdminParticipant) {
-                await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
-                return await whatsapp.reply('Mon chaud... tu n\'es pas *super admin*, donc laisse!')
+                // Pour debug, on affiche quand même; si tu veux restreindre -> décommente return
+                //await whatsapp.reply('Tu n\'es pas admin, j\'affiche quand même le classement (debug).')
+                return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
             }
 
 
-
             const ids = whatsapp.mentions
-            const amount = whatsapp.text.split("!removepoints")[1].trim().split(' ')[whatsapp.text.split("!removepoints")[1].trim().split(' ').length - 1]
+            const amount = whatsapp.text.split("!sendpoints")[1].trim().split(' ')[whatsapp.text.split("!sendpoints")[1].trim().split(' ').length - 1]
 
             const allPlayers = getAllUsers()
 
@@ -763,13 +818,13 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                         const player = allPlayers[playerJid];
                         if (player.lid === id) {
                             await wwm.addUserPoints(playerJid, whatsapp, -parseInt(amount), "envoyé par super admin", 0)
-                            await whatsapp.reply(`@${id.split('@')[0]} a été déduit *-${amount} points*`, [id])
+                            await whatsapp.reply(`@${id.split('@')[0]} a reçu *+${amount} points*`, [id])
                         }
                     }
 
                 } else {
                     await wwm.addUserPoints(id, whatsapp, -parseInt(amount), "envoyé par super admin", 0)
-                    await whatsapp.reply(`@${id.split('@')[0]} a été déduit *-${amount} points*`, [id])
+                    await whatsapp.reply(`@${id.split('@')[0]} a reçu *+${amount} points*`, [id])
                 }
             }
 
@@ -805,10 +860,19 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
             //console.log(participants)
-            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
+            // Détection d'admin plus robuste (compare la partie avant @)
+            const senderLocal = whatsapp.senderJid.split('@')[0]
+            const AdminParticipant = participants.find(p => {
+                const pid = (p.phoneNumber || p.jid || p.id || '').toString()
+                if (!pid) return false
+                const pidLocal = pid.split('@')[0]
+                return pidLocal === senderLocal && !!p.admin
+            })
+
             if (!AdminParticipant) {
-                await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
-                return await whatsapp.reply('Mon chaud... tu n\'es pas *admin*, donc laisse!')
+                // Pour debug, on affiche quand même; si tu veux restreindre -> décommente return
+                //await whatsapp.reply('Tu n\'es pas admin, j\'affiche quand même le classement (debug).')
+                return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
             }
 
             if (whatsapp.game === null) return await whatsapp.reply('persone n\'est entrain de jouer à un jeu! tu es attardé?')
@@ -844,8 +908,20 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
             if (whatsapp.text.split("!bot insulte").length == 1 || whatsapp.text.split("!bot insulte")[1].trim().length == 0) return await whatsapp.reply('Moi je vois pas celui que tu veux que j\'insulte 🤷‍♂️')
             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
-            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
-            if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+            // Détection d'admin plus robuste (compare la partie avant @)
+            const senderLocal = whatsapp.senderJid.split('@')[0]
+            const AdminParticipant = participants.find(p => {
+                const pid = (p.phoneNumber || p.jid || p.id || '').toString()
+                if (!pid) return false
+                const pidLocal = pid.split('@')[0]
+                return pidLocal === senderLocal && !!p.admin
+            })
+
+            if (!AdminParticipant) {
+                // Pour debug, on affiche quand même; si tu veux restreindre -> décommente return
+                //await whatsapp.reply('Tu n\'es pas admin, j\'affiche quand même le classement (debug).')
+                return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+            }
 
             const name = whatsapp.text.split("!bot insulte")[1].trim().split(' ')[0]
             const user = whatsapp.ids.lid ? name.replace('@', '') + "@lid" : name.replace('@', '') + "@s.whatsapp.net"
