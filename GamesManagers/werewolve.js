@@ -1630,7 +1630,7 @@ export class WereWolvesManager {
 
         if (user)
             await whatsapp.reply(`Profil de @${user.jid.split('@')[0]}\n\n` +
-                `Nom : *${user.pushName.trim()}*\n` +
+                `Nom : *${(user.pushName || ' ').trim()}*\n` +
                 `points : *${user.points} points*\n\n` +
                 (!user.LastWordGame ? `` : `Parties Mots restants : *${user.wordGameCreated} parties*\n`) +
                 (!user.LastHangGame ? `` : `Parties Pendu restants : *${user.hangGameCreated} parties*\n`) +
