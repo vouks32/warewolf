@@ -276,7 +276,7 @@ async function startBot() {
                         const metadata = await sock.groupMetadata(groupJid);
 
                         // Find the participant by JID
-                        const participant = metadata.participants
+                        const participant = metadata.participants.map(p => ({ ...p, jid : p.jid || p.phoneNumber }))
 
                         return participant.map(p => ({ ...p, id: p.jid || p.id })) || null; // Return participant or null if not found
                     } catch (error) {
@@ -392,7 +392,7 @@ async function startBot() {
         for (const groupJid in groups) {
             const group = groups[groupJid];
             const metadata = await sock.groupMetadata(groupJid);
-            const participant = metadata.participants
+            const participant = metadata.participants.map(p => ({ ...p, jid : p.jid || p.phoneNumber }))
             group.sort((p1, p2) => p2.points - p1.points)
 
             await sock.sendMessage(groupJid, {
@@ -403,7 +403,7 @@ async function startBot() {
 
             for (let index = 0; index < group.length; index++) {
                 const p = group[index];
-                const groupParticipant = participant.find(gp => gp.jid === p.jid || gp.id === p.jid)
+                const groupParticipant = participant.find(gp => gp.jid === p.jid || gp.phoneNumber === p.jid)
                 if (index < 3 && groupParticipant) {
 
                     console.log(`Num ${index + 1}`, p.jid, groupParticipant)
