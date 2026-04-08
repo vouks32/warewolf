@@ -45,6 +45,7 @@ function htmlDecode(text) {
 }
 
 let groupRanks = {}
+let allPlayers = getAllUsers()
 for (const playerJid in allPlayers) {
     const player = allPlayers[playerJid];
     player.groups.forEach(groupJid => {
