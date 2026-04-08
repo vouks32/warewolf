@@ -53,7 +53,7 @@ for (const playerJid in allPlayers) {
     });
 }
 
-for (const groupJid in groups) {
+for (const groupJid in groupRanks) {
     const group = groupRanks[groupJid];
     group.sort((p1, p2) => p2.points - p1.points)
     groupRanks[groupJid] = group
