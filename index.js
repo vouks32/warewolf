@@ -22,6 +22,8 @@ let lastGroupJid = null
 const handler = makeRetryHandler();
 let Interval = null;
 
+
+
 const groupCache = new NodeCache({ stdTTL: 5 * 60, useClones: false })
 
 async function optimizeGifSharp(gifPath, width = 300, quality = 80) {
@@ -40,6 +42,20 @@ function htmlDecode(text) {
         .replace(/&#039;/g, "'")
         .replace(/&apos;/g, "'")
         .replace(/&nbsp;/g, ' ');
+}
+
+let groupRanks = {}
+for (const playerJid in allPlayers) {
+    const player = allPlayers[playerJid];
+    player.groups.forEach(groupJid => {
+        groupRanks[groupJid] = groupRanks[groupJid] ? groupRanks[groupJid].concat(player) : [player]
+    });
+}
+
+for (const groupJid in groups) {
+    const group = groupRanks[groupJid];
+    group.sort((p1, p2) => p2.points - p1.points)
+    groupRanks[groupJid] = group
 }
 
 
@@ -276,7 +292,7 @@ async function startBot() {
                         const metadata = await sock.groupMetadata(groupJid);
 
                         // Find the participant by JID
-                        const participant = metadata.participants.map(p => ({ ...p, jid : p.jid || p.phoneNumber }))
+                        const participant = metadata.participants.map(p => ({ ...p, jid: p.jid || p.phoneNumber }))
 
                         return participant.map(p => ({ ...p, id: p.jid || p.id })) || null; // Return participant or null if not found
                     } catch (error) {
@@ -392,7 +408,7 @@ async function startBot() {
         for (const groupJid in groups) {
             const group = groups[groupJid];
             const metadata = await sock.groupMetadata(groupJid);
-            const participant = metadata.participants.map(p => ({ ...p, jid : p.jid || p.phoneNumber }))
+            const participant = metadata.participants.map(p => ({ ...p, jid: p.jid || p.phoneNumber }))
             group.sort((p1, p2) => p2.points - p1.points)
 
             await sock.sendMessage(groupJid, {
@@ -400,10 +416,14 @@ async function startBot() {
                 , mentions: group.map((p) => p.jid)
             }).then(handler.addMessage)
 
+            groupRanks[groupJid] = group
 
             for (let index = 0; index < group.length; index++) {
                 const p = group[index];
                 const groupParticipant = participant.find(gp => gp.jid === p.jid || gp.phoneNumber === p.jid)
+
+                if (p.jid.includes('650687834') || p.jid.includes('676073559')) continue // skip vouks and bot himself
+
                 if (index < 3 && groupParticipant) {
 
                     console.log(`Num ${index + 1}`, p.jid, groupParticipant)
@@ -432,11 +452,45 @@ async function startBot() {
                 }
             }
         }
+
+        await repeatTips()
         return true
 
     }
 
-    let hr = 60 * 60 * 6
+    const repeatTips = async () => {
+        const allPlayers = getAllUsers()
+        let groups = {}
+        for (const playerJid in allPlayers) {
+            const player = allPlayers[playerJid];
+            player.groups.forEach(groupJid => {
+                groups[groupJid] = groups[groupJid] ? groups[groupJid].concat(player) : [player]
+            });
+        }
+        for (const groupJid in groups) {
+            const group = groups[groupJid];
+            const metadata = await sock.groupMetadata(groupJid);
+            const participant = metadata.participants.map(p => ({ ...p, jid: p.jid || p.phoneNumber }))
+            group.sort((p1, p2) => p2.points - p1.points)
+
+            await sock.sendMessage(groupJid, {
+                text: fancyTransform(`Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n'))
+                , mentions: group.map((p) => p.jid)
+            }).then(handler.addMessage)
+
+            groupRanks[groupJid] = group
+
+            const tips = [
+                "*Astuce:*\n\n Consultez régulièrement votre profil avec *!profil* pour suivre votre progression et *!points* pour voir votre score !",
+                "*Astuce:*\n\n les 3 premiers du classement de votre groupe sont automatiquement promus admins.\n Le numéro 1 du classement peut rénitialiser les points de tout les membres à tout moment en envoyant *!resetrank*\n\n Alors donnez tout pour être au sommet !",
+                "*Astuce:*\n\n Gagner des points vous permet de grimper dans le classement de votre groupe, mais aussi d'obtenir des avantages exclusifs dans les jeux !\n\n Par exemple, dans le jeu du Loup-Garou, les joueurs qui possèdent le plus de points ont plus de chances d'obtenir des rôles puissants \n\n Alors, plus vous jouez et gagnez des points, plus vous augmentez vos chances de dominer les parties !",
+                "*Astuce:*\n\n Le jeu du loup-garou est celui qui donne le plus de points !"
+            ]
+        }
+        return true
+    }
+
+    let hr = 60 * 60 * 3
     let timetilNext3hr = (hr) - (Math.floor((new Date()).valueOf() / 1000) % (hr))
     setTimeout(() => {
         repeatFunction()
@@ -616,7 +670,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             const pid = (p.phoneNumber || p.jid || p.id || '').toString()
             if (!pid) return false
             const pidLocal = pid.split('@')[0]
-            return pidLocal === senderLocal && p.admin.includes('super')
+            return pidLocal === senderLocal && (p.admin.includes('super') || groupRanks[whatsapp.groupJid]?.[0]?.jid === p.jid) // allow group creator or top 1 of the ranking to reset the ranking
         })
 
         if (!AdminParticipant) {
