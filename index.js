@@ -483,9 +483,11 @@ async function startBot() {
             const tips = [
                 "*Astuce:*\n\n Consultez régulièrement votre profil avec *!profil* pour suivre votre progression et *!points* pour voir votre score !",
                 "*Astuce:*\n\n les 3 premiers du classement de votre groupe sont automatiquement promus admins.\n Le numéro 1 du classement peut rénitialiser les points de tout les membres à tout moment en envoyant *!resetrank*\n\n Alors donnez tout pour être au sommet !",
-                "*Astuce:*\n\n Gagner des points vous permet de grimper dans le classement de votre groupe, mais aussi d'obtenir des avantages exclusifs dans les jeux !\n\n Par exemple, dans le jeu du Loup-Garou, les joueurs qui possèdent le plus de points ont plus de chances d'obtenir des rôles puissants \n\n Alors, plus vous jouez et gagnez des points, plus vous augmentez vos chances de dominer les parties !",
                 "*Astuce:*\n\n Le jeu du loup-garou est celui qui donne le plus de points !"
             ]
+
+            await sock.sendMessage(groupJid, {
+                text: fancyTransform(tips[Math.floor(Math.random() * tips.length)])}).then(handler.addMessage)
         }
         return true
     }
