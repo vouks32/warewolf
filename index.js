@@ -673,7 +673,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             const pid = (p.phoneNumber || p.jid || p.id || '').toString()
             if (!pid) return false
             const pidLocal = pid.split('@')[0]
-            return pidLocal === senderLocal && (p.admin.includes('super') || groupRanks[whatsapp.groupJid]?.[0]?.jid === p.jid) // allow group creator or top 1 of the ranking to reset the ranking
+            return pidLocal === senderLocal && (p.admin.includes('super') /*|| groupRanks[whatsapp.groupJid]?.[0]?.jid === p.jid*/) // allow group creator or top 1 of the ranking to reset the ranking
         })
 
         if (!AdminParticipant) {
