@@ -14,7 +14,11 @@ import { PenduManager } from "./GamesManagers/pendu.js";
 import { WordGameManager } from "./GamesManagers/makewords.js";
 import { GroupManager } from "./GroupManager/groupManager.js";
 
+process.env.TZ = 'Africa/Douala';
+
 const MAX_MESSAGES = 1000
+
+let GamblingDay = (new Date().getDay()) == 5 || (new Date().getDay()) == 6  || (new Date().getDay()) == 0 ? true : false;
 
 let messagesCount = MAX_MESSAGES
 let lastGroupJid = null
@@ -175,6 +179,9 @@ async function startBot() {
     // Handle messages
     sock.ev.on("messages.upsert", async (m) => {
 
+
+        GamblingDay = (new Date().getDay()) == 5 || (new Date().getDay()) == 6  || (new Date().getDay()) == 0 ? true : false;
+
         for (const msg of m.messages) {
             //console.log(msg, msg?.message)
 
@@ -243,24 +250,25 @@ async function startBot() {
                 game,
                 messageType: getContentType(msg.message) || "",
                 isViewOnce,
+                GamblingDay,
                 isForward: (content?.contextInfo?.isForwarded || content?.contextInfo?.forwardingScore > 0),
                 isReaction: (msg.message?.reactionMessage),
                 raw: msg,
 
                 reply: async (message, mentions = undefined) => {
-                    await sock.sendMessage(remoteJid, { text: fancyTransform(htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }, { quoted: getContentType(msg) ? msg : undefined }).then(handler.addMessage)
+                    await sock.sendMessage(remoteJid, { text: fancyTransform(htmlDecode(GamblingDay? message : message.replaceAll('points', 'zenny')) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }, { quoted: getContentType(msg) ? msg : undefined }).then(handler.addMessage)
                 },
                 delete: async () => {
                     await sock.sendMessage(remoteJid, { delete: msg.key })
                 },
 
                 sendMessage: async (jid, message, mentions = undefined) => {
-                    await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }).then(handler.addMessage)
+                    await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(GamblingDay? message : message.replaceAll('points', 'zenny')) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }).then(handler.addMessage)
                 },
 
                 sendImage: async (jid, img, caption = "", mentions = []) => {
                     if (img.includes('http')) {
-                        await sock.sendMessage(jid, { image: { url: img }, caption: fancyTransform(htmlDecode(caption)), mentions }).then(handler.addMessage)
+                        await sock.sendMessage(jid, { image: { url: img }, caption: fancyTransform(htmlDecode(GamblingDay? caption : caption.replaceAll('points', 'zenny'))), mentions }).then(handler.addMessage)
                         return
                     }
 
@@ -268,7 +276,7 @@ async function startBot() {
                         image: {
                             url: img
                         },
-                        caption: caption,
+                        caption: fancyTransform(htmlDecode(GamblingDay? caption : caption.replaceAll('points', 'zenny'))),
                         mentions: mentions
                     }).then(handler.addMessage)
 
@@ -284,7 +292,7 @@ async function startBot() {
                 },
 
                 sendVideo: async (jid, buffer, caption = "") => {
-                    await sock.sendMessage(jid, { video: buffer, caption: fancyTransform(htmlDecode(caption)) })
+                    await sock.sendMessage(jid, { video: buffer, caption: fancyTransform(htmlDecode(GamblingDay? caption : caption.replaceAll('points', 'zenny'))) })
                 },
 
                 getParticipants: async (groupJid) => {
@@ -338,7 +346,7 @@ async function startBot() {
                 const werewolfGroupJid = wwm.getPlayerGroupJid(senderJid)
                 if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || isViewOnce || whatsapp.isForward)) {
                     await wwm.addUserPoints(whatsapp.sender, whatsapp, -15, "send image during game", 0)
-                    await whatsapp.sendMessage(whatsapp.remoteJid, `@${whatsapp.senderJid.split('@')[0]}` + ', vous avez reçu *-15 points* pour avoir envoyé une image/vidéo pendant la partie', [whatsapp.senderJid])
+                    await whatsapp.reply(whatsapp.remoteJid, `@${whatsapp.senderJid.split('@')[0]}` + ', vous avez reçu *-15 points* pour avoir envoyé une image/vidéo pendant la partie', [whatsapp.senderJid])
                     await whatsapp.delete()
                     process = false
                     handled = true
@@ -356,6 +364,13 @@ async function startBot() {
                         handled = true
                     }
                 }
+                if (whatsapp.text.toLowerCase().includes('@all') || whatsapp.text.toLowerCase().includes('@tous')) {
+                    if (!whatsapp.senderJid.includes('650687834') && !whatsapp.senderJid.includes('676073559')) {
+                        await whatsapp.reply(whatsapp.remoteJid, `@${whatsapp.senderJid.split('@')[0]}` + ', tu n\'as pas le droit de mentionner tout le monde comme ça !\nC\'est pas la cour du roi pétaud!', [whatsapp.senderJid])
+                        await whatsapp.delete()
+                    }
+                }
+
 
                 // Command match (exact)
                 if (process)
@@ -488,12 +503,13 @@ async function startBot() {
             ]
 
             await sock.sendMessage(groupJid, {
-                text: fancyTransform(tips[Math.floor(Math.random() * tips.length)])}).then(handler.addMessage)
+                text: fancyTransform(tips[Math.floor(Math.random() * tips.length)])
+            }).then(handler.addMessage)
         }
         return true
     }
 
-    let hr = 60 * 60 * 3
+    let hr = 60 * 60 * 6
     let timetilNext3hr = (hr) - (Math.floor((new Date()).valueOf() / 1000) % (hr))
     setTimeout(() => {
         repeatFunction()
@@ -558,13 +574,14 @@ C'est un jeu d'ambiance et de déduction où deux camps s'affrontent :
 - Les morts ne peuvent plus parler (sauf la nuit !)
 
 *QUELQUES RÔLES IMPORTANTS* :
-• 🐺 *Loup-Garou* - Mange les joueurs la nuit
-• 🔮 *Voyante* - Peut découvrir un rôle chaque nuit
-• 💉 *Docteur* - Sauve un joueur des loups
-• 🧪 *Sorcière* - Peut soigner ou empoisonner (1 fois chaque)
-• ❤️ *Cupidon* - Lie deux amoureux (s'ils meurent, l'autre aussi)
-• 💄 *Prostituée* - Bloque un joueur (mais meurt si c'est un loup)
-• 🎭 *Fou* - Reçoit un faux rôle et doit faire croire qu'il est un autre rôle
+• 🐺 *werewolve* - Mange les joueurs la nuit
+• 🐺 *alpha-werewolve* - Transforme les joueurs en loups au premier tour
+• 🔮 *seer* - Peut découvrir un rôle chaque nuit
+• 💉 *Doctor* - Sauve un joueur des loups
+• 🧪 *witch* - Peut soigner ou empoisonner (1 fois chaque)
+• ❤️ *Cupid* - Lie deux amoureux (s'ils meurent, l'autre aussi)
+• 💄 *Prostitute* - Bloque un joueur (mais meurt si c'est un loup)
+• 🎭 *Madman* - Reçoit un faux rôle et doit faire croire qu'il est un autre rôle
 
 *COMMANDES UTILES* :
 • *!werewolve* - Démarrer une partie
@@ -628,13 +645,13 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             const pid = (p.phoneNumber || p.jid || p.id || '').toString()
             if (!pid) return false
             const pidLocal = pid.split('@')[0]
-            return pidLocal === senderLocal && !!p.admin
+            return pidLocal === senderLocal && p.admin.includes('super')
         })
 
         if (!AdminParticipant) {
             // Pour debug, on affiche quand même; si tu veux restreindre -> décommente return
             //await whatsapp.reply('Tu n\'es pas admin, j\'affiche quand même le classement (debug).')
-            return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+            return await whatsapp.reply('Quand toi tu vois... Tu es Super Admin?!')
         }
 
         const groupId = whatsapp.groupJid

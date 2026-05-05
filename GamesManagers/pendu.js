@@ -2,7 +2,7 @@
 import fs from "fs-extra"
 import path from "path"
 import RoleManager from "./werewolve-utils/roleManager.js"
-import { getUser, saveUser } from "../userStorage.js";
+import { getUser, saveUser, SaveUsersPoints, SaveUsersZenny } from "../userStorage.js";
 
 
 const DATA_FILE = path.join(process.cwd(), "games/pendu.json")
@@ -86,33 +86,16 @@ export class PenduManager {
         this.games = loadGames()
     }
 
-
-
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
-        if (!playerJid || !whatsapp || !reason) return false
-        console.log(`Adding ${points} points to ${playerJid} for ${reason}`, whatsapp?.ids)
-        let user = getUser(playerJid)
-        let arr = {}
-        arr[reason] = points
-
-        if (!user) {
-            saveUser({ jid: playerJid, lid: whatsapp.ids?.lid || null, groups: [whatsapp.groupJid], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName || ' ', games: { PENDU: gamescount }, points: 50, pointsTransactions: [arr] })
-        } else {
-            if (!user.groups.some(g => g === whatsapp.groupJid)) {
-                user.groups.push(whatsapp.groupJid)
-            }
-            if (whatsapp?.ids?.lid && whatsapp.ids?.lid !== user.lid && whatsapp.sender === playerJid) {
-                user.lid = whatsapp.ids.lid
-            }
-            user.points += points
-            user.games.PENDU += gamescount
-            user.pointsTransactions.push(arr)
-            user = saveUser(user)
-        }
-        return true
+        if (whatsapp.GamblingDay) {
+            const c = SaveUsersZenny(playerJid, whatsapp, reason, points, "PENDU", gamescount, this)
+            if (c)
+                this.games = c.games
+        } else
+            const c = SaveUsersPoints(playerJid, whatsapp, reason, points, "PENDU", gamescount, this)
+        if (c)
+            this.games = c.games
     }
-
-
 
     isPlaying(groupId) {
         const game = this.games[groupId]
@@ -150,12 +133,12 @@ export class PenduManager {
             if ((user.LastHangGame && Date.now() - user.LastHangGame < 24 * 60 * 60 * 1000)) {
                 if (user.hangGameCreated > 0) {
                     user.hangGameCreated = (user.hangGameCreated) - 1;
-                } else{
+                } else {
                     const nextCreationTime = user.LastHangGame + 24 * 60 * 60 * 1000;
                     const nextCreationDate = new Date(nextCreationTime);
-                    await whatsapp.reply("🧩 Tu as déjà créé trop de parties du pendu ! Tu dois attendre jusqu'au *"+ nextCreationDate.toLocaleString() +"* avant d'en créer une autre.");
+                    await whatsapp.reply("🧩 Tu as déjà créé trop de parties du pendu ! Tu dois attendre jusqu'au *" + nextCreationDate.toLocaleString() + "* avant d'en créer une autre.");
                     return;
-                } 
+                }
             } else {
                 user.LastHangGame = Date.now();
                 user.hangGameCreated = 9;

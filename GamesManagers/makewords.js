@@ -95,24 +95,17 @@ export class WordGameManager {
         return letters;
     }
 
-    async addPoints(playerJid, whatsapp, points, reason) {
-        let user = getUser(playerJid);
-        if (!user) {
-            saveUser({
-                jid: playerJid,
-                groups: [whatsapp.groupJid],
-                points: 50 + points,
-                games: { WORDGAME: 1 },
-                pointsTransactions: [{ [reason]: points }],
-            });
-        } else {
-            if (!user.groups.includes(whatsapp.groupJid)) user.groups.push(whatsapp.groupJid);
-            user.points += points;
-            user.games.WORDGAME = (user.games.WORDGAME || 0) + 1;
-            user.pointsTransactions.push({ [reason]: points });
-            saveUser(user);
-        }
-    }
+   async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
+           if (whatsapp.GamblingDay) {
+               const c = SaveUsersZenny(playerJid, whatsapp, reason, points, "WORDGAME", gamescount, this)
+               if (c)
+                   this.games = c.games
+           } else
+               const c = SaveUsersPoints(playerJid, whatsapp, reason, points, "WORDGAME", gamescount, this)
+           if (c)
+               this.games = c.games
+       }
+   
 
     // ---------------- LOGIC ----------------
     async createGame(groupId, whatsapp) {
@@ -373,9 +366,9 @@ export class WordGameManager {
         const winner = results[0];
         const winner2 = results[1];
         const winner3 = results[2];
-        const pointsToAdd = Object.values(game.players).length * 2 - Math.round(Object.values(game.players).length / 2);
-        const pointsToAdd2 = Math.round(pointsToAdd / 2);
-        const pointsToAdd3 = Math.round(pointsToAdd / 3);
+        const pointsToAdd = (Object.values(game.players).length * 2 - Math.round(Object.values(game.players).length / 2))*2;
+        const pointsToAdd2 = Math.round(pointsToAdd / 2)*2;
+        const pointsToAdd3 = Math.round(pointsToAdd / 3)*2;
 
         await whatsapp.sendMessage(
             groupId,
