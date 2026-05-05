@@ -256,19 +256,19 @@ async function startBot() {
                 raw: msg,
 
                 reply: async (message, mentions = undefined) => {
-                    await sock.sendMessage(remoteJid, { text: fancyTransform(htmlDecode(GamblingDay? message : message.replaceAll('points', 'zenny')) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }, { quoted: getContentType(msg) ? msg : undefined }).then(handler.addMessage)
+                    await sock.sendMessage(remoteJid, { text: fancyTransform(htmlDecode(!GamblingDay? message : message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }, { quoted: getContentType(msg) ? msg : undefined }).then(handler.addMessage)
                 },
                 delete: async () => {
                     await sock.sendMessage(remoteJid, { delete: msg.key })
                 },
 
                 sendMessage: async (jid, message, mentions = undefined) => {
-                    await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(GamblingDay? message : message.replaceAll('points', 'zenny')) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }).then(handler.addMessage)
+                    await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(!GamblingDay? message : message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }).then(handler.addMessage)
                 },
 
                 sendImage: async (jid, img, caption = "", mentions = []) => {
                     if (img.includes('http')) {
-                        await sock.sendMessage(jid, { image: { url: img }, caption: fancyTransform(htmlDecode(GamblingDay? caption : caption.replaceAll('points', 'zenny'))), mentions }).then(handler.addMessage)
+                        await sock.sendMessage(jid, { image: { url: img }, caption: fancyTransform(htmlDecode(!GamblingDay? caption : caption)), mentions }).then(handler.addMessage)
                         return
                     }
 
@@ -276,7 +276,7 @@ async function startBot() {
                         image: {
                             url: img
                         },
-                        caption: fancyTransform(htmlDecode(GamblingDay? caption : caption.replaceAll('points', 'zenny'))),
+                        caption: fancyTransform(htmlDecode(!GamblingDay? caption : caption)),
                         mentions: mentions
                     }).then(handler.addMessage)
 
@@ -292,7 +292,7 @@ async function startBot() {
                 },
 
                 sendVideo: async (jid, buffer, caption = "") => {
-                    await sock.sendMessage(jid, { video: buffer, caption: fancyTransform(htmlDecode(GamblingDay? caption : caption.replaceAll('points', 'zenny'))) })
+                    await sock.sendMessage(jid, { video: buffer, caption: fancyTransform(htmlDecode(!GamblingDay? caption : caption)) })
                 },
 
                 getParticipants: async (groupJid) => {
