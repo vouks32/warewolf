@@ -97,18 +97,18 @@ export class WereWolvesManager {
     //////////////////////////////////////////               UTILITIES                     ////////////////////////////////////////////
 
 
-  async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
-          if (whatsapp.GamblingDay) {
-              const c = SaveUsersZenny(playerJid, whatsapp, reason, points, "WEREWOLVE", gamescount, this)
-              if (c)
-                  this.games = c.games
-          } else{
-              const c = SaveUsersPoints(playerJid, whatsapp, reason, points, "WEREWOLVE", gamescount, this)
-          if (c)
-              this.games = c.games
-            }
-      }
-  
+    async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
+        if (whatsapp.GamblingDay) {
+            const c = SaveUsersZenny(playerJid, whatsapp, reason, points, "WEREWOLVE", gamescount, this)
+            if (c)
+                this.games = c.games
+        } else {
+            const c = SaveUsersPoints(playerJid, whatsapp, reason, points, "WEREWOLVE", gamescount, this)
+            if (c)
+                this.games = c.games
+        }
+    }
+
 
     async addPrayer(playerJid, whatsapp) {
 
@@ -546,7 +546,7 @@ export class WereWolvesManager {
                     await whatsapp.sendMessage(p.jid, "Joueurs :\n\n" + names, mentions)
                 }
 
-                if(p.role !== "ALPHAWEREWOLF" && p.role !== "WEREWOLF") {
+                if (p.role !== "ALPHAWEREWOLF" && p.role !== "WEREWOLF") {
                     await whatsapp.sendMessage(p.jid, "Tu peux aussi prier pour la nuit en envoyant *!pray* (une seule fois par partie). Si tu pries, le seigneur te protègeras des loups qui veulent te dévorer.")
                 }
             }
@@ -1175,12 +1175,12 @@ export class WereWolvesManager {
             return
         }
 
-        if(prayingUser.prayers < 1) {
+        if (prayingUser.prayers < 1) {
             await whatsapp.sendMessage(whatsapp.sender, "⚠️ Ta foie est à trop basse, tu as 0 prières, tu ne peux pas prier ce soir.")
             return
         }
 
-        if( Object.entries(game.prayingPlayersNight).find(arr => arr[0] === prayingPlayer.jid)) {
+        if (Object.entries(game.prayingPlayersNight).find(arr => arr[0] === prayingPlayer.jid)) {
             await whatsapp.sendMessage(whatsapp.sender, "⚠️ Tu as déjà prié pendant cette partie. Le seigneur n'a pas que ça à faire ehh.")
             return
         }
@@ -1747,15 +1747,16 @@ export class WereWolvesManager {
         const game = this.games[groupId]
         if (!game) return
 
-        for (let i = 0; i < timers[groupId].length; i++) {
-            const timer = timers[groupId][i];
-            if (!timer) continue
-            try {
-                clearTimeout(timer)
-            } catch (e) {
+        if (timers && timers[groupId]) {
+            for (let i = 0; i < timers[groupId].length; i++) {
+                const timer = timers[groupId][i];
+                if (!timer) continue
+                try {
+                    clearTimeout(timer)
+                } catch (e) {
+                }
             }
         }
-
         await whatsapp.sendMessage(groupId, `🏆 Partie terminée!`)
         await whatsapp.sendMessage(groupId, `envoie *"!werewolve"* pour rejouer`)
         delete this.games[groupId]
