@@ -102,10 +102,11 @@ export class WereWolvesManager {
               const c = SaveUsersZenny(playerJid, whatsapp, reason, points, "WEREWOLVE", gamescount, this)
               if (c)
                   this.games = c.games
-          } else
+          } else{
               const c = SaveUsersPoints(playerJid, whatsapp, reason, points, "WEREWOLVE", gamescount, this)
           if (c)
               this.games = c.games
+            }
       }
   
 

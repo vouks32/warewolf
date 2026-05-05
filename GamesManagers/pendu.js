@@ -91,10 +91,11 @@ export class PenduManager {
             const c = SaveUsersZenny(playerJid, whatsapp, reason, points, "PENDU", gamescount, this)
             if (c)
                 this.games = c.games
-        } else
+        } else {
             const c = SaveUsersPoints(playerJid, whatsapp, reason, points, "PENDU", gamescount, this)
-        if (c)
-            this.games = c.games
+            if (c)
+                this.games = c.games
+        }
     }
 
     isPlaying(groupId) {

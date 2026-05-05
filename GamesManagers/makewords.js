@@ -95,17 +95,18 @@ export class WordGameManager {
         return letters;
     }
 
-   async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
-           if (whatsapp.GamblingDay) {
-               const c = SaveUsersZenny(playerJid, whatsapp, reason, points, "WORDGAME", gamescount, this)
-               if (c)
-                   this.games = c.games
-           } else
-               const c = SaveUsersPoints(playerJid, whatsapp, reason, points, "WORDGAME", gamescount, this)
-           if (c)
-               this.games = c.games
-       }
-   
+    async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
+        if (whatsapp.GamblingDay) {
+            const c = SaveUsersZenny(playerJid, whatsapp, reason, points, "WORDGAME", gamescount, this)
+            if (c)
+                this.games = c.games
+        } else {
+            const c = SaveUsersPoints(playerJid, whatsapp, reason, points, "WORDGAME", gamescount, this)
+            if (c)
+                this.games = c.games
+        }
+    }
+
 
     // ---------------- LOGIC ----------------
     async createGame(groupId, whatsapp) {
@@ -119,12 +120,12 @@ export class WordGameManager {
             if (user.LastWordGame && Date.now() - user.LastWordGame < 24 * 60 * 60 * 1000) {
                 if (user.wordGameCreated > 0) {
                     user.wordGameCreated = (user.wordGameCreated) - 1;
-                } else  {
+                } else {
                     const nextCreationTime = user.LastWordGame + 24 * 60 * 60 * 1000;
                     const nextCreationDate = new Date(nextCreationTime);
-                    await whatsapp.reply("🧩 Tu as déjà créé trop de parties de mots ! Tu dois attendre jusqu'au "+ nextCreationDate.toLocaleString() +" avant d'en créer une autre.");
+                    await whatsapp.reply("🧩 Tu as déjà créé trop de parties de mots ! Tu dois attendre jusqu'au " + nextCreationDate.toLocaleString() + " avant d'en créer une autre.");
                     return;
-                } 
+                }
             } else {
                 user.LastWordGame = Date.now();
                 user.wordGameCreated = 9;
@@ -366,9 +367,9 @@ export class WordGameManager {
         const winner = results[0];
         const winner2 = results[1];
         const winner3 = results[2];
-        const pointsToAdd = (Object.values(game.players).length * 2 - Math.round(Object.values(game.players).length / 2))*2;
-        const pointsToAdd2 = Math.round(pointsToAdd / 2)*2;
-        const pointsToAdd3 = Math.round(pointsToAdd / 3)*2;
+        const pointsToAdd = (Object.values(game.players).length * 2 - Math.round(Object.values(game.players).length / 2)) * 2;
+        const pointsToAdd2 = Math.round(pointsToAdd / 2) * 2;
+        const pointsToAdd3 = Math.round(pointsToAdd / 3) * 2;
 
         await whatsapp.sendMessage(
             groupId,
