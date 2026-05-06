@@ -97,13 +97,13 @@ export class WordGameManager {
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
         if (whatsapp.GamblingDay) {
-            const c = SaveUsersZenny(playerJid, whatsapp, reason, points, "WORDGAME", gamescount, this)
-            if (c)
-                this.games = c.games
+            const c = SaveUsersZenny(playerJid, whatsapp, reason, points, "WORDGAME", gamescount, this.games)
+             if (c)
+                this.games = c
         } else {
-            const c = SaveUsersPoints(playerJid, whatsapp, reason, points, "WORDGAME", gamescount, this)
-            if (c)
-                this.games = c.games
+            const c = SaveUsersPoints(playerJid, whatsapp, reason, points, "WORDGAME", gamescount, this.games)
+             if (c)
+                this.games = c
         }
     }
 

@@ -86,7 +86,7 @@ export function getAllUsers() {
     return players
 }
 
-export function SaveUsersPoints(playerJid, whatsapp, reason, points, gameType, gamescount, thisManager = null) {
+export function SaveUsersPoints(playerJid, whatsapp, reason, points, gameType, gamescount, games) {
 
      if (!playerJid || !whatsapp || !reason) return false
             console.log(`Adding ${points} points to ${playerJid} for ${reason}`, whatsapp?.ids)
@@ -110,15 +110,16 @@ export function SaveUsersPoints(playerJid, whatsapp, reason, points, gameType, g
                 user = saveUser(user)
             }
     
-            const game = thisManager?.games[(thisManager.getPlayerGroupJid(playerJid) || ' ')]
+            if(!games) return null
+            const game = games[(thisManager.getPlayerGroupJid(playerJid) || ' ')]
             if (!game) return null
             const Player = game.players.find(p => p.jid === playerJid)
             if (Player)
                 Player.points.push({ points, reason })
     
-            return thisManager ? thisManager.saveGames(thisManager.games) : null
+            return games
 }
-export function SaveUsersZenny(playerJid, whatsapp, reason, points, gameType, gamescount, thisManager = null) {
+export function SaveUsersZenny(playerJid, whatsapp, reason, points, gameType, gamescount, games = null) {
 
      if (!playerJid || !whatsapp || !reason) return false
             console.log(`Adding ${points} zenny to ${playerJid} for ${reason}`, whatsapp?.ids)
@@ -142,11 +143,12 @@ export function SaveUsersZenny(playerJid, whatsapp, reason, points, gameType, ga
                 user = saveUser(user)
             }
     
-            const game = thisManager?.games[(thisManager.getPlayerGroupJid(playerJid) || ' ')]
+            if(!games) return null
+            const game = games[(thisManager.getPlayerGroupJid(playerJid) || ' ')]
             if (!game) return true
             const Player = game.players.find(p => p.jid === playerJid)
             if (Player)
                 Player.points.push({ points, reason })
     
-            return thisManager ? thisManager.saveGames(thisManager.games) : null
+            return games
 }

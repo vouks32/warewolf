@@ -663,7 +663,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                 group.push(player)
         }
 
-        try {
+        try { 
             const metadata = await sock.groupMetadata(groupId);
             group.sort((p1, p2) => p2.points - p1.points)
 
