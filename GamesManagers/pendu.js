@@ -346,7 +346,7 @@ export class PenduManager {
             await this.giveLetter(groupId, playerJid, choice.toLowerCase(), whatsapp)
         } else if (game.state === "CHOOSING_GAME_TYPE") {
             console.log("CHOICE ===== ", choice)
-            await this.chooseGameVote(groupId, playerJid, choice, whatsapp)
+            await this.chooseGameVote(groupId, playerJid, parseInt(choice), whatsapp)
         }
 
     }

@@ -1869,7 +1869,7 @@ export class WereWolvesManager {
 
             }
         } else if (game.state === "CHOOSING_GAME_TYPE") {
-            await this.chooseGameVote(groupId, playerJid, targetJid, whatsapp)
+            await this.chooseGameVote(groupId, playerJid, parseInt(targetJid), whatsapp)
         }
 
     }
