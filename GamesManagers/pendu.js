@@ -161,7 +161,7 @@ export class PenduManager {
         }
         this.games[groupId] = {
             state: "CHOOSING_GAME_TYPE",
-            creator: whatsapp.sender,
+            hostjid: whatsapp.sender,
             players: [],
             word: (new String(word)).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(),
             displayWord: "_".repeat(word.length),
@@ -195,7 +195,7 @@ export class PenduManager {
         const game = this.games[groupId]
         if (!game || game.state !== "CHOOSING_GAME_TYPE") return
         
-        if (playerJid !== game.host) return await whatsapp.sendMessage(groupId, "❌ Seul celui qui a créé la partie peut choisir le type de jeu.", [player.jid])
+        if (playerJid !== game.host) return await whatsapp.sendMessage(groupId, "❌ Seul celui qui a créé la partie peut choisir le type de jeu.", [playerJid])
 
         game.gameType = parseInt(vote)
         try {

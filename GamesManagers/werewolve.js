@@ -354,7 +354,7 @@ export class WereWolvesManager {
         const game = this.games[groupId]
         if (!game || game.state !== "CHOOSING_GAME_TYPE") return
        
-        if (playerJid !== game.host) return await whatsapp.sendMessage(groupId, "❌ Seul celui qui a créé la partie peut choisir le type de jeu.", [playerJid])
+        if (playerJid !== game.hostjid) return await whatsapp.sendMessage(groupId, "❌ Seul celui qui a créé la partie peut choisir le type de jeu.", [playerJid])
 
         game.gameType = parseInt(vote)
 
