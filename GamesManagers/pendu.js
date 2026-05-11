@@ -290,7 +290,7 @@ export class PenduManager {
 
         if (!player) {
             await whatsapp.sendMessage(groupId, `Youpiii @${voterJid.split('@')[0]} a rejoin la partie`, [voterJid])
-            game.players.push({ jid: voterJid, answers: [{ letter, correct: game.word.includes(letter), points : [] }] })
+            game.players.push({ jid: voterJid, answers: [{ letter, correct: game.word.includes(letter)}], points : [] })   
         } else {
             player.answers.push({ letter, correct: game.word.includes(letter) })
         }
