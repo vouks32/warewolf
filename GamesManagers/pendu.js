@@ -160,7 +160,7 @@ export class PenduManager {
             return
         }
         this.games[groupId] = {
-            state: "SET_WORD",
+            state: "CHOOSING_GAME_TYPE",
             creator: whatsapp.sender,
             players: [],
             word: (new String(word)).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(),
@@ -189,8 +189,24 @@ export class PenduManager {
             }
         }, 30 * 1000)
 
-    }
+    } 
 
+    async chooseGameVote(groupId, playerJid, vote, whatsapp) {
+        const game = this.games[groupId]
+        if (!game || game.state !== "CHOOSING_GAME_TYPE") return
+        const player = game.players.find(p => p.jid === playerJid)
+        if (!player) return
+        if (player.jid !== game.host) return await whatsapp.sendMessage(groupId, "❌ Seul celui qui a créé la partie peut choisir le type de jeu.", [player.jid])
+
+        game.gameType = parseInt(vote)
+        try {
+            clearTimeout(timers[groupId][0])
+        } catch (e) { }
+        try {
+            clearTimeout(timers[groupId][1])
+        } catch (e) { }
+        this.createGame(groupId, whatsapp)
+    }
 
     async createGame(groupId, whatsapp) {
 
@@ -252,23 +268,6 @@ export class PenduManager {
         await whatsapp.sendMessage(groupId, `envoie *"!pendu"* Pour jouer à nouveau`)
         delete this.games[groupId]
 
-    }
-
-    async chooseGameVote(groupId, playerJid, vote, whatsapp) {
-        const game = this.games[groupId]
-        if (!game || game.state !== "CHOOSING_GAME_TYPE") return
-        const player = game.players.find(p => p.jid === playerJid)
-        if (!player) return
-        if (player.jid !== game.host) return await whatsapp.sendMessage(groupId, "❌ Seul celui qui a créé la partie peut choisir le type de jeu.", [player.jid])
-
-        game.gameType = parseInt(vote)
-        try {
-            clearTimeout(timers[groupId][0])
-        } catch (e) { }
-        try {
-            clearTimeout(timers[groupId][1])
-        } catch (e) { }
-        this.createGame(groupId, whatsapp)
     }
 
     async giveLetter(groupId, voterJid, letter, whatsapp) {

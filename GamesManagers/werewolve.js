@@ -350,6 +350,24 @@ export class WereWolvesManager {
 
     }
 
+    async chooseGameVote(groupId, playerJid, vote, whatsapp) {
+        const game = this.games[groupId]
+        if (!game || game.state !== "CHOOSING_GAME_TYPE") return
+        const player = game.players.find(p => p.jid === playerJid)
+        if (!player) return
+        if (player.jid !== game.host) return await whatsapp.sendMessage(groupId, "❌ Seul celui qui a créé la partie peut choisir le type de jeu.", [player.jid])
+
+        game.gameType = parseInt(vote)
+
+        try {
+            clearTimeout(timers[groupId][0])
+        } catch (e) { }
+        try {
+            clearTimeout(timers[groupId][1])
+        } catch (e) { }
+        this.createGame(groupId, whatsapp)
+    }
+
     async createGame(groupId, whatsapp) {
 
         this.games[groupId].state = "WAITING_PLAYERS"
@@ -1032,23 +1050,6 @@ export class WereWolvesManager {
 
     //////////////////////////////////////////               ACTIONS                     ////////////////////////////////////////////
 
-    async chooseGameVote(groupId, playerJid, vote, whatsapp) {
-        const game = this.games[groupId]
-        if (!game || game.state !== "CHOOSING_GAME_TYPE") return
-        const player = game.players.find(p => p.jid === playerJid)
-        if (!player) return
-        if (player.jid !== game.host) return await whatsapp.sendMessage(groupId, "❌ Seul celui qui a créé la partie peut choisir le type de jeu.", [player.jid])
-
-        game.gameType = parseInt(vote)
-
-        try {
-            clearTimeout(timers[groupId][0])
-        } catch (e) { }
-        try {
-            clearTimeout(timers[groupId][1])
-        } catch (e) { }
-        this.createGame(groupId, whatsapp)
-    }
 
     async wolfKill(groupId, wolfJid, targetJid, whatsapp) {
         const game = this.games[groupId]
