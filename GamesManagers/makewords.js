@@ -239,6 +239,7 @@ export class WordGameManager {
             score: 0,
             currentWord: null,
             currentScore: 0,
+            points : [],
             name: pseudo || whatsapp.raw?.pushName || `Joueur-${Object.keys(game.players).length + 1}`
         };
         this.saveGames();
