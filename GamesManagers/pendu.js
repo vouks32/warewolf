@@ -166,7 +166,7 @@ export class PenduManager {
             wrongLetters: [],
             rounds: -1
         }
-        this.saveGames(this.games)
+        saveGames(this.games)
 
         await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points)\n2. Partie avec mise en jeu (zenny)\n\n_ps: Une partie normale coute 10 zenny_")
 
@@ -174,7 +174,7 @@ export class PenduManager {
             if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
                 await whatsapp.sendMessage(groupId, "⏰ Temps écoulé pour choisir le type de partie! Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
                 delete this.games[groupId]
-                this.saveGames(this.games)
+                saveGames(this.games)
             }
         }, 1 * 60 * 1000)
         timers[groupId][1] = setTimeout(async () => {
@@ -190,7 +190,7 @@ export class PenduManager {
 
         this.games[groupId].state = "SET_WORD"
 
-        this.saveGames(this.games)
+        saveGames(this.games)
         const game = this.games[groupId]
 
         let PlayingFee = 0
@@ -202,7 +202,7 @@ export class PenduManager {
             } else {
                 await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de zenny pour lancer une partie avec mise en jeu. Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
                 delete this.games[groupId]
-                this.saveGames(this.games)
+                saveGames(this.games)
                 return
             }
         } else {
