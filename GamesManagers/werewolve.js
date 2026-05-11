@@ -1039,7 +1039,7 @@ export class WereWolvesManager {
         if (!player) return
         if (player.jid !== game.host) return await whatsapp.sendMessage(groupId, "❌ Seul celui qui a créé la partie peut choisir le type de jeu.", [player.jid])
 
-        game.gameType = vote
+        game.gameType = parseInt(vote)
 
         try {
             clearTimeout(timers[groupId][0])
@@ -1868,6 +1868,8 @@ export class WereWolvesManager {
             } else {
 
             }
+        } else if (game.state === "CHOOSING_GAME_TYPE") {
+            await this.chooseGameVote(groupId, playerJid, targetJid, whatsapp)
         }
 
     }

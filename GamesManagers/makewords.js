@@ -355,6 +355,7 @@ export class WordGameManager {
         const game = this.games[groupId];
         const player = game.players[whatsapp.senderJid];
 
+
         if (!game || game.state !== "PLAYING") return;
 
         // Vérifier que le joueur est dans la partie
@@ -472,6 +473,16 @@ export class WordGameManager {
         delete this.games[groupId]
         this.saveGames(this.games)
         return
+    }
+
+     async handleShortHand(groupId, playerJid, choice, whatsapp) {
+        const game = this.games[groupId]
+        if (!game) return
+
+        if (game.state === "CHOOSING_GAME_TYPE") {
+            await this.chooseGameVote(groupId, playerJid, parseInt(choice), whatsapp)
+        }
+
     }
 
 }

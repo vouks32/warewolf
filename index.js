@@ -1350,8 +1350,10 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         if (/^[\p{L}]+$/u.test(text) && text.length > 2 && text.split(' ').length === 1 && word.isPlaying(whatsapp.groupJid)) {
             await word.handleWord(whatsapp)
             return
+        }else if(word.isPlaying(whatsapp.groupJid) && parseInt(text) >= 0 && parseInt(text) < 10){
+            await word.handleShortHand(whatsapp.groupJid, whatsapp.sender, parseInt(text), whatsapp)
+            return
         }
-
         /////////////////     HANDLE PENDU       
         const letter = whatsapp.text.trim();
         if (letter.length === 1 && penduGroupJid) {

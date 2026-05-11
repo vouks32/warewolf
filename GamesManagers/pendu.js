@@ -261,13 +261,13 @@ export class PenduManager {
         if (!player) return
         if (player.jid !== game.host) return await whatsapp.sendMessage(groupId, "❌ Seul celui qui a créé la partie peut choisir le type de jeu.", [player.jid])
 
-        game.gameType = vote
+        game.gameType = parseInt(vote)
         try {
-        clearTimeout(timers[groupId][0])
-        } catch (e) {}
-         try {
-        clearTimeout(timers[groupId][1])
-        } catch (e) {}
+            clearTimeout(timers[groupId][0])
+        } catch (e) { }
+        try {
+            clearTimeout(timers[groupId][1])
+        } catch (e) { }
         this.createGame(groupId, whatsapp)
     }
 
@@ -346,6 +346,8 @@ export class PenduManager {
 
         if (game.state === "PLAYING") {
             await this.giveLetter(groupId, playerJid, choice.toLowerCase(), whatsapp)
+        } else if (game.state === "CHOOSING_GAME_TYPE") {
+            await this.chooseGameVote(groupId, playerJid, choice, whatsapp)
         }
 
     }
