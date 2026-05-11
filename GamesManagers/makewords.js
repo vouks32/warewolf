@@ -117,6 +117,8 @@ export class WordGameManager {
             await whatsapp.reply("🧩 Une partie est déjà en cours !");
             return;
         }
+        
+        timers[groupId] = [null, null, null, null, null, null, null]
 
         let user = getUser(whatsapp.senderJid);
         if (user) {

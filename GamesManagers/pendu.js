@@ -3,6 +3,7 @@ import fs from "fs-extra"
 import path from "path"
 import RoleManager from "./werewolve-utils/roleManager.js"
 import { getAllUsers, getUser, saveUser, SaveUsersPoints, SaveUsersZenny } from "../userStorage.js";
+import { time } from "console";
 
 
 const DATA_FILE = path.join(process.cwd(), "games/pendu.json")
@@ -169,6 +170,9 @@ export class PenduManager {
             rounds: -1
         }
         saveGames(this.games)
+        timers[groupId] = [null, null, null, null, null, null, null]
+
+
 
         await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points)\n2. Partie avec mise en jeu (zenny)\n\n_ps: Une partie normale coute 10 zenny_")
 
