@@ -228,7 +228,7 @@ export class PenduManager {
             }
         } else {
             const allUsers = getAllUsers()
-            const averageZennyPerUser = allUsers.reduce((sum, user) => sum + (user.zenny || 0), 0) / allUsers.length
+            const averageZennyPerUser = Object.values(allUsers).reduce((sum, user) => sum + (user.zenny || 0), 0) / allUsers.length
             console.log(`Average zenny per user: ${averageZennyPerUser}`)
             if (averageZennyPerUser / 5 > 10)
                 PlayingFee = Math.floor(Math.ceil(averageZennyPerUser / 5) / 10) * 10
