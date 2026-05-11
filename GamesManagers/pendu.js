@@ -161,7 +161,7 @@ export class PenduManager {
         }
         this.games[groupId] = {
             state: "CHOOSING_GAME_TYPE",
-            hostjid: whatsapp.sender,
+            hostjid: whatsapp.senderJid,
             players: [],
             word: (new String(word)).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(),
             displayWord: "_".repeat(word.length),
@@ -220,8 +220,13 @@ export class PenduManager {
             const hostUser = this.games[groupId].hostjid ? getUser(this.games[groupId].hostjid) : null
             if (hostUser && hostUser.zenny >= 10) {
                 await SaveUsersZenny(this.games[groupId].hostjid, whatsapp, -10, "a lancé une partie de loup avec mise en jeu", 0)
+            } else if (hostUser && hostUser.zenny < 10) {
+                 await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de zenny pour lancer une partie avec mise en jeu. Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
+                delete this.games[groupId]
+                saveGames(this.games)
+                return
             } else {
-                await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de zenny pour lancer une partie avec mise en jeu. Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
+               await whatsapp.sendMessage(groupId, "Une érreur est survenue lors de la vérification des zenny du créateur de la partie. Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
                 delete this.games[groupId]
                 saveGames(this.games)
                 return
