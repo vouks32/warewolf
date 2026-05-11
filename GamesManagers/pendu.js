@@ -8,6 +8,8 @@ import { getAllUsers, getUser, saveUser, SaveUsersPoints, SaveUsersZenny } from 
 const DATA_FILE = path.join(process.cwd(), "games/pendu.json")
 const WORDS_FILE = path.join(process.cwd(), "GamesManagers/mots.json")
 
+let timers = {}
+
 const HANGMANPICS = [`
   +---+
    |       |

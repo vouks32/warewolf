@@ -7,6 +7,7 @@ const DATA_FILE = path.join(process.cwd(), "games/wordgame.json");
 
 const VOWELS = ["A", "E", "I", "O", "U", "Y", "A", "E", "I", "O", "U", "Y", "È", "É", "Ê",];
 const CONSONANTS = "BCÇDFGHJKLMNPQRSTVWXZBCDFGHJKLMNPQRSTVWXZÇ".split("");
+let timers = {}
 
 export class WordGameManager {
     constructor() {
