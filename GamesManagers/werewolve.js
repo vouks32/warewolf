@@ -99,11 +99,11 @@ export class WereWolvesManager {
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
         if (whatsapp.GamblingDay) {
-            const c = SaveUsersZenny(playerJid, whatsapp, reason, points, "WEREWOLVE", gamescount, this.games)
+            const c = SaveUsersZenny(playerJid, whatsapp, points, reason, "WEREWOLVE", gamescount, this.games[whatsapp.groupJid])
             if (c)
                 this.games[whatsapp.groupJid] = c
         } else {
-            const c = SaveUsersPoints(playerJid, whatsapp, reason, points, "WEREWOLVE", gamescount, this.games)
+            const c = SaveUsersPoints(playerJid, whatsapp, points, reason,"WEREWOLVE", gamescount, this.games[whatsapp.groupJid])
             if (c)
                 this.games[whatsapp.groupJid] = c
         }

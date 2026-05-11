@@ -91,11 +91,11 @@ export class PenduManager {
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
         if (whatsapp.GamblingDay) {
-            const c = SaveUsersZenny(playerJid, whatsapp, reason, points, "PENDU", gamescount, this.games)
+            const c = SaveUsersZenny(playerJid, whatsapp, points, reason,  "PENDU", gamescount, this.games[whatsapp.groupJid])
             if (c)
                 this.games[whatsapp.groupJid] = c
         } else {
-            const c = SaveUsersPoints(playerJid, whatsapp, reason, points, "PENDU", gamescount, this.games)
+            const c = SaveUsersPoints(playerJid, whatsapp, points, reason,  "PENDU", gamescount, this.games[whatsapp.groupJid])
             if (c)
                 this.games[whatsapp.groupJid] = c
         }
@@ -262,7 +262,7 @@ export class PenduManager {
         await whatsapp.sendMessage(groupId, `Scores:\n\n${playerScores.map(p => `@${p.jid.split('@')[0]}:\n✅ *${p.correctCount}* lettres correctes\n❌ *${p.incorrectCount}* lettres incorrectes \n *+${(p.correctCount) - p.incorrectCount} points*`).join('\n\n')}`, playerScores.map(p => p.jid))
         for (let p of playerScores) {
             const points = (p.correctCount) - p.incorrectCount
-            await this.addUserPoints(p.jid, whatsapp, points, "PENDU", 1)
+            await this.addUserPoints(p.jid, whatsapp, points, "pendu points", "PENDU", 1)
         }
         await whatsapp.sendMessage(groupId, `envoie *"!pendu"* Pour jouer à nouveau`)
         delete this.games[groupId]
