@@ -219,7 +219,7 @@ export class PenduManager {
         if (this.games[groupId].gameType === 1) {
             const hostUser = this.games[groupId].hostjid ? getUser(this.games[groupId].hostjid) : null
             if (hostUser && hostUser.zenny >= 10) {
-                await SaveUsersZenny(this.games[groupId].hostjid, whatsapp, -10, "a lancé une partie de loup avec points", 0)
+                await SaveUsersZenny(this.games[groupId].hostjid, whatsapp, -10, "a lancé une partie de loup avec points", "PENDU", 0, this.games[groupId])
             } else if (hostUser && hostUser.zenny < 10) {
                  await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de zenny pour lancer une partie points. Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
                 delete this.games[groupId]
