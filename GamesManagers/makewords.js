@@ -97,7 +97,7 @@ export class WordGameManager {
     }
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
-        if (whatsapp.GamblingDay) {
+        if (this.games[whatsapp.groupJid].gameType === 2) {
             const c = SaveUsersZenny(playerJid, whatsapp, points, reason, "WORDGAME", gamescount, this.games[whatsapp.groupJid])
              if (c)
                 this.games[whatsapp.groupJid] = c
@@ -453,9 +453,9 @@ export class WordGameManager {
             [winner.jid]
         );
 
-        await this.addUserPoints(winner.jid, whatsapp, pointsToAdd, "Gagnant du jeu de mots", 1);
-        await this.addUserPoints(winner2.jid, whatsapp, pointsToAdd2, "2eme Gagnant du jeu de mots", 1);
-        await this.addUserPoints(winner3.jid, whatsapp, pointsToAdd3, "3eme Gagnant du jeu de mots", 1);
+        await this.addUserPoints(winner.jid, whatsapp, pointsToAdd, "Gagnant du jeu de mots", 0);
+        await this.addUserPoints(winner2.jid, whatsapp, pointsToAdd2, "2eme Gagnant du jeu de mots", 0);
+        await this.addUserPoints(winner3.jid, whatsapp, pointsToAdd3, "3eme Gagnant du jeu de mots", 0);
 
         await whatsapp.sendMessage(
             groupId,

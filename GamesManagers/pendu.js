@@ -90,7 +90,7 @@ export class PenduManager {
     }
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
-        if (whatsapp.GamblingDay) {
+        if (this.games[whatsapp.groupJid].gameType === 2) {
             const c = SaveUsersZenny(playerJid, whatsapp, points, reason,  "PENDU", gamescount, this.games[whatsapp.groupJid])
             if (c)
                 this.games[whatsapp.groupJid] = c
@@ -219,7 +219,7 @@ export class PenduManager {
         if (this.games[groupId].gameType === 1) {
             const hostUser = this.games[groupId].hostjid ? getUser(this.games[groupId].hostjid) : null
             if (hostUser && hostUser.zenny >= 10) {
-                await SaveUsersZenny(this.games[groupId].hostjid, whatsapp, -10, "a lancé une partie de loup avec points", "PENDU", 0, this.games[groupId])
+                await SaveUsersZenny(this.games[groupId].hostjid, whatsapp, -10, "a lancé une partie de loup avec points", "PENDU", 1, this.games[groupId])
             } else if (hostUser && hostUser.zenny < 10) {
                  await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de zenny pour lancer une partie points. Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
                 delete this.games[groupId]
@@ -267,7 +267,7 @@ export class PenduManager {
         await whatsapp.sendMessage(groupId, `Scores:\n\n${playerScores.map(p => `@${p.jid.split('@')[0]}:\n✅ *${p.correctCount}* lettres correctes\n❌ *${p.incorrectCount}* lettres incorrectes \n *+${(p.correctCount) - p.incorrectCount} points*`).join('\n\n')}`, playerScores.map(p => p.jid))
         for (let p of playerScores) {
             const points = (p.correctCount) - p.incorrectCount
-            await this.addUserPoints(p.jid, whatsapp, points, "pendu points", 1)
+            await this.addUserPoints(p.jid, whatsapp, points, "pendu points", 0)
         }
         await whatsapp.sendMessage(groupId, `envoie *"!pendu"* Pour jouer à nouveau`)
         delete this.games[groupId]
