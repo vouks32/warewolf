@@ -453,9 +453,9 @@ export class WordGameManager {
             [winner.jid]
         );
 
-        await this.addUserPoints(winner.jid, whatsapp, pointsToAdd, "Gagnant du jeu de mots");
-        await this.addUserPoints(winner2.jid, whatsapp, pointsToAdd2, "2eme Gagnant du jeu de mots");
-        await this.addUserPoints(winner3.jid, whatsapp, pointsToAdd3, "3eme Gagnant du jeu de mots");
+        await this.addUserPoints(winner.jid, whatsapp, pointsToAdd, "Gagnant du jeu de mots", 1);
+        await this.addUserPoints(winner2.jid, whatsapp, pointsToAdd2, "2eme Gagnant du jeu de mots", 1);
+        await this.addUserPoints(winner3.jid, whatsapp, pointsToAdd3, "3eme Gagnant du jeu de mots", 1);
 
         await whatsapp.sendMessage(
             groupId,
