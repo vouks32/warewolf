@@ -1351,19 +1351,24 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             await word.handleWord(whatsapp)
             return
         }else if(word.isPlaying(whatsapp.groupJid) && parseInt(text) >= 0 && parseInt(text) < 10){
+            console.log("WORD SHORT HAND NUMBER", text)
             await word.handleShortHand(whatsapp.groupJid, whatsapp.sender, parseInt(text), whatsapp)
             return
         }
         /////////////////     HANDLE PENDU       
         const letter = whatsapp.text.trim();
         if (letter.length === 1 && penduGroupJid) {
+            console.log("PENDU SHORT HAND NUMBER", text)
+
             await pendum.handleShortHand(penduGroupJid, whatsapp.sender, letter, whatsapp)
+
             return
         }
 
         /////////////////     HANDLE QUIZ / WEREWOLVES SHORT HAND NUMBER
         const t = whatsapp.text.trim();
         if ((t.length > 2 || Number.isNaN(parseInt(t))) && whatsapp.isGroup) {
+            console.log("WEREWOLF SHORT HAND NUMBER", text)
             await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
             return
         }
