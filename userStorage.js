@@ -2,6 +2,8 @@ import fs from "fs"
 import path from "path"
 
 const USER_FOLDER = path.join(process.cwd(), "../users")
+const GROUP_FOLDER = path.join(process.cwd(), "../groups")
+
 const killWithPowers = 5
 export const POINTS_LIST = {
     joinGame: 1,
@@ -75,6 +77,36 @@ export function getUser(jid) {
     }
 }
 
+export function saveGroup(group) {
+    if (!fs.existsSync(path.join(GROUP_FOLDER, group.jid + '.json'))) {
+        fs.writeFileSync(path.join(GROUP_FOLDER, group.jid + '.json'), JSON.stringify({
+            ...group,
+            roleHistory: {} // Nouveau champ pour l'historique des rôles par groupe
+        }, null, 2))
+        return group
+    }
+
+    const SavedGroup = JSON.parse(fs.readFileSync(path.join(GROUP_FOLDER, group.jid + '.json')))
+    fs.writeFileSync(path.join(GROUP_FOLDER, group.jid + '.json'), JSON.stringify({ 
+        ...SavedGroup, 
+        ...group,
+        // Conserver l'historique des rôles lors des mises à jour
+        roleHistory: SavedGroup.roleHistory || {}
+    }, null, 2))
+    return JSON.parse(fs.readFileSync(path.join(GROUP_FOLDER, group.jid + '.json')))
+}
+
+export function getGroup(jid) {
+    if (!fs.existsSync(GROUP_FOLDER)) fs.mkdirSync(GROUP_FOLDER, { recursive: true })
+    if(!jid) return null
+    if (!fs.existsSync(path.join(GROUP_FOLDER, jid + '.json'))) return null
+    try {
+        return JSON.parse(fs.readFileSync(path.join(GROUP_FOLDER, jid + '.json')))
+    } catch (error) {
+        return null
+    }
+}
+
 export function getAllUsers() {
     if (!fs.existsSync(USER_FOLDER)) fs.mkdirSync(USER_FOLDER, { recursive: true })
 
@@ -86,7 +118,7 @@ export function getAllUsers() {
     return players
 }
 
-export function SaveUsersPoints(playerJid, whatsapp, reason, points, gameType, gamescount, games) {
+export function SaveUsersPoints(playerJid, whatsapp, reason, points, gameType, gamescount, game) {
 
      if (!playerJid || !whatsapp || !reason) return false
             console.log(`Adding ${points} points to ${playerJid} for ${reason}`, whatsapp?.ids)
@@ -110,16 +142,14 @@ export function SaveUsersPoints(playerJid, whatsapp, reason, points, gameType, g
                 user = saveUser(user)
             }
     
-            if(!games) return null
-            const game = games[(thisManager.getPlayerGroupJid(playerJid) || ' ')]
-            if (!game) return null
+           if(!game) return null
             const Player = game.players.find(p => p.jid === playerJid)
             if (Player)
                 Player.points.push({ points, reason })
     
-            return games
+            return game
 }
-export function SaveUsersZenny(playerJid, whatsapp, reason, points, gameType, gamescount, games = null) {
+export function SaveUsersZenny(playerJid, whatsapp, reason, points, gameType, gamescount, game = null) {
 
      if (!playerJid || !whatsapp || !reason) return false
             console.log(`Adding ${points} zenny to ${playerJid} for ${reason}`, whatsapp?.ids)
@@ -143,12 +173,11 @@ export function SaveUsersZenny(playerJid, whatsapp, reason, points, gameType, ga
                 user = saveUser(user)
             }
     
-            if(!games) return null
-            const game = games[(thisManager.getPlayerGroupJid(playerJid) || ' ')]
-            if (!game) return true
+            if(!game) return null
             const Player = game.players.find(p => p.jid === playerJid)
             if (Player)
                 Player.points.push({ points, reason })
     
-            return games
+            return game
 }
+

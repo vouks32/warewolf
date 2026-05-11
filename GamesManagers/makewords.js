@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { getUser, saveUser, getAllUsers } from "../userStorage.js";
+import { getUser, saveUser, getAllUsers, SaveUsersZenny } from "../userStorage.js";
 import { parseWiktionary } from "./guessword-utils/checkword.js";
 
 const DATA_FILE = path.join(process.cwd(), "games/wordgame.json");
@@ -99,17 +99,19 @@ export class WordGameManager {
         if (whatsapp.GamblingDay) {
             const c = SaveUsersZenny(playerJid, whatsapp, reason, points, "WORDGAME", gamescount, this.games)
              if (c)
-                this.games = c
+                this.games[whatsapp.groupJid] = c
         } else {
             const c = SaveUsersPoints(playerJid, whatsapp, reason, points, "WORDGAME", gamescount, this.games)
-             if (c)
-                this.games = c
+            if (c)
+                this.games[whatsapp.groupJid] = c
         }
     }
 
 
     // ---------------- LOGIC ----------------
-    async createGame(groupId, whatsapp) {
+
+
+    async chooseGameType(groupId, whatsapp) {
         if (this.games[groupId]) {
             await whatsapp.reply("🧩 Une partie est déjà en cours !");
             return;
@@ -137,7 +139,7 @@ export class WordGameManager {
         this.games[groupId] = {
             groupId,
             letters,
-            state: "WAITING_PLAYERS",
+            state: "CHOOSING_GAME_TYPE",
             players: {}, // {jid: {words:[], score:0, currentWord: null, currentScore: 0}}
             timer: null,
             currentRound: 0,
@@ -146,9 +148,53 @@ export class WordGameManager {
         };
         this.saveGames();
 
+        await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points)\n2. Partie avec mise en jeu (zenny)\n\n_ps: Une partie normale coute 10 zenny_")
+
+        timers[groupId][0] = setTimeout(async () => {
+            if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
+                await whatsapp.sendMessage(groupId, "⏰ Temps écoulé pour choisir le type de partie! Partie annulée.\nEnvoyez *!mots* pour réessayer.")
+                delete this.games[groupId]
+                this.saveGames(this.games)
+            }
+        }, 1 * 60 * 1000)
+        timers[groupId][1] = setTimeout(async () => {
+            if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
+                await whatsapp.sendMessage(groupId, "⏰ 30 secondes restantes pour choisir le type de partie!")
+            }
+        }, 30 * 1000)
+
+    }
+
+    async createGame(groupId, whatsapp) {
+
+        const game = this.games[groupId]
+        game.state = "WAITING_PLAYERS"
+        this.saveGames();
+
+        let PlayingFee = 0
+
+        if (this.games[groupId].gameType === 1) {
+            const hostUser = this.games[groupId].hostjid ? getUser(this.games[groupId].hostjid) : null
+            if (hostUser && hostUser.zenny >= 10) {
+                await SaveUsersZenny(this.games[groupId].hostjid, whatsapp, -10, "a lancé une partie de loup avec mise en jeu", 0)
+            } else {
+                await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de zenny pour lancer une partie avec mise en jeu. Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
+                delete this.games[groupId]
+                this.saveGames(this.games)
+                return
+            }
+        } else {
+            const allUsers = getAllUsers()
+            const averageZennyPerUser = allUsers.reduce((sum, user) => sum + (user.zenny || 0), 0) / allUsers.length
+            console.log(`Average zenny per user: ${averageZennyPerUser}`)
+            if (averageZennyPerUser / 5 > 10)
+                PlayingFee = Math.floor(Math.ceil(averageZennyPerUser / 5) / 10) * 10
+        }
+
+
         await whatsapp.sendMessage(
             groupId,
-            `🎮 *Début du jeu de lettres !*\n\nRejoignez la partie avec *!play _pseudo_* dans les prochains 120 secondes !`,
+            `🎮 *Début du jeu de lettres !*\n\nRejoignez la partie avec *!play _pseudo_* dans les prochains 120 secondes !` + (game.gameType == 2 ? "\n\n Une partie de loup coutera " + PlayingFee + " zenny et vous remportez le totale des zenny misé" : ""),
             Object.keys(getAllUsers())
         );
 
@@ -281,6 +327,23 @@ export class WordGameManager {
             this.saveGames();
             await this.startRound(groupId, whatsapp);
         }
+    }
+
+    async chooseGameVote(groupId, playerJid, vote, whatsapp) {
+        const game = this.games[groupId]
+        if (!game || game.state !== "CHOOSING_GAME_TYPE") return
+        const player = game.players.find(p => p.jid === playerJid)
+        if (!player) return
+        if (player.jid !== game.host) return await whatsapp.sendMessage(groupId, "❌ Seul celui qui a créé la partie peut choisir le type de jeu.", [player.jid])
+
+        game.gameType = vote
+        try {
+            clearTimeout(timers[groupId][0])
+        } catch (e) { }
+        try {
+            clearTimeout(timers[groupId][1])
+        } catch (e) { }
+        this.createGame(groupId, whatsapp)
     }
 
     async handleWord(whatsapp) {

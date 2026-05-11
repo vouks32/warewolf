@@ -1048,7 +1048,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         //return await whatsapp.reply('Le jeu des mots n\'est pas disponible pour l\'instant!')
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
         if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
-        await word.createGame(whatsapp.groupJid, whatsapp)
+        await word.chooseGameType(whatsapp.groupJid, whatsapp)
     })
 
 
@@ -1058,7 +1058,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         //return await whatsapp.reply('Le jeu du pendu est désactivé pour le moment !')
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
         if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
-        await pendum.createGame(whatsapp.groupJid, whatsapp)
+        await pendum.chooseGameType(whatsapp.groupJid, whatsapp)
     })
 
 
@@ -1106,7 +1106,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
         if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
         console.log("Creating game...")
-        await wwm.createGame(whatsapp.groupJid, whatsapp)
+        await wwm.chooseGameType(whatsapp.groupJid, whatsapp)
     })
     handlers.commands.set("!werewolf", async (whatsapp) => {
         const handler = handlers.commands.get("!werewolve")
