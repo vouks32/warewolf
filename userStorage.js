@@ -118,7 +118,7 @@ export function getAllUsers() {
     return players
 }
 
-export function SaveUsersPoints(playerJid, whatsapp, reason, points, gameType, gamescount, game) {
+export function SaveUsersPoints(playerJid, whatsapp, points, reason, gameType, gamescount, game) {
 
      if (!playerJid || !whatsapp || !reason) return false
             console.log(`Adding ${points} points to ${playerJid} for ${reason}`, whatsapp?.ids)
@@ -149,7 +149,7 @@ export function SaveUsersPoints(playerJid, whatsapp, reason, points, gameType, g
     
             return game
 }
-export function SaveUsersZenny(playerJid, whatsapp, reason, points, gameType, gamescount, game = null) {
+export function SaveUsersZenny(playerJid, whatsapp, points, reason, gameType, gamescount, game = null) {
 
      if (!playerJid || !whatsapp || !reason) return false
             console.log(`Adding ${points} zenny to ${playerJid} for ${reason}`, whatsapp?.ids)
