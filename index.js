@@ -18,7 +18,7 @@ process.env.TZ = 'Africa/Douala';
 
 const MAX_MESSAGES = 1000
 
-let GamblingDay = (new Date().getDay()) == 5 || (new Date().getDay()) == 6  || (new Date().getDay()) == 0 ? true : false;
+let GamblingDay = (new Date().getDay()) == 5 || (new Date().getDay()) == 6 || (new Date().getDay()) == 0 ? true : false;
 
 let messagesCount = MAX_MESSAGES
 let lastGroupJid = null
@@ -180,7 +180,7 @@ async function startBot() {
     sock.ev.on("messages.upsert", async (m) => {
 
 
-        GamblingDay = (new Date().getDay()) == 5 || (new Date().getDay()) == 6  || (new Date().getDay()) == 0 ? true : false;
+        GamblingDay = (new Date().getDay()) == 5 || (new Date().getDay()) == 6 || (new Date().getDay()) == 0 ? true : false;
 
         for (const msg of m.messages) {
             //console.log(msg, msg?.message)
@@ -256,29 +256,35 @@ async function startBot() {
                 raw: msg,
 
                 reply: async (message, mentions = undefined) => {
-                    await sock.sendMessage(remoteJid, { text: fancyTransform(htmlDecode(!GamblingDay? message : message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }, { quoted: getContentType(msg) ? msg : undefined }).then(handler.addMessage)
+                    await sock.sendMessage(remoteJid, { text: fancyTransform(htmlDecode(!GamblingDay ? message : message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }, { quoted: getContentType(msg) ? msg : undefined }).then(handler.addMessage)
                 },
                 delete: async () => {
                     await sock.sendMessage(remoteJid, { delete: msg.key })
                 },
 
                 sendMessage: async (jid, message, mentions = undefined) => {
-                    await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(!GamblingDay? message : message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }).then(handler.addMessage)
+                    await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(!GamblingDay ? message : message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }).then(handler.addMessage)
                 },
 
                 sendImage: async (jid, img, caption = "", mentions = []) => {
-                    if (img.includes('http')) {
-                        await sock.sendMessage(jid, { image: { url: img }, caption: fancyTransform(htmlDecode(!GamblingDay? caption : caption)), mentions }).then(handler.addMessage)
-                        return
-                    }
 
-                    await sock.sendMessage(jid, {
-                        image: {
-                            url: img
-                        },
-                        caption: fancyTransform(htmlDecode(!GamblingDay? caption : caption)),
-                        mentions: mentions
-                    }).then(handler.addMessage)
+                    try {
+                        if (img.includes('http')) {
+                            await sock.sendMessage(jid, { image: { url: img }, caption: fancyTransform(htmlDecode(!GamblingDay ? caption : caption)), mentions }).then(handler.addMessage)
+                            return
+                        }
+                        await sock.sendMessage(jid, {
+                            image: {
+                                url: img
+                            },
+                            caption: fancyTransform(htmlDecode(!GamblingDay ? caption : caption)),
+                            mentions: mentions
+                        }).then(handler.addMessage)
+
+                    } catch (error) {
+                        console.log("Error sending image, maybe try to optimize it ? ", error)
+                        await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(caption)), mentions: mentions }).then(handler.addMessage)
+                    }
 
                     /*const text = "======================\n\n" +
                         htmlDecode(caption) +
@@ -292,7 +298,7 @@ async function startBot() {
                 },
 
                 sendVideo: async (jid, buffer, caption = "") => {
-                    await sock.sendMessage(jid, { video: buffer, caption: fancyTransform(htmlDecode(!GamblingDay? caption : caption)) })
+                    await sock.sendMessage(jid, { video: buffer, caption: fancyTransform(htmlDecode(!GamblingDay ? caption : caption)) })
                 },
 
                 getParticipants: async (groupJid) => {
@@ -664,7 +670,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                 group.push(player)
         }
 
-        try { 
+        try {
             const metadata = await sock.groupMetadata(groupId);
             group.sort((p1, p2) => p2.points - p1.points)
 
@@ -1322,7 +1328,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
     // SHORT HAND NUMBER WHEN IN GAME
     handlers.any.push(async (whatsapp) => {
-        
+
         const quizGroupJid = qm.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
         const quizFRGroupJid = qmfr.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
         const penduGroupJid = pendum.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
@@ -1351,7 +1357,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         if (/^[\p{L}]+$/u.test(text) && text.length > 2 && text.split(' ').length === 1 && word.isPlaying(whatsapp.groupJid)) {
             await word.handleWord(whatsapp)
             return
-        }else if(word.isPlaying(whatsapp.groupJid) && parseInt(text) >= 0 && parseInt(text) < 10){
+        } else if (word.isPlaying(whatsapp.groupJid) && parseInt(text) >= 0 && parseInt(text) < 10) {
             console.log("WORD SHORT HAND NUMBER", text)
             await word.handleShortHand(whatsapp.groupJid, whatsapp.sender, parseInt(text), whatsapp)
             return
@@ -1375,7 +1381,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         }
 
         const target = parseInt(t) - 1
-            console.log("OUT WEREWOLF SHORT HAND NUMBER", target)
+        console.log("OUT WEREWOLF SHORT HAND NUMBER", target)
 
         if (target < 0 || t.length == 0) return
 
