@@ -1321,13 +1321,13 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
     // SHORT HAND NUMBER WHEN IN GAME
     handlers.any.push(async (whatsapp) => {
-        const werewolfGroupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
+        
         const quizGroupJid = qm.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
         const quizFRGroupJid = qmfr.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
         const penduGroupJid = pendum.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
 
         //console.log('type', whatsapp.messageType)
-        if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
+        if (wwm.isPlaying(whatsapp.groupJid) && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || whatsapp.isViewOnce || whatsapp.isForward)) {
             await wwm.addUserPoints(whatsapp.sender, whatsapp, -30, "send image during game", 0)
             await whatsapp.reply('Vous avez reçu *-30 points* pour avoir envoyé une image/vidéo pendant la partie')
             await whatsapp.delete()
@@ -1378,11 +1378,10 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
         if (target < 0 || t.length == 0) return
 
-        //console.log(" group jids of bollosses", werewolfGroupJid, quizGroupJid, quizFRGroupJid)
-        if (werewolfGroupJid) {
+        if (wwm.isPlaying(whatsapp.groupJid)) {
             console.log("IN WEREWOLF SHORT HAND NUMBER", target)
-            const targetJid = wwm.getPlayerJidFromNumber(werewolfGroupJid, target)
-            await wwm.handleShortHand(werewolfGroupJid, whatsapp.sender, target, targetJid, whatsapp)
+            const targetJid = wwm.getPlayerJidFromNumber(whatsapp.groupJid, target)
+            await wwm.handleShortHand(whatsapp.groupJid, whatsapp.sender, target, targetJid, whatsapp)
         }
 
         if (quizGroupJid) {
