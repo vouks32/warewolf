@@ -103,7 +103,7 @@ export class WereWolvesManager {
             if (c)
                 this.games[whatsapp.groupJid] = c
         } else {
-            const c = SaveUsersPoints(playerJid, whatsapp, points, reason,"WEREWOLVE", gamescount, this.games[whatsapp.groupJid])
+            const c = SaveUsersPoints(playerJid, whatsapp, points, reason, "WEREWOLVE", gamescount, this.games[whatsapp.groupJid])
             if (c)
                 this.games[whatsapp.groupJid] = c
         }
@@ -353,10 +353,13 @@ export class WereWolvesManager {
     async chooseGameVote(groupId, playerJid, vote, whatsapp) {
         const game = this.games[groupId]
         if (!game || game.state !== "CHOOSING_GAME_TYPE") return
-       
-        if (playerJid !== game.hostjid) return await whatsapp.sendMessage(groupId, "❌ Seul celui qui a créé la partie peut choisir le type de jeu.", [playerJid])
 
-        game.gameType = parseInt(vote)
+        if (playerJid !== game.hostjid) return await whatsapp.sendMessage(groupId, "❌ Seul celui qui a créé la partie peut choisir le type de jeu.", [playerJid])
+        if (parseInt(vote) === 1 || parseInt(vote) === 2) {
+            game.gameType = parseInt(vote)
+        } else {
+            return await whatsapp.sendMessage(groupId, "❌ Mouf! Vote invalide. Envoie 1 ou 2.", [playerJid])
+        }
 
         try {
             clearTimeout(timers[groupId][0])
@@ -380,12 +383,12 @@ export class WereWolvesManager {
             if (hostUser && hostUser.zenny >= 10) {
                 await SaveUsersZenny(this.games[groupId].hostjid, whatsapp, -10, "a lancé une partie de loup avec mise en jeu", "WEREWOLVE", 1, this.games[groupId])
             } else if (hostUser && hostUser.zenny < 10) {
-                 await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de zenny pour lancer une partie avec mise en jeu. Partie annulée.\nEnvoyez *!werewolve* pour réessayer.")
+                await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de zenny pour lancer une partie avec mise en jeu. Partie annulée.\nEnvoyez *!werewolve* pour réessayer.")
                 delete this.games[groupId]
                 saveGames(this.games)
                 return
             } else {
-               await whatsapp.sendMessage(groupId, "❌ Une érreur est survenue lors de la vérification des zenny du créateur de la partie. Partie annulée.\nEnvoyez *!werewolve* pour réessayer.")
+                await whatsapp.sendMessage(groupId, "❌ Une érreur est survenue lors de la vérification des zenny du créateur de la partie. Partie annulée.\nEnvoyez *!werewolve* pour réessayer.")
                 delete this.games[groupId]
                 saveGames(this.games)
                 return
@@ -1832,7 +1835,7 @@ export class WereWolvesManager {
         return
     }
 
-    async handleShortHand(groupId, playerJid, targetJid, whatsapp) {
+    async handleShortHand(groupId, playerJid, target, targetJid, whatsapp) {
         const game = this.games[groupId]
         if (!game) return
 
@@ -1874,7 +1877,7 @@ export class WereWolvesManager {
 
             }
         } else if (game.state === "CHOOSING_GAME_TYPE") {
-            await this.chooseGameVote(groupId, playerJid, parseInt(targetJid), whatsapp)
+            await this.chooseGameVote(groupId, playerJid, parseInt(target)+1, whatsapp)
         }
 
     }

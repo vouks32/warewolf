@@ -1380,7 +1380,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         //console.log(" group jids of bollosses", werewolfGroupJid, quizGroupJid, quizFRGroupJid)
         if (werewolfGroupJid) {
             const targetJid = wwm.getPlayerJidFromNumber(werewolfGroupJid, target)
-            await wwm.handleShortHand(werewolfGroupJid, whatsapp.sender, targetJid, whatsapp)
+            await wwm.handleShortHand(werewolfGroupJid, whatsapp.sender, target, targetJid, whatsapp)
         }
 
         if (quizGroupJid) {
