@@ -385,12 +385,12 @@ export class WereWolvesManager {
             } else if (hostUser && hostUser.zenny < 10) {
                 await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de zenny pour lancer une partie avec mise en jeu. Partie annulée.\nEnvoyez *!werewolve* pour réessayer.")
                 delete this.games[groupId]
-                saveGames(this.games)
+                this.saveGames(this.games)
                 return
             } else {
                 await whatsapp.sendMessage(groupId, "❌ Une érreur est survenue lors de la vérification des zenny du créateur de la partie. Partie annulée.\nEnvoyez *!werewolve* pour réessayer.")
                 delete this.games[groupId]
-                saveGames(this.games)
+                this.saveGames(this.games)
                 return
             }
         } else {
