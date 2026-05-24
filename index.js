@@ -434,6 +434,7 @@ async function startBot() {
 
             groupRanks[groupJid] = group
 
+            continue;
             for (let index = 0; index < group.length; index++) {
                 const p = group[index];
                 const groupParticipant = participant.find(gp => gp.jid === p.jid || gp.phoneNumber === p.jid)
