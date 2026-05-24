@@ -1368,17 +1368,19 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         /////////////////     HANDLE QUIZ / WEREWOLVES SHORT HAND NUMBER
         const t = whatsapp.text.trim();
         if ((t.length > 2 || Number.isNaN(parseInt(t))) && whatsapp.isGroup) {
-            console.log("WEREWOLF SHORT HAND NUMBER", text)
+            console.log("WEREWOLF check if can speak", text)
             await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
             return
         }
 
         const target = parseInt(t) - 1
+            console.log("OUT WEREWOLF SHORT HAND NUMBER", target)
 
         if (target < 0 || t.length == 0) return
 
         //console.log(" group jids of bollosses", werewolfGroupJid, quizGroupJid, quizFRGroupJid)
         if (werewolfGroupJid) {
+            console.log("IN WEREWOLF SHORT HAND NUMBER", target)
             const targetJid = wwm.getPlayerJidFromNumber(werewolfGroupJid, target)
             await wwm.handleShortHand(werewolfGroupJid, whatsapp.sender, target, targetJid, whatsapp)
         }
