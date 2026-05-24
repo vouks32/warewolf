@@ -270,13 +270,11 @@ async function startBot() {
 
                     try {
                         if (img.includes('http')) {
-                            await sock.sendMessage(jid, { image: { url: img }, caption: fancyTransform(htmlDecode(!GamblingDay ? caption : caption)), mentions }).then(handler.addMessage)
+                            await sock.sendMessage(jid, {  image: fs.readFileSync(img), caption: fancyTransform(htmlDecode(!GamblingDay ? caption : caption)), mentions }).then(handler.addMessage)
                             return
                         }
                         await sock.sendMessage(jid, {
-                            image: {
-                                url: img
-                            },
+                           image: fs.readFileSync(img),
                             caption: fancyTransform(htmlDecode(!GamblingDay ? caption : caption)),
                             mentions: mentions
                         }).then(handler.addMessage)
