@@ -2,7 +2,7 @@
 import fs from "fs"
 import path from "path"
 import RoleManager from "./werewolve-utils/roleManager.js"
-import { getUser, saveUser, POINTS_LIST, SaveUsersPoints, ZENNY_LIST, SaveUsersZenny, getAllUsers } from "../userStorage.js"
+import { getUser, saveUser, POINTS_LIST, SaveUsersPoints, FRANCS_LIST, SaveUsersfrancs, getAllUsers } from "../userStorage.js"
 import { get } from "http";
 
 let pointsList = POINTS_LIST;
@@ -99,7 +99,7 @@ export class WereWolvesManager {
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
         if (this.games[whatsapp.groupJid].gameType === 2) {
-            const c = SaveUsersZenny(playerJid, whatsapp, points, reason, "WEREWOLVE", gamescount, this.games[whatsapp.groupJid])
+            const c = SaveUsersfrancs(playerJid, whatsapp, points, reason, "WEREWOLVE", gamescount, this.games[whatsapp.groupJid])
             if (c)
                 this.games[whatsapp.groupJid] = c
         } else {
@@ -292,7 +292,7 @@ export class WereWolvesManager {
         }
         timers[groupId] = [null, null, null, null, null, null, null]
         if (whatsapp.GamblingDay) {
-            pointsList = ZENNY_LIST
+            pointsList = FRANCS_LIST
         } else {
             pointsList = POINTS_LIST
         }
@@ -300,7 +300,7 @@ export class WereWolvesManager {
         this.games[groupId] = {
             groupId,
             hostjid: whatsapp.senderJid,
-            gameType: null, // "POINTS" ou "ZENNY"
+            gameType: null, // "POINTS" ou "francs"
             state: "CHOOSING_GAME_TYPE",
             players: [], // { jid, isPlaying, isDead, role }
             votes: {},   // daytime votes { voterJid: targetJid }
@@ -333,7 +333,7 @@ export class WereWolvesManager {
 
         this.saveGames(this.games)
 
-        await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points)\n2. Partie avec mise en jeu (zenny)\n\n_ps: Une partie normale coute 10 zenny_")
+        await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points)\n2. Partie avec mise en jeu (francs)\n\n_ps: Une partie normale coute 10 francs_")
 
         timers[groupId][0] = setTimeout(async () => {
             if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
@@ -380,29 +380,29 @@ export class WereWolvesManager {
 
         if (this.games[groupId].gameType === 1) {
             const hostUser = this.games[groupId].hostjid ? getUser(this.games[groupId].hostjid) : null
-            if (hostUser && hostUser.zenny >= 10) {
-                await SaveUsersZenny(this.games[groupId].hostjid, whatsapp, -10, "a lancé une partie de loup avec mise en jeu", "WEREWOLVE", 1, this.games[groupId])
-            } else if (hostUser && hostUser.zenny < 10) {
-                await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de zenny pour lancer une partie avec mise en jeu. Partie annulée.\nEnvoyez *!werewolve* pour réessayer.")
+            if (hostUser && hostUser.francs >= 10) {
+                await SaveUsersfrancs(this.games[groupId].hostjid, whatsapp, -10, "a lancé une partie de loup avec mise en jeu", "WEREWOLVE", 1, this.games[groupId])
+            } else if (hostUser && hostUser.francs < 10) {
+                await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de francs pour lancer une partie avec mise en jeu. Partie annulée.\nEnvoyez *!werewolve* pour réessayer.")
                 delete this.games[groupId]
                 this.saveGames(this.games)
                 return
             } else {
-                await whatsapp.sendMessage(groupId, "❌ Une érreur est survenue lors de la vérification des zenny du créateur de la partie. Partie annulée.\nEnvoyez *!werewolve* pour réessayer.")
+                await whatsapp.sendMessage(groupId, "❌ Une érreur est survenue lors de la vérification des francs du créateur de la partie. Partie annulée.\nEnvoyez *!werewolve* pour réessayer.")
                 delete this.games[groupId]
                 this.saveGames(this.games)
                 return
             }
         } else {
             const allUsers = getAllUsers()
-            const averageZennyPerUser = Object.values(allUsers).reduce((sum, user) => sum + (user.zenny || 0), 0) / allUsers.length
-            console.log(`Average zenny per user: ${averageZennyPerUser}`)
-            if (averageZennyPerUser / 5 > 10)
-                PlayingFee = Math.floor(Math.ceil(averageZennyPerUser / 5) / 10) * 10
+            const averageFrancsPerUser = Object.values(allUsers).reduce((sum, user) => sum + (user.francs || 0), 0) / allUsers.length
+            console.log(`Average francs per user: ${averageFrancsPerUser}`)
+            if (averageFrancsPerUser / 5 > 10)
+                PlayingFee = Math.floor(Math.ceil(averageFrancsPerUser / 5) / 10) * 10
         }
 
         await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "startgame.jpg"), "🎮 Nouvelle partie de loup garou, *Awoooo!😭*.")
-        await whatsapp.sendMessage(groupId, "🎮 Envoie *!play _pseudo_* pour rejoindre (3 minutes restantes)" + (game.gameType == 2 ? "\n\n Une partie de loup coutera " + PlayingFee + " zenny et vous remportez le totale des zenny misé" : ""))
+        await whatsapp.sendMessage(groupId, "🎮 Envoie *!play _pseudo_* pour rejoindre (3 minutes restantes)" + (game.gameType == 2 ? "\n\n Une partie de loup coutera " + PlayingFee + " francs et vous remportez le totale des francs misé" : ""))
 
         timers[groupId][0] = setTimeout(async () => {
             await this.startGame(groupId, whatsapp)
@@ -1783,10 +1783,10 @@ export class WereWolvesManager {
             await whatsapp.reply(`Profil de @${user.jid.split('@')[0]}\n\n` +
                 `Nom : *${(user.pushName || ' ').trim()}*\n` +
                 `points : *${user.points} points*\n` +
-                `zenny : *ż${user.zenny ? user.zenny : 0}*\n\n` +
+                `francs : *${user.francs ? user.francs : 0}* frs\n\n` +
                 (!user.LastWordGame ? `` : `Parties Mots restants : *${user.wordGameCreated} parties*\n`) +
                 (!user.LastHangGame ? `` : `Parties Pendu restants : *${user.hangGameCreated} parties*\n`) +
-                `\nParties joués :\n ${Object.entries(user.games).map(([gameName, number]) => gameName + ' : *' + number + ' Parties joués*').join('\n')}`, [user.jid])
+                `\nParties joués :\n ${Object.entries(user.games).filter(([gameName, number]) => gameName.length > 2 ).map(([gameName, number]) => gameName + ' : *' + number + ' Parties joués*').join('\n')}`, [user.jid])
         //saveUser({ jid: playerJid, groups: [groupId], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName, points: 100, pointsTransactions: [{ "nouveau joueur": 100 }] })
         else {
             await this.addUserPoints(whatsapp.sender, whatsapp, 50, 'new player', 0)
@@ -1806,7 +1806,7 @@ export class WereWolvesManager {
             }
             await whatsapp.reply(`Points de @${user.jid.split('@')[0]}\n\n` +
                 `points : *${user.points} points*\n` +
-                `zenny : *ż${user.zenny ? user.zenny : 0}*\n\n` +
+                `francs : *${user.francs ? user.francs : 0}* frs\n\n` +
                 `*Historique* :\n` + transactionText, [user.jid])
             //saveUser({ jid: playerJid, groups: [groupId], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName, points: 100, pointsTransactions: [{ "nouveau joueur": 100 }] })
         } else {

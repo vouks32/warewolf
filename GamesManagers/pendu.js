@@ -2,7 +2,7 @@
 import fs from "fs-extra"
 import path from "path"
 import RoleManager from "./werewolve-utils/roleManager.js"
-import { getAllUsers, getUser, saveUser, SaveUsersPoints, SaveUsersZenny } from "../userStorage.js";
+import { getAllUsers, getUser, saveUser, SaveUsersPoints, SaveUsersfrancs } from "../userStorage.js";
 import { time } from "console";
 
 
@@ -91,11 +91,11 @@ export class PenduManager {
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
         if (this.games[whatsapp.groupJid].gameType === 2) {
-            const c = SaveUsersZenny(playerJid, whatsapp, points, reason,  "PENDU", gamescount, this.games[whatsapp.groupJid])
+            const c = SaveUsersfrancs(playerJid, whatsapp, points, reason, "PENDU", gamescount, this.games[whatsapp.groupJid])
             if (c)
                 this.games[whatsapp.groupJid] = c
         } else {
-            const c = SaveUsersPoints(playerJid, whatsapp, points, reason,  "PENDU", gamescount, this.games[whatsapp.groupJid])
+            const c = SaveUsersPoints(playerJid, whatsapp, points, reason, "PENDU", gamescount, this.games[whatsapp.groupJid])
             if (c)
                 this.games[whatsapp.groupJid] = c
         }
@@ -174,7 +174,7 @@ export class PenduManager {
 
 
 
-        await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points)\n2. Partie avec mise en jeu (zenny)\n\n_ps: Une partie normale coute 10 zenny_")
+        await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points)\n2. Partie avec mise en jeu (francs)\n\n_ps: Une partie normale coute 10 francs_")
 
         timers[groupId][0] = setTimeout(async () => {
             if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
@@ -189,15 +189,20 @@ export class PenduManager {
             }
         }, 30 * 1000)
 
-    } 
+    }
 
     async chooseGameVote(groupId, playerJid, vote, whatsapp) {
         const game = this.games[groupId]
         if (!game || game.state !== "CHOOSING_GAME_TYPE") return
-        
+
         if (playerJid !== game.hostjid) return await whatsapp.sendMessage(groupId, "❌ Seul celui qui a créé la partie peut choisir le type de jeu.", [playerJid])
 
-        game.gameType = parseInt(vote)
+        if (parseInt(vote) === 1 || parseInt(vote) === 2) {
+            game.gameType = parseInt(vote)
+        } else {
+            return await whatsapp.sendMessage(groupId, "❌ Mouf! Vote invalide. Envoie 1 ou 2.", [playerJid])
+        }
+        
         try {
             clearTimeout(timers[groupId][0])
         } catch (e) { }
@@ -218,28 +223,28 @@ export class PenduManager {
 
         if (this.games[groupId].gameType === 1) {
             const hostUser = this.games[groupId].hostjid ? getUser(this.games[groupId].hostjid) : null
-            if (hostUser && hostUser.zenny >= 10) {
-                await SaveUsersZenny(this.games[groupId].hostjid, whatsapp, -10, "a lancé une partie de loup avec points", "PENDU", 0, this.games[groupId])
-            } else if (hostUser && hostUser.zenny < 10) {
-                 await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de zenny pour lancer une partie points. Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
+            if (hostUser && hostUser.francs >= 10) {
+                await SaveUsersfrancs(this.games[groupId].hostjid, whatsapp, -10, "a lancé une partie de loup avec points", "PENDU", 0, this.games[groupId])
+            } else if (hostUser && hostUser.francs < 10) {
+                await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de francs pour lancer une partie points. Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
                 delete this.games[groupId]
                 saveGames(this.games)
                 return
             } else {
-               await whatsapp.sendMessage(groupId, "Une érreur est survenue lors de la vérification des zenny du créateur de la partie. Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
+                await whatsapp.sendMessage(groupId, "Une érreur est survenue lors de la vérification des francs du créateur de la partie. Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
                 delete this.games[groupId]
                 saveGames(this.games)
                 return
             }
         } else {
             const allUsers = getAllUsers()
-            const averageZennyPerUser = Object.values(allUsers).reduce((sum, user) => sum + (user.zenny || 0), 0) / allUsers.length
-            console.log(`Average zenny per user: ${averageZennyPerUser}`)
-            if (averageZennyPerUser / 5 > 10)
-                PlayingFee = Math.floor(Math.ceil(averageZennyPerUser / 5) / 10) * 10
+            const averagefrancsPerUser = Object.values(allUsers).reduce((sum, user) => sum + (user.francs || 0), 0) / allUsers.length
+            console.log(`Average francs per user: ${averagefrancsPerUser}`)
+            if (averagefrancsPerUser / 5 > 10)
+                PlayingFee = Math.floor(Math.ceil(averagefrancsPerUser / 5) / 10) * 10
         }
 
-        await whatsapp.reply("🪢 Nouvelle partie du Pendu" + (game.gameType == 2 ? "\n\n Une partie de loup coutera " + PlayingFee + " zenny et vous remportez le totale des zenny misé" : ""))
+        await whatsapp.reply("🪢 Nouvelle partie du Pendu" + (game.gameType == 2 ? "\n\n Une partie de loup coutera " + PlayingFee + " francs et vous remportez le totale des francs misé" : ""))
         await this.startGame(groupId, whatsapp)
 
     }
@@ -290,7 +295,7 @@ export class PenduManager {
 
         if (!player) {
             await whatsapp.sendMessage(groupId, `Youpiii @${voterJid.split('@')[0]} a rejoin la partie`, [voterJid])
-            game.players.push({ jid: voterJid, answers: [{ letter, correct: game.word.includes(letter)}], points : [] })   
+            game.players.push({ jid: voterJid, answers: [{ letter, correct: game.word.includes(letter) }], points: [] })
         } else {
             player.answers.push({ letter, correct: game.word.includes(letter) })
         }

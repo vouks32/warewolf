@@ -26,7 +26,7 @@ export const POINTS_LIST = {
     votedAsTanner : 10,
 }
 
-export const ZENNY_LIST = {
+export const FRANCS_LIST = {
     joinGame: 0,
     WinAsVillager: 6,
     WinAsWolve: 8, 
@@ -149,16 +149,16 @@ export function SaveUsersPoints(playerJid, whatsapp, points, reason, gameType, g
     
             return game
 }
-export function SaveUsersZenny(playerJid, whatsapp, points, reason, gameType, gamescount, game = null) {
+export function SaveUsersfrancs(playerJid, whatsapp, points, reason, gameType, gamescount, game = null) {
 
      if (!playerJid || !whatsapp || !reason) return false
-            console.log(`Adding ${points} zenny to ${playerJid} for ${reason}`, whatsapp?.ids)
+            console.log(`Adding ${points} francs to ${playerJid} for ${reason}`, whatsapp?.ids)
             let user = getUser(playerJid)
             let arr = {}
             arr[reason] = points
     
             if (!user) {
-                saveUser({ jid: playerJid, lid: whatsapp.ids?.lid || null, groups: [whatsapp.groupJid], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName || ' ', games: { [gameType]: gamescount }, points: 50, zenny : 0, pointsTransactions: [arr] })
+                saveUser({ jid: playerJid, lid: whatsapp.ids?.lid || null, groups: [whatsapp.groupJid], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName || ' ', games: { [gameType]: gamescount }, points: 50, francs : 0, pointsTransactions: [arr] })
     
             } else {
                 if (!user.groups.some(g => g === whatsapp.groupJid)) {
@@ -167,7 +167,7 @@ export function SaveUsersZenny(playerJid, whatsapp, points, reason, gameType, ga
                 if (whatsapp?.ids?.lid && whatsapp.ids?.lid !== user.lid && whatsapp.sender === playerJid) {
                     user.lid = whatsapp.ids.lid
                 }
-                user.zenny += points
+                user.francs += points
                 user.games[gameType] = (user.games[gameType] || 0) + gamescount
                 user.pointsTransactions.push(arr)
                 user = saveUser(user)
