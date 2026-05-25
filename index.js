@@ -270,7 +270,7 @@ async function startBot() {
 
                     await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(caption)), mentions: mentions }).then(handler.addMessage)
                     return
-                    
+
                     try {
                         if (img.includes('http')) {
                             await sock.sendMessage(jid, { image: fs.readFileSync(img), caption: fancyTransform(htmlDecode(!GamblingDay ? caption : caption)), mentions }).then(handler.addMessage)
@@ -506,7 +506,6 @@ async function startBot() {
 
             const tips = [
                 "*Astuce:*\n\n Consultez régulièrement votre profil avec *!profil* pour suivre votre progression et *!points* pour voir votre score !",
-                "*Astuce:*\n\n les 3 premiers du classement de votre groupe sont automatiquement promus admins.\n Le numéro 1 du classement peut rénitialiser les points de tout les membres à tout moment en envoyant *!resetrank*\n\n Alors donnez tout pour être au sommet !",
                 "*Astuce:*\n\n Le jeu du loup-garou est celui qui donne le plus de points !"
             ]
 
@@ -688,7 +687,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
     })
     handlers.commands.set("!rang", handlers.commands.get("!rank"))
 
-    handlers.commands.set("!resetrank", async (whatsapp) => {
+    handlers.commands.set("!resetpoints", async (whatsapp) => {
         if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
         const participants = await whatsapp.getParticipants(whatsapp.groupJid)
         //console.log(participants)
@@ -732,6 +731,44 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             text: `Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) => ('[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n')
             , mentions: group.map((p) => p.jid)
         }).then(handler.addMessage)
+
+    })
+
+    handlers.commands.set("!resetfrancs", async (whatsapp) => {
+        if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+        const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+        //console.log(participants)
+        // Détection d'admin plus robuste (compare la partie avant @)
+        const senderLocal = whatsapp.senderJid.split('@')[0]
+        const AdminParticipant = participants.find(p => {
+            const pid = (p.phoneNumber || p.jid || p.id || '').toString()
+            if (!pid) return false
+            const pidLocal = pid.split('@')[0]
+            return pidLocal === senderLocal && (p?.admin?.includes('super') /*|| groupRanks[whatsapp.groupJid]?.[0]?.jid === p.jid*/) // allow group creator or top 1 of the ranking to reset the ranking
+        })
+
+        if (!AdminParticipant) {
+            // Pour debug, on affiche quand même; si tu veux restreindre -> décommente return
+            //await whatsapp.reply('Tu n\'es pas admin, j\'affiche quand même le classement (debug).')
+            return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+        }
+
+        const groupId = whatsapp.groupJid
+
+        const allPlayers = getAllUsers()
+        let group = []
+        for (const playerJid in allPlayers) {
+            const player = allPlayers[playerJid];
+            if (player.groups.some(gJID => gJID === groupId)) {
+                if (!player.francs || player.francs < 11)
+                    player.francs = 50
+                delete player.zenny
+                saveUser(player)
+                group.push(player)
+            }
+        }
+
+        await whatsapp.reply(`Tout les joueurs ayant 0 frs ont été réinitialisés avec 50 francs !`)
 
     })
 
