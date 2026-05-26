@@ -98,14 +98,14 @@ export class WereWolvesManager {
 
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
-        if (this.games[this.getPlayerGroupJid(playerJid)].gameType === 2) {
-            const c = SaveUsersfrancs(playerJid, whatsapp, points, reason, "WEREWOLVE", gamescount, this.games[this.getPlayerGroupJid(playerJid)])
+        if (this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)].gameType === 2) {
+            const c = SaveUsersfrancs(playerJid, whatsapp, points, reason, "WEREWOLVE", gamescount, this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)])
             if (c)
-                this.games[this.getPlayerGroupJid(playerJid)] = c
+                this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)] = c
         } else {
-            const c = SaveUsersPoints(playerJid, whatsapp, points, reason, "WEREWOLVE", gamescount, this.games[this.getPlayerGroupJid(playerJid)])
+            const c = SaveUsersPoints(playerJid, whatsapp, points, reason, "WEREWOLVE", gamescount, this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)])
             if (c)
-                this.games[this.getPlayerGroupJid(playerJid)] = c
+                this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)] = c
         }
     }
 
