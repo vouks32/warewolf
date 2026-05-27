@@ -527,14 +527,6 @@ async function startBot() {
     }, timetilNext3hr * 1000)
 
 
-    /*
-    let hr2 = 60 * 60 * 1
-    let timetilNext3hr2 = (hr) - (Math.floor((new Date()).valueOf() / 1000) % (hr))
-    setTimeout(() => {
-        repeatFunction()
-        Interval = setInterval(() => repeatFunction(), hr2 * 1000)
-    }, timetilNext3hr2 * 1000)
-*/
 
 
     //////////////////////////// UTILITIES //////////////////////////////////////////////////
@@ -690,91 +682,6 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
     })
     handlers.commands.set("!rang", handlers.commands.get("!rank"))
 
-    handlers.commands.set("!resetpoints", async (whatsapp) => {
-        if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
-        const participants = await whatsapp.getParticipants(whatsapp.groupJid)
-        //console.log(participants)
-        // Détection d'admin plus robuste (compare la partie avant @)
-        const senderLocal = whatsapp.senderJid.split('@')[0]
-        const AdminParticipant = participants.find(p => {
-            const pid = (p.phoneNumber || p.jid || p.id || '').toString()
-            if (!pid) return false
-            const pidLocal = pid.split('@')[0]
-            return pidLocal === senderLocal && (p?.admin?.includes('super') /*|| groupRanks[whatsapp.groupJid]?.[0]?.jid === p.jid*/) // allow group creator or top 1 of the ranking to reset the ranking
-        })
-
-        if (!AdminParticipant) {
-            // Pour debug, on affiche quand même; si tu veux restreindre -> décommente return
-            //await whatsapp.reply('Tu n\'es pas admin, j\'affiche quand même le classement (debug).')
-            return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
-        }
-
-        const groupId = whatsapp.groupJid
-
-        const allPlayers = getAllUsers()
-        let group = []
-        for (const playerJid in allPlayers) {
-            const player = allPlayers[playerJid];
-            if (player.groups.some(gJID => gJID === groupId)) {
-                player.points = 50
-                player.games.WEREWOLF = 0
-                player.games.WORDGAME = 0
-                player.LastHangGame = Date.now();
-                player.hangGameCreated = 10;
-                player.LastWordGame = Date.now();
-                player.wordGameCreated = 10;
-                saveUser(player)
-                group.push(player)
-            }
-        }
-
-        const metadata = await sock.groupMetadata(groupId);
-
-        await sock.sendMessage(groupId, {
-            text: `Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) => ('[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n')
-            , mentions: group.map((p) => p.jid)
-        }).then(handler.addMessage)
-
-    })
-
-    handlers.commands.set("!resetfrancs", async (whatsapp) => {
-        if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
-        const participants = await whatsapp.getParticipants(whatsapp.groupJid)
-        //console.log(participants)
-        // Détection d'admin plus robuste (compare la partie avant @)
-        const senderLocal = whatsapp.senderJid.split('@')[0]
-        const AdminParticipant = participants.find(p => {
-            const pid = (p.phoneNumber || p.jid || p.id || '').toString()
-            if (!pid) return false
-            const pidLocal = pid.split('@')[0]
-            return pidLocal === senderLocal && (p?.admin?.includes('super') /*|| groupRanks[whatsapp.groupJid]?.[0]?.jid === p.jid*/) // allow group creator or top 1 of the ranking to reset the ranking
-        })
-
-        if (!AdminParticipant) {
-            // Pour debug, on affiche quand même; si tu veux restreindre -> décommente return
-            //await whatsapp.reply('Tu n\'es pas admin, j\'affiche quand même le classement (debug).')
-            return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
-        }
-
-        const groupId = whatsapp.groupJid
-
-        const allPlayers = getAllUsers()
-        let group = []
-        for (const playerJid in allPlayers) {
-            const player = allPlayers[playerJid];
-            if (player.groups.some(gJID => gJID === groupId)) {
-                if (!player.francs || player.francs < 11)
-                    player.francs = 50
-                delete player.zenny
-                saveUser(player)
-                group.push(player)
-            }
-        }
-
-        await whatsapp.reply(`Tout les joueurs ayant 0 frs ont été réinitialisés avec 50 francs !`)
-
-    })
-
     handlers.commands.set("!setranking", async (whatsapp) => {
         if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
         const participants = await whatsapp.getParticipants(whatsapp.groupJid)
@@ -798,6 +705,66 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
     })
 
 
+
+    ////////////////////////////////////////////////////////    RESET ALL PLAYERS IN GROUP    ////////////////////////////////////////////////////////
+    handlers.text.push({
+        regex: /^!resetgroup/,
+        fn: async (whatsapp) => {
+            if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+            const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+            const senderLocal = whatsapp.senderJid.split('@')[0]
+            const AdminParticipant = participants.find(p => {
+                const pid = (p.phoneNumber || p.jid || p.id || '').toString()
+                if (!pid) return false
+                const pidLocal = pid.split('@')[0]
+                return pidLocal === senderLocal && (p?.admin?.includes('super'))
+            })
+
+            if (!AdminParticipant) {
+                return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+            }
+
+            const groupId = whatsapp.groupJid
+
+            const allPlayers = getAllUsers()
+            let group = []
+            for (const playerJid in allPlayers) {
+                const player = {
+                    "jid": allPlayers[playerJid].jid || null,
+                    "lid": allPlayers[playerJid].lid || null,
+                    "groups": allPlayers[playerJid].groups.filter(g => g !== null && g !== undefined && g !== ""),
+                    "dateCreated": allPlayers[playerJid].dateCreated || Date.now(),
+                    "pushName": allPlayers[playerJid].pushName || allPlayers[playerJid].jid.split('@')[0] || "Inconnu",
+                    "games": {
+                        "WORDGAME": 0,
+                        "PENDU": 0,
+                        "WEREWOLVE": 0
+                    },
+                    "points": 50,
+                    "pointsTransactions": [],
+                    "roleHistory": {},
+                    "LastWordGame": Date.now(),
+                    "wordGameCreated": 10,
+                    "LastHangGame": Date.now(),
+                    "hangGameCreated": 10,
+                    "francs": 100,
+                    "lastDeathNight": 1,
+                    "prayers" : 1
+                };
+                saveUser(player)
+                group.push(player)
+
+            }
+
+            const metadata = await sock.groupMetadata(groupId);
+
+            await sock.sendMessage(groupId, {
+                text: `Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) => ('[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n')
+                , mentions: group.map((p) => p.jid)
+            }).then(handler.addMessage)
+        }
+    })
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Stop game (group)
     handlers.text.push({
@@ -1391,7 +1358,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                 deactivate_games = true
                 return
             }
-        }else if(whatsapp.text.toLowerCase() === "jeux activé"){
+        } else if (whatsapp.text.toLowerCase() === "jeux activé") {
             if (!whatsapp.sender.includes('676073559')) {
                 await whatsapp.reply("Seul mon créateur peut activer les jeux")
                 return

@@ -231,6 +231,7 @@ export class WereWolvesManager {
 
         // Ajouter le nouveau rôle au début de l'historique
         user.roleHistory[groupId].unshift(role)
+        let x = []
 
         // Garder seulement les 10 derniers rôles
         if (user.roleHistory[groupId].length > 10) {
@@ -619,7 +620,10 @@ export class WereWolvesManager {
                 }
 
                 if (p.role !== "ALPHAWEREWOLF" && p.role !== "WEREWOLF") {
-                    await whatsapp.sendMessage(p.jid, "Tu peux aussi prier pour la nuit en envoyant *!pray* (une seule fois par partie). Si tu pries, le seigneur à 70% de chance de te protèger des loups qui veulent te dévorer.")
+                    const pUser = getUser(p.jid)
+                    if (pUser && pUser.prayers && pUser.prayers > 0) {
+                        await whatsapp.sendMessage(p.jid, "Tu peux aussi prier pour la nuit en envoyant *!pray* (une seule fois par partie). Si tu pries, le seigneur à 50% de chance de te protèger des loups qui veulent te dévorer.\n\nPrières Disponibles: " + pUser.prayers + " Prières")
+                    }
                 }
             }
         }
@@ -722,7 +726,7 @@ export class WereWolvesManager {
                     whatsapp.sendMessage('237676073559@s.whatsapp.net', `Erreur lors de la résolution des loups pour, la victime est invalide`)
                     continue;
                 }
-                 if (!wolfJidArray) {
+                if (!wolfJidArray) {
                     whatsapp.sendMessage('237676073559@s.whatsapp.net', `Erreur lors de la résolution des loups pour la victime aucun loup n'a été trouvé`)
                     continue;
                 }
@@ -760,7 +764,7 @@ export class WereWolvesManager {
                 } else if (game.witchHeal) {
                     await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été protégée par magie! 🪄\n" + `+${pointsList.witchProtected} points pour la sorcière`)
                     await this.addUserPoints(game.players.find(p => p.role === "WITCH")?.jid, whatsapp, pointsList.witchProtected, "protection magique", 0)
-                } else if (Object.entries(game.prayingPlayersNight).find(arr => arr[0] === victimId && arr[1] === game.nights) && Math.random() <= 0.3) {
+                } else if (Object.entries(game.prayingPlayersNight).find(arr => arr[0] === victimId && arr[1] === game.nights) && Math.random() <= 0.5) {
                     await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été protégée par leur foi indéfectible en le seigneur tout puissant! 🙏👼\n")
                 } else {
                     if (victim.role === "HUNTER") {
@@ -779,9 +783,9 @@ export class WereWolvesManager {
 
                         victim.isDead = true
                         const victimUser = getUser(victim.jid)
-                        if (victimUser && victimUser.lastDeathNight == 1 && game.nights == 1) {
+                        if (victimUser && victimUser.lastDeathNight == 1 && game.nights == 1 && Math.random() < 0.3) {
                             await this.addPrayer(victim.jid, whatsapp)
-                            await whatsapp.sendMessage(victim.jid, `Vous avez reçu une grace de la prière.\nEnvoyer !pray pour vous protéger du loup durant votre prochaine partie du jeu du loups. Ce pouvoir dure 1 nuit, à 70% de chance de vous protéger et vous la conserverait tant que vous ne l'utilisez pas.`)
+                            await whatsapp.sendMessage(victim.jid, `Vous avez reçu une grace de la prière.\n\nEnvoyez *"!pray"* pour vous protéger du loup durant votre prochaine partie du jeu du loups. \n\nCe pouvoir dure 1 nuit, à 50% de chance de vous protéger et vous la conserverait tant que vous ne l'utilisez pas.`)
                         }
 
                         if (victimUser) {
@@ -845,7 +849,7 @@ export class WereWolvesManager {
                 await whatsapp.sendMessage(groupId, "☀️ Le jour se lève... \npersonne n'est mort cette nuit.")
             }
         } catch (error) {
-            await whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur dans resolve night négro \n\n*" + error.name + '*\n\n'+error.message+ '*\n'+error.stack+'\n\nLe dernier Message :')
+            await whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur dans resolve night négro \n\n*" + error.name + '*\n\n' + error.message + '*\n' + error.stack + '\n\nLe dernier Message :')
             console.log(error)
         }
 
@@ -1266,7 +1270,7 @@ export class WereWolvesManager {
         prayingUser.prayers -= 1
         saveUser(prayingUser)
         this.saveGames(this.games)
-        await whatsapp.sendMessage(doctor.jid, `Le seigneur a entendu ta prière! Va en paix.`, [target.jid])
+        await whatsapp.sendMessage(prayingPlayer.jid, `Le seigneur a entendu ta prière! Va en paix.`, [target.jid])
     }
 
     async _hunterRant(groupId, hunter, whatsapp) {
@@ -1792,7 +1796,9 @@ export class WereWolvesManager {
                 `francs : *${user.francs ? user.francs : 0}* frs\n\n` +
                 (!user.LastWordGame ? `` : `Parties Mots restants : *${user.wordGameCreated} parties*\n`) +
                 (!user.LastHangGame ? `` : `Parties Pendu restants : *${user.hangGameCreated} parties*\n`) +
-                `\nParties joués :\n ${Object.entries(user.games).filter(([gameName, number]) => gameName.length > 2 ).map(([gameName, number]) => gameName + ' : *' + number + ' Parties joués*').join('\n')}`, [user.jid])
+                `\nParties joués :\n ${Object.entries(user.games).filter(([gameName, number]) => gameName.length > 2).map(([gameName, number]) => gameName + ' : *' + number + ' Parties joués*').join('\n')}` + 
+                'Prières disponibles :\n' + (user.prayers || 0) + ' Prières'
+                , [user.jid])
         //saveUser({ jid: playerJid, groups: [groupId], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName, points: 100, pointsTransactions: [{ "nouveau joueur": 100 }] })
         else {
             await this.addUserPoints(whatsapp.sender, whatsapp, 50, 'new player', 0)
@@ -1883,7 +1889,7 @@ export class WereWolvesManager {
 
             }
         } else if (game.state === "CHOOSING_GAME_TYPE") {
-            await this.chooseGameVote(groupId, playerJid, parseInt(target)+1, whatsapp)
+            await this.chooseGameVote(groupId, playerJid, parseInt(target) + 1, whatsapp)
         }
 
     }
