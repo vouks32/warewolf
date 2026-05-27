@@ -143,9 +143,9 @@ export function SaveUsersPoints(playerJid, whatsapp, points, reason, gameType, g
             }
     
            if(!game) return null
-            const Player = game.players.find(p => p.jid === playerJid)
+            const Player = game?.players?.find(p => p.jid === playerJid)
             if (Player)
-                Player.points.push({ points, reason })
+                Player.points?.push({ points, reason })
     
             return game
 }
@@ -174,9 +174,9 @@ export function SaveUsersfrancs(playerJid, whatsapp, points, reason, gameType, g
             }
     
             if(!game) return null
-            const Player = game.players.find(p => p.jid === playerJid)
+            const Player = game?.players?.find(p => p.jid === playerJid)
             if (Player)
-                Player.points.push({ points, reason })
+                Player.points?.push({ points, reason })
     
             return game
 }
