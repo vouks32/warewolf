@@ -144,7 +144,7 @@ export class WordGameManager {
             hostjid: whatsapp.senderJid,
             letters,
             state: "CHOOSING_GAME_TYPE",
-            players: {}, // {jid: {words:[], score:0, currentWord: null, currentScore: 0}}
+            players: [], // {jid: {words:[], score:0, currentWord: null, currentScore: 0}}
             timer: null,
             currentRound: 0,
             totalRounds: 5,
@@ -233,24 +233,24 @@ export class WordGameManager {
             return;
         }
 
-        if (game.players[playerJid]) {
+        if (game.players.some(p => p.jid === playerJid)) {
             await whatsapp.reply("❌ Tu as déjà rejoint la partie !");
             return;
         }
 
-        game.players[playerJid] = {
+        game.players.push({
             jid: playerJid,
             words: [],
             score: 0,
             currentWord: null,
             currentScore: 0,
             points: [],
-            name: pseudo || whatsapp.raw?.pushName || `Joueur-${Object.keys(game.players).length + 1}`
-        };
+            name: pseudo || whatsapp.raw?.pushName || `Joueur-${game.players.length + 1}`
+        });
         this.saveGames();
 
-        const names = Object.values(game.players).map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
-        const mentions = Object.values(game.players).map((p, i) => p.jid)
+        const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
+        const mentions = game.players.map((p, i) => p.jid)
 
         await whatsapp.reply(`✅ Tu as rejoint!\n\nListe des joueurs:\n\n${names}`, mentions)
     }
@@ -259,7 +259,7 @@ export class WordGameManager {
         const game = this.games[groupId];
         if (!game || game.state !== "WAITING_PLAYERS") return;
 
-        const playerCount = Object.keys(game.players).length;
+        const playerCount = game.players.length;
         if (playerCount <= 0) {
             await whatsapp.sendMessage(groupId, "❌ Pas assez de joueurs pour commencer la partie !");
             delete this.games[groupId];
@@ -291,13 +291,13 @@ export class WordGameManager {
         await whatsapp.sendMessage(
             groupId,
             `🔄 *Manche ${game.currentRound}/${game.totalRounds}*\n\nVous avez 90 secondes pour proposer un mot !\n\nLettres : \n*${game.letters.join(" ")}*`,
-            Object.keys(game.players)
+            game.players.map(p => p.jid)
         );
 
         // Réinitialiser les mots actuels pour cette manche
-        Object.keys(game.players).forEach(jid => {
-            game.players[jid].currentWord = null;
-            game.players[jid].currentScore = 0;
+        game.players.forEach(player => {
+            player.currentWord = null;
+            player.currentScore = 0;
         });
         this.saveGames();
 
@@ -320,8 +320,7 @@ export class WordGameManager {
         if (!game || game.state !== "PLAYING") return;
 
         // Ajouter les scores de la manche aux scores totaux
-        Object.keys(game.players).forEach(jid => {
-            const player = game.players[jid];
+        game.players.forEach(player => {
             if (player.currentWord) {
                 player.score += player.currentScore;
                 player.words.push(player.currentWord);
@@ -344,7 +343,7 @@ export class WordGameManager {
         if (!game || game.state !== "CHOOSING_GAME_TYPE") return
 
         if (playerJid !== game.hostjid) return await whatsapp.sendMessage(groupId, "❌ Seul celui qui a créé la partie peut choisir le type de jeu.", [playerJid])
-            
+
         if (parseInt(vote) === 1 || parseInt(vote) === 2) {
             game.gameType = parseInt(vote)
         } else {
@@ -364,13 +363,13 @@ export class WordGameManager {
         const groupId = whatsapp.groupJid;
         const word = whatsapp.text.trim().toUpperCase();
         const game = this.games[groupId];
-        const player = game.players[whatsapp.senderJid];
+        const player = game.players.find(p => p.jid === whatsapp.senderJid);
 
 
         if (!game || game.state !== "PLAYING") return;
 
         // Vérifier que le joueur est dans la partie
-        if (!game.players[whatsapp.senderJid]) {
+        if (!player) {
             // await whatsapp.reply("❌ Tu n'es pas dans cette partie !");
             return;
         }
@@ -386,7 +385,7 @@ export class WordGameManager {
         }
 
 
-        if (Object.values(game.players).some(p => p.currentWord === word)) {
+        if (game.players.some(p => p.currentWord === word)) {
             await whatsapp.reply(`❌ @${player.jid.split('@')[0]} Le mot *"${word}"* a déjà été proposé par un autre joueur dans cette manche! remet toi en question!`, [player.jid]);
             return;
         }
@@ -418,12 +417,12 @@ export class WordGameManager {
         game.state = "ENDED";
 
         // Trier les joueurs par score
-        const results = Object.entries(game.players)
-            .map(([jid, data]) => ({
-                jid,
-                name: data.name,
-                score: data.score,
-                words: data.words
+        const results = game.players
+            .map(player => ({
+                jid: player.jid,
+                name: player.name,
+                score: player.score,
+                words: player.words
             }))
             .sort((a, b) => b.score - a.score);
 
@@ -445,7 +444,7 @@ export class WordGameManager {
         const winner = results[0];
         const winner2 = results[1];
         const winner3 = results[2];
-        const pointsToAdd = (Object.values(game.players).length * 2 - Math.round(Object.values(game.players).length / 2)) * 2;
+        const pointsToAdd = (game.players.length * 2 - Math.round(game.players.length / 2)) * 2;
         const pointsToAdd2 = Math.round(pointsToAdd / 2) * 2;
         const pointsToAdd3 = Math.round(pointsToAdd / 3) * 2;
 
