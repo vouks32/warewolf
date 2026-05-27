@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { getUser, saveUser, getAllUsers, SaveUsersfrancs } from "../userStorage.js";
+import { getUser, saveUser, getAllUsers, SaveUsersfrancs, SaveUsersPoints } from "../userStorage.js";
 import { parseWiktionary } from "./guessword-utils/checkword.js";
 
 const DATA_FILE = path.join(process.cwd(), "games/wordgame.json");
