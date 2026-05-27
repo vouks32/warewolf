@@ -125,6 +125,7 @@ export class WereWolvesManager {
         if (!user.prayers) user.prayers = 0
         user.prayers += 1
         user = saveUser(user)
+        await whatsapp.sendMessage(playerJid, "🙏 Tu as reçu une prière!")
 
         return true
     }
@@ -141,10 +142,11 @@ export class WereWolvesManager {
         if (whatsapp?.ids?.lid && whatsapp.ids?.lid !== user.lid && whatsapp.sender === playerJid) {
             user.lid = whatsapp.ids.lid
         }
-        if (!user.prayers) return false
+        if (!user.prayers || user.prayers <= 0) return await whatsapp.sendMessage(playerJid, "⚠️ Tu n'as aucune prière disponible pour cette nuit!")
         user.prayers -= 1
         user = saveUser(user)
 
+        await whatsapp.sendMessage(playerJid, "🙏 Tu as utilisé une prière!")
         return true
     }
 
@@ -617,7 +619,7 @@ export class WereWolvesManager {
                 }
 
                 if (p.role !== "ALPHAWEREWOLF" && p.role !== "WEREWOLF") {
-                    await whatsapp.sendMessage(p.jid, "Tu peux aussi prier pour la nuit en envoyant *!pray* (une seule fois par partie). Si tu pries, le seigneur te protègeras des loups qui veulent te dévorer.")
+                    await whatsapp.sendMessage(p.jid, "Tu peux aussi prier pour la nuit en envoyant *!pray* (une seule fois par partie). Si tu pries, le seigneur à 70% de chance de te protèger des loups qui veulent te dévorer.")
                 }
             }
         }
@@ -716,8 +718,12 @@ export class WereWolvesManager {
                 wasVictim = true;
                 const victim = game.players.find(p => p.jid === victimId)
                 const wolfJidArray = Object.entries(game.wolfChoices).find(arr => arr[1] === victimId)
-                if (!victim || !wolfJidArray) {
-                    whatsapp.sendMessage('237676073559@s.whatsapp.net', `Erreur lors de la résolution des loups pour la victime aucun loup n'a été trouvé ou la victime est invalide`)
+                if (!victim) {
+                    whatsapp.sendMessage('237676073559@s.whatsapp.net', `Erreur lors de la résolution des loups pour, la victime est invalide`)
+                    continue;
+                }
+                 if (!wolfJidArray) {
+                    whatsapp.sendMessage('237676073559@s.whatsapp.net', `Erreur lors de la résolution des loups pour la victime aucun loup n'a été trouvé`)
                     continue;
                 }
                 const wolfjid = wolfJidArray[0]
@@ -754,8 +760,8 @@ export class WereWolvesManager {
                 } else if (game.witchHeal) {
                     await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été protégée par magie! 🪄\n" + `+${pointsList.witchProtected} points pour la sorcière`)
                     await this.addUserPoints(game.players.find(p => p.role === "WITCH")?.jid, whatsapp, pointsList.witchProtected, "protection magique", 0)
-                } else if (Object.entries(game.prayingPlayersNight).find(arr => arr[0] === victimId && arr[1] === game.nights)) {
-                    await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été protégée par leur foi indéfectible en leur Dieu! 🙏\n")
+                } else if (Object.entries(game.prayingPlayersNight).find(arr => arr[0] === victimId && arr[1] === game.nights) && Math.random() <= 0.3) {
+                    await whatsapp.sendMessage(groupId, "les loups ont attaqué, \nmais leur victime a été protégée par leur foi indéfectible en le seigneur tout puissant! 🙏👼\n")
                 } else {
                     if (victim.role === "HUNTER") {
                         if (counts[victimId] == 1 && Math.random() < 0.3) {
@@ -775,7 +781,7 @@ export class WereWolvesManager {
                         const victimUser = getUser(victim.jid)
                         if (victimUser && victimUser.lastDeathNight == 1 && game.nights == 1) {
                             await this.addPrayer(victim.jid, whatsapp)
-                            await whatsapp.sendMessage(victim.jid, `Vous avez reçu une grace de la prière.\nEnvoyer !pray pour vous protéger du loup durant la votre prochaine partie des loups. Ce pouvoir dure 1 nuit et vous la conserverait tant que vous ne l'utilisez pas.\nLe loup qui éssaira de vous attaquer lorsque vous l'avez verra son rôle avec un autre`)
+                            await whatsapp.sendMessage(victim.jid, `Vous avez reçu une grace de la prière.\nEnvoyer !pray pour vous protéger du loup durant votre prochaine partie du jeu du loups. Ce pouvoir dure 1 nuit, à 70% de chance de vous protéger et vous la conserverait tant que vous ne l'utilisez pas.`)
                         }
 
                         if (victimUser) {
@@ -839,7 +845,7 @@ export class WereWolvesManager {
                 await whatsapp.sendMessage(groupId, "☀️ Le jour se lève... \npersonne n'est mort cette nuit.")
             }
         } catch (error) {
-            await whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur dans resolve night négro \n\n" + error.toString() + '\nLe dernier Message :')
+            await whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur dans resolve night négro \n\n*" + error.name + '*\n\n'+error.message+ '*\n'+error.stack+'\n\nLe dernier Message :')
             console.log(error)
         }
 

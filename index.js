@@ -18,6 +18,8 @@ process.env.TZ = 'Africa/Douala';
 
 const MAX_MESSAGES = 1000
 
+let deactivate_games = false
+
 let GamblingDay = (new Date().getDay()) == 5 || (new Date().getDay()) == 6 || (new Date().getDay()) == 0 ? true : false;
 
 let messagesCount = MAX_MESSAGES
@@ -349,54 +351,55 @@ async function startBot() {
 
             try {
 
-                //Check if can talk
-                const werewolfGroupJid = wwm.getPlayerGroupJid(senderJid)
-                if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || isViewOnce || whatsapp.isForward)) {
-                    await wwm.addUserPoints(whatsapp.sender, whatsapp, -15, "send image during game", 0)
-                    await whatsapp.reply(whatsapp.remoteJid, `@${whatsapp.senderJid.split('@')[0]}` + ', vous avez reçu *-15 points* pour avoir envoyé une image/vidéo pendant la partie', [whatsapp.senderJid])
-                    await whatsapp.delete()
-                    process = false
-                    handled = true
-                }
-                if (whatsapp.isGroup && whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
-                    if (whatsapp.senderJid.includes('x650687834') || whatsapp.senderJid.includes('x676073559')) { } else {
-                        const ans = [
-                            `@${whatsapp.sender.split('@')[0]} on est pas dans ton village ici, les morts ne réagissent pas\nVous avez reçu *-5 points*`,
-                            `@${whatsapp.sender.split('@')[0]} Tu es mort et tu envoie les réactions ehh, *-5 points*`,
-                            `@${whatsapp.sender.split('@')[0]} Si tu voulais trop réagir fallait le faire de ton vivant , *-5 points*`,
-                        ]
-                        await whatsapp.sendMessage(whatsapp.remoteJid, ans[Math.floor(Math.random() * ans.length)], [whatsapp.sender])
-                        await wwm.addUserPoints(whatsapp.sender, whatsapp, -5, "réagis étant mort", 0)
+                if (!deactivate_games) {
+                    //Check if can talk
+                    const werewolfGroupJid = wwm.getPlayerGroupJid(senderJid)
+                    if (werewolfGroupJid && (whatsapp.messageType.includes('video') || whatsapp.messageType.includes('image') || isViewOnce || whatsapp.isForward)) {
+                        await wwm.addUserPoints(whatsapp.sender, whatsapp, -15, "send image during game", 0)
+                        await whatsapp.reply(whatsapp.remoteJid, `@${whatsapp.senderJid.split('@')[0]}` + ', vous avez reçu *-15 points* pour avoir envoyé une image/vidéo pendant la partie', [whatsapp.senderJid])
+                        await whatsapp.delete()
                         process = false
                         handled = true
                     }
-                }
-                if (whatsapp.text.toLowerCase().includes('@all') || whatsapp.text.toLowerCase().includes('@tous')) {
-                    if (!whatsapp.senderJid.includes('650687834') && !whatsapp.senderJid.includes('676073559')) {
-                        await whatsapp.reply(whatsapp.remoteJid, `@${whatsapp.senderJid.split('@')[0]}` + ', tu n\'as pas le droit de mentionner tout le monde comme ça !\nC\'est pas la cour du roi pétaud!', [whatsapp.senderJid])
-                        await whatsapp.delete()
-                    }
-                }
-
-
-                // Command match (exact)
-                if (process)
-                    if (handlers.commands.has(text.toLowerCase().trim())) {
-                        await handlers.commands.get(text.toLowerCase().trim())(whatsapp)
-                        console.log("Handled command", text.toLowerCase().trim())
-                        handled = true
-                    }
-
-                // Regex/text match
-                if (process)
-                    for (const { regex, fn } of handlers.text) {
-                        if (regex.test(text.toLowerCase().trim())) {
-                            await fn(whatsapp)
-                            console.log("regex Handled command", text.toLowerCase().trim())
+                    if (whatsapp.isGroup && whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
+                        if (whatsapp.senderJid.includes('x650687834') || whatsapp.senderJid.includes('x676073559')) { } else {
+                            const ans = [
+                                `@${whatsapp.sender.split('@')[0]} on est pas dans ton village ici, les morts ne réagissent pas\nVous avez reçu *-5 points*`,
+                                `@${whatsapp.sender.split('@')[0]} Tu es mort et tu envoie les réactions ehh, *-5 points*`,
+                                `@${whatsapp.sender.split('@')[0]} Si tu voulais trop réagir fallait le faire de ton vivant , *-5 points*`,
+                            ]
+                            await whatsapp.sendMessage(whatsapp.remoteJid, ans[Math.floor(Math.random() * ans.length)], [whatsapp.sender])
+                            await wwm.addUserPoints(whatsapp.sender, whatsapp, -5, "réagis étant mort", 0)
+                            process = false
                             handled = true
                         }
                     }
+                    if (whatsapp.text.toLowerCase().includes('@all') || whatsapp.text.toLowerCase().includes('@tous')) {
+                        if (!whatsapp.senderJid.includes('650687834') && !whatsapp.senderJid.includes('676073559')) {
+                            await whatsapp.reply(whatsapp.remoteJid, `@${whatsapp.senderJid.split('@')[0]}` + ', tu n\'as pas le droit de mentionner tout le monde comme ça !\nC\'est pas la cour du roi pétaud!', [whatsapp.senderJid])
+                            await whatsapp.delete()
+                        }
+                    }
 
+
+                    // Command match (exact)
+                    if (process)
+                        if (handlers.commands.has(text.toLowerCase().trim())) {
+                            await handlers.commands.get(text.toLowerCase().trim())(whatsapp)
+                            console.log("Handled command", text.toLowerCase().trim())
+                            handled = true
+                        }
+
+                    // Regex/text match
+                    if (process)
+                        for (const { regex, fn } of handlers.text) {
+                            if (regex.test(text.toLowerCase().trim())) {
+                                await fn(whatsapp)
+                                console.log("regex Handled command", text.toLowerCase().trim())
+                                handled = true
+                            }
+                        }
+                }
 
                 // Fallback "any" handlers
                 if (!handled) {
@@ -408,7 +411,7 @@ async function startBot() {
 
             } catch (error) {
                 //await whatsapp.reply("Donc... ta commande m'a fait crasher😐\nVas savoir pourquoi... enfin bon, pas de panique, j'ai été programmé pour gérer ça")
-                await whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur négro \n\n" + error.toString() + '\nLe dernier Message :')
+                await whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur négro \n\n*" + error.name + '*\n\n' + error.message + '*\n' + error.stack + '\n\nLe dernier Message :')
                 await whatsapp.sendMessage("237676073559@s.whatsapp.net", "@" + whatsapp.sender.split('@')[0] + " : " + whatsapp.text, [whatsapp.sender])
                 console.log(error)
             }
@@ -1191,6 +1194,18 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         }
     })
 
+    // Wolves eat (private DM only)
+    handlers.text.push({
+        regex: /^!pray/,
+        fn: async (whatsapp) => {
+            if (whatsapp.isGroup) return await whatsapp.reply("Cette action en peut être éffectué que dans l'intimité de notre conversation")
+            const groupJid = wwm.getPlayerGroupJid(whatsapp.senderJid)
+            if (!groupJid) return await whatsapp.reply("Tu n'es dans aucune partie dont j'ai connaissance")
+
+            await wwm.Pray(groupJid, whatsapp)
+        }
+    })
+
     // Wolves transform (private DM only)
     handlers.text.push({
         regex: /^!wolf\s+(\S+)/,
@@ -1366,6 +1381,26 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
     // SHORT HAND NUMBER WHEN IN GAME
     handlers.any.push(async (whatsapp) => {
+
+        if (whatsapp.text.toLowerCase() === "jeux désactivé") {
+            if (!whatsapp.sender.includes('676073559')) {
+                await whatsapp.reply("Seul mon créateur peut désactiver les jeux")
+                return
+            } else {
+                await whatsapp.reply("les jeux sont désactivés, envoie 'jeux activé'")
+                deactivate_games = true
+                return
+            }
+        }else if(whatsapp.text.toLowerCase() === "jeux activé"){
+            if (!whatsapp.sender.includes('676073559')) {
+                await whatsapp.reply("Seul mon créateur peut activer les jeux")
+                return
+            } else {
+                await whatsapp.reply("les jeux sont activés")
+                deactivate_games = false
+                return
+            }
+        }
 
         const quizGroupJid = qm.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
         const quizFRGroupJid = qmfr.getGroupData(whatsapp.groupJid) ? whatsapp.groupJid : null
