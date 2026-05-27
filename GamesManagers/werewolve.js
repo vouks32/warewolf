@@ -1270,7 +1270,7 @@ export class WereWolvesManager {
         prayingUser.prayers -= 1
         saveUser(prayingUser)
         this.saveGames(this.games)
-        await whatsapp.sendMessage(prayingPlayer.jid, `Le seigneur a entendu ta prière! Va en paix.`, [target.jid])
+        await whatsapp.sendMessage(prayingPlayer.jid, `Le seigneur a entendu ta prière! Va en paix.`)
     }
 
     async _hunterRant(groupId, hunter, whatsapp) {
