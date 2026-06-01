@@ -235,12 +235,12 @@ export class WereWolvesManager {
         }
 
         // Ajouter le nouveau rôle au début de l'historique
-        user.roleHistory[groupId].unshift(role)
+        user.roleHistory[groupId].push(role)
         let x = []
 
         // Garder seulement les 10 derniers rôles
         if (user.roleHistory[groupId].length > 10) {
-            user.roleHistory[groupId] = user.roleHistory[groupId].slice(0, 10)
+            user.roleHistory[groupId] = user.roleHistory[groupId].slice(user.roleHistory[groupId].length - 3); // Garder les 4 derniers rôles pour une meilleure rotation
         }
 
         saveUser(user)
@@ -266,6 +266,7 @@ export class WereWolvesManager {
         // Pour chaque joueur, vérifier l'historique des rôles
         players.forEach((player, index) => {
             const recentRoles = this.getRecentRoles(player.jid, groupId)
+            console.log(`Rôles récents pour ${player.jid}:`, recentRoles)
 
             // Si le rôle actuel est dans les 3 derniers rôles, essayer de l'échanger
             if (recentRoles.length >= 2 && recentRoles.slice(0, 2).includes(adjustedRoles[index])) {
@@ -1821,28 +1822,53 @@ export class WereWolvesManager {
             user.LastWordGame = Date.now();
         }
 
-        if (user)
-            await whatsapp.reply(`Profil de @${user.jid.split('@')[0]}\n\n` +
-                `Nom : *${(user.pushName || ' ').trim()}*\n` +
-                `points : *${user.points} points*\n` +
-                `francs : *${user.francs ? user.francs : 0} frs*\n\n` +
-                (!user.LastWerewolveGame ? `` : `Parties Loups restants : *${user.WerewolveGameCreated} parties*\n`) +
-                (!user.LastWordGame ? `` : `Parties Mots restants : *${user.wordGameCreated} parties*\n`) +
-                (!user.LastHangGame ? `` : `Parties Pendu restants : *${user.hangGameCreated} parties*\n`) +
-                `\n*Parties joués* :\n${Object.entries(user.games).filter(([gameName, number]) => gameName.length > 2).map(([gameName, number]) => '- ' + gameName + ' : *' + number + ' Parties joués*').join('\n')}` +
-                '\n\n*Pouvoirs disponibles* :'+
-                '\n- Prières disponibles : *' + (user.prayers || 0) + ' Prières*' +
-                '\n- Clairvoyance disponibles : *' + (user.clairvoyance || 0) + ' Clairvoyances*'+
-                '\n- Incidence disponibles : *' + (user.incidence || 0) + ' Incidences*'+
-                '\n- Âme du Vol disponibles : *' + (user.ameDuVol || 0) + ' Âmes du Vol*'
-                , [user.jid])
-        //saveUser({ jid: playerJid, groups: [groupId], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName, points: 100, pointsTransactions: [{ "nouveau joueur": 100 }] })
-        else {
-            await this.addUserPoints(whatsapp.sender, whatsapp, 50, 'new player', 0)
-            await whatsapp.reply(`Profil de @${whatsapp.sender.split('@')[0]}\n\n` +
-                `Nom : *${(whatsapp.raw?.pushName || ' ').trim()}*\n` +
-                `points : *${50} points*\n\n`, [whatsapp.sender])
+        if (!user) {
+            const player = {
+                "jid": whatsapp.sender || null,
+                "lid": whatsapp.ids.lid || null,
+                "groups": whatsapp.groupId ? [whatsapp.groupId] : [],
+                "dateCreated": Date.now(),
+                "pushName": whatsapp.raw?.pushName || whatsapp.sender.split('@')[0] || "Inconnu",
+                "games": {
+                    "WORDGAME": 0,
+                    "PENDU": 0,
+                    "WEREWOLVE": 0
+                },
+                "points": 50,
+                "pointsTransactions": [],
+                "roleHistory": {},
+                "LastWordGame": Date.now(),
+                "wordGameCreated": 10,
+                "LastHangGame": Date.now(),
+                "hangGameCreated": 10,
+                "LastWerewolveGame": Date.now(),
+                "WerewolveGameCreated": 10,
+                "francs": 250,
+                "clairvoyance": 0,
+                "incidence ": 0,
+                "ameDuVol ": 0,
+                "lastDeathNight": 1,
+                "prayers": 1
+            };
+            saveUser(player)
+            user = getUser(whatsapp.sender)
         }
+
+        await whatsapp.reply(`Profil de @${user.jid.split('@')[0]}\n\n` +
+            `Nom : *${(user.pushName || ' ').trim()}*\n` +
+            `points : *${user.points} points*\n` +
+            `francs : *${user.francs ? user.francs : 0} frs*\n\n` +
+            (!user.LastWerewolveGame ? `` : `Parties Loups restants : *${user.WerewolveGameCreated} parties*\n`) +
+            (!user.LastWordGame ? `` : `Parties Mots restants : *${user.wordGameCreated} parties*\n`) +
+            (!user.LastHangGame ? `` : `Parties Pendu restants : *${user.hangGameCreated} parties*\n`) +
+            `\n*Parties joués* :\n${Object.entries(user.games).filter(([gameName, number]) => gameName.length > 2).map(([gameName, number]) => '- ' + gameName + ' : *' + number + ' Parties joués*').join('\n')}` +
+            '\n\n*Pouvoirs disponibles* :' +
+            '\n- Prières disponibles : *' + (user.prayers || 0) + ' Prières*' +
+            '\n- Clairvoyance disponibles : *' + (user.clairvoyance || 0) + ' Clairvoyances*' +
+            '\n- Incidence disponibles : *' + (user.incidence || 0) + ' Incidences*' +
+            '\n- Âme du Vol disponibles : *' + (user.ameDuVol || 0) + ' Âmes du Vol*'
+            , [user.jid])
+
     }
 
     async sendPlayerPoints(whatsapp) {

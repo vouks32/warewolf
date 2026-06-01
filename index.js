@@ -456,7 +456,6 @@ async function startBot() {
 
             groupRanks[groupJid] = group
 
-            continue;
             for (let index = 0; index < group.length; index++) {
                 const p = group[index];
                 const groupParticipant = participant.find(gp => gp.jid === p.jid || gp.phoneNumber === p.jid)
@@ -491,8 +490,6 @@ async function startBot() {
                 }
             }
         }
-
-        await repeatTips()
         return true
 
     }
@@ -512,16 +509,15 @@ async function startBot() {
             const participant = metadata.participants.map(p => ({ ...p, jid: p.jid || p.phoneNumber }))
             group.sort((p1, p2) => p2.points - p1.points)
 
-            await sock.sendMessage(groupJid, {
-                text: fancyTransform(`Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) => (i == 0 ? '🥇' : i == 1 ? '🥈' : i == 2 ? '🥉' : '[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n'))
-                , mentions: group.map((p) => p.jid)
-            }).then(handler.addMessage)
-
             groupRanks[groupJid] = group
 
             const tips = [
-                "*Astuce:*\n\n Consultez régulièrement votre profil avec *!profil* pour suivre votre progression et *!points* pour voir votre score !",
-                "*Astuce:*\n\n Le jeu du loup-garou est celui qui donne le plus de points !"
+                "*Astuce:*\n\n Consultez régulièrement votre profil avec *!profil* pour suivre votre progression!",
+                "*Astuce:*\n\n En lançant une partie, vous avez 2 options !\n\n1. *jouer pour gagner des points*. Ici vous jouez pour gagner des points et avancer dans le classement. les 3 premiers du classement sont promus admin et obtiennent de nombreux avatages\n2. *jouer pour gagner de l'argent via les mises*. Ici chaque jouer mise une somme lorsqu'il participe et cette somme est repartager aux gagnants à la fin de la partie (en fonction de leur points).\n\nEssayez les 2 modes pour voir celui que vous préférez !",
+                "*Astuce:*\n\n N'hésitez pas à inviter vos amis à rejoindre le groupe et jouer avec vous ! Plus on est de fous, plus on rit !",
+                "*Astuce:*\n\n Vous pouvez acheter des packs pour obtenir des francs et des pouvoir spéciaux!\n\nEnvoyez *!packs* pour voir les packs disponibles et leurs avantages !",
+                "*Astuce:*\n\n Envoyez *!packs* pour voir les packs disponibles et leurs avantages !",
+                "*Astuce:*\n\n Consultez la liste des packs et leurs pouvoir en envoyant *!packs*",
             ]
 
             await sock.sendMessage(groupJid, {
@@ -536,6 +532,20 @@ async function startBot() {
     setTimeout(() => {
         repeatFunction()
         Interval = setInterval(() => repeatFunction(), hr * 1000)
+    }, timetilNext3hr * 1000)
+
+
+    let hr = 60 * 60 * 1
+    let timetilNext3hr = (hr) - (Math.floor((new Date()).valueOf() / 1000) % (hr))
+    setTimeout(() => {
+        if (Math.random() < 0.5) {
+            await repeatTips()
+        }
+        Interval = setInterval(() => {
+            if (Math.random() < 0.5) {
+                await repeatTips()
+            }
+        }, hr * 1000)
     }, timetilNext3hr * 1000)
 
 
@@ -600,7 +610,7 @@ C'est un jeu d'ambiance et de déduction où deux camps s'affrontent :
 *COMMANDES UTILES* :
 • *!werewolve* - Démarrer une partie
 • *!play pseudo* - Rejoindre la partie
-• *!vote numéro* - Voter contre un joueur
+• *!vote numéro* ou juste *numéro* - Voter contre un joueur
 • *!profil* - Voir ton profil et tes points
 
 *CONSEILS AUX DÉBUTANTS* :
@@ -609,40 +619,10 @@ C'est un jeu d'ambiance et de déduction où deux camps s'affrontent :
 3. Les loups mentent, les villageois cherchent des incohérences
 4. Ne révèle pas ton rôle sans raison
 
-*POINTS ET RÉCOMPENSES* :
-Tu gagnes des points en :
-- Gagnant une partie (+10)
-- Devinant un loup (+3)
-- Utilisant bien ton rôle spécial (+2 à +5)
-Et tu en perds si :
-- Tu votes un innocent (-1)
-- Tu parles quand tu es mort (-5)
-
 *VEUX-TU ESSAYER ?* 😈
 Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 `;
         return await whatsapp.reply(rulesMessage, participants.map(p => p.id))
-    })
-
-    handlers.commands.set("!tag", async (whatsapp) => {
-        if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
-        const participants = await whatsapp.getParticipants(whatsapp.groupJid)
-        // console.log(participants)
-        const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin) : (_p.id == whatsapp.ids.jid && _p.admin))
-        if (!AdminParticipant) return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
-
-
-        const allPlayers = getAllUsers()
-        for (const playerJid in allPlayers) {
-            const player = allPlayers[playerJid];
-            if (participants.find(p => p.jid === player.jid)) {
-                saveUser({ ...player, lid: participants.find(p => p.jid === player.jid).lid })
-            }
-        }
-
-        const t = 'Tag Générale :\n\n' + participants.map(p => `- @${p.id.split('@')[0]}`).join('\n')
-        const mentions = participants.map(p => p.id)
-        await whatsapp.reply(t, mentions)
     })
 
     handlers.commands.set("!rank", async (whatsapp) => {
@@ -831,10 +811,71 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             }
         }
     })
+
+    //activate pack (private DM only)
+    handlers.text.push({
+        regex: /^!activatepack/,
+        fn: async (whatsapp) => {
+            if (whatsapp.isGroup) return await whatsapp.reply("Cette action en peut être éffectué que dans l'intimité de notre conversation")
+
+            let phone = whatsapp.sender.split('@')[0]
+            if (phone.startsWith('237')) {
+                phone = phone.substring(3);
+            }
+            const response = await (await fetch('https://vouks-apis.vercel.app/api/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    verify: true,
+                    phone: phone
+                })
+            })).json()
+
+            if (response.success) {
+                const packID = response.data?.payload?.product?.name?.split('-')[2]?.trim() || null
+                console.log('Pack ID from API:', packID)
+
+                if (!packID) return await whatsapp.reply("Aucun pack associé à ce compte. Contacte le support si tu penses que c'est une erreur et ils l'activerons pour toi.\n\nSupport: https://wa.me/237676073559")
+                await AddPackToUser(null, whatsapp.senderJid, parseInt(packID), whatsapp)
+                await whatsapp.reply(`Pack *${packID}* activé avec succès!`, [whatsapp.senderJid])
+
+                const updatedPack = await (await fetch('https://vouks-apis.vercel.app/api/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        claim: true,
+                        phone: phone
+                    })
+                })).json()
+                if (updatedPack.success) {
+                    console.log('Succeeded to claim response:', updatedPack)
+                } else {
+                    console.log('Failed to claim pack:', updatedPack)
+                }
+            } else {
+                await whatsapp.reply("Impossible d'activer le pack. Contacte le support si tu penses que c'est une erreur et ils l'activerons pour toi..\n\nSupport: https://wa.me/237676073559")
+            }
+
+        }
+    })
+
+    
+    handlers.commands.set("!packs", async (whatsapp) => {
+        await whatsapp.reply(`Voici les packs disponibles:\n\n` +
+            `1️⃣ *Pack Chrétien - Recevez toutes les protections contres les loups* :\n- *+500 francs* - Monnaie du jeu \n- *20 prières* - Protection contre les loups uniquement \nhttps://plglnbtn.mychariow.shop/001\n\n` +
+            `2️⃣ *Pack Loup - Protection en tant que loup* :\n- *+750  francs* - Monnaie du jeu \n- *15 Clairvoyances* - peut voir les rôles des joueurs durant 1 tour  \n- *10 incidences* - 50% de faire en sorte qu'un incident ce produit lors de la pendaison, empêchant d'être pendu durant 1 tour (ne peut être utilisé qu'une fois par partie de moins de 10 joueurs et 2 fois pour le reste) \n- *3 âmes du Vole* - échange son rôle (n'importe lequel) avec un autre joueur \nhttps://plglnbtn.mychariow.shop/002\n\n` +
+            `3️⃣ *Pack Tout puissant - Contrôle quasi Totale* :\n- *Admin du groupe pendant 1 semaine* \n- *1000 francs* - Monnaie du jeu  \n- *10 prières* -  Protection contre les loups uniquement \nhttps://plglnbtn.mychariow.shop/003\n\n` + 
+            `clique sur un pack pour en savoir plus`, [whatsapp.senderJid])
+    })
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // Stop game (group)
+    // send text and tag everyone (group)
     handlers.text.push({
         regex: /^!tagtext/,
         fn: async (whatsapp) => {
@@ -914,31 +955,6 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         }
     })
 
-
-    // Send +5 points
-    handlers.text.push({
-        regex: /^!sendpp/,
-        fn: async (whatsapp) => {
-            if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
-            const participants = await whatsapp.getParticipants(whatsapp.groupJid)
-            //console.log(participants)
-            const AdminParticipant = participants.find(_p => _p.id.includes('@lid') ? (_p.id == whatsapp.ids.lid && _p.admin && _p.admin.includes('super')) : (_p.id == whatsapp.ids.jid && _p.admin) && _p.admin.includes('super'))
-            if (!AdminParticipant) {
-                await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
-                return
-            }
-
-            const ids = whatsapp.mentions
-            for (let i = 0; i < ids.length; i++) {
-                const id = ids[i];
-                const ppUrl = await sock.profilePictureUrl(id, 'image')
-                await whatsapp.sendImage(whatsapp.senderJid, ppUrl, `Voici la photo de profil de @${id.split('@')[0]}`, [id])
-            }
-
-        }
-    })
-
-
     // remove -5 points
     handlers.text.push({
         regex: /^!removepoints/,
@@ -990,15 +1006,6 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
     handlers.commands.set("!image", async (whatsapp) => {
         return //await whatsapp.sendImage(whatsapp.remoteJid, './images/creategame.jpg')
-    })
-
-    handlers.commands.set("!startgame", async (whatsapp) => {
-        return await whatsapp.reply('Pour jouer à un jeu, écris:\n\n' +
-            "🐺 *!werewolve* - pour jouer au loup\n" +
-            "😵 *!pendu* - pour jouer au jeu du pendu\n" +
-            "📝 *!quiz* - pour jouer à un quiz (en Anglais)\n" +
-            "\nℹ️ *!info* - Pour tout savoir sur moi"
-        )
     })
 
     handlers.commands.set("!profil", async (whatsapp) => {
@@ -1109,62 +1116,6 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             }
         }
     })
-
-
-
-    /*       PACK      */
-    //activate pack (private DM only)
-    handlers.text.push({
-        regex: /^!activatepack/,
-        fn: async (whatsapp) => {
-            if (whatsapp.isGroup) return await whatsapp.reply("Cette action en peut être éffectué que dans l'intimité de notre conversation")
-
-            let phone = whatsapp.sender.split('@')[0]
-            if (phone.startsWith('237')) {
-                phone = phone.substring(3);
-            }
-            const response = await (await fetch('https://vouks-apis.vercel.app/api/verify', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    verify: true,
-                    phone: phone
-                })
-            })).json()
-
-            if (response.success) {
-                const packID = response.data?.payload?.product?.name?.split('-')[2]?.trim() || null
-                console.log('Pack ID from API:', packID)
-
-                if (!packID) return await whatsapp.reply("Aucun pack associé à ce compte. Contacte le support si tu penses que c'est une erreur et ils l'activerons pour toi.\n\nSupport: https://wa.me/237676073559")
-                await AddPackToUser(null, whatsapp.senderJid, parseInt(packID), whatsapp)
-                await whatsapp.reply(`Pack *${packID}* activé avec succès!`, [whatsapp.senderJid])
-
-                const updatedPack = await (await fetch('https://vouks-apis.vercel.app/api/verify', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        claim: true,
-                        phone: phone
-                    })
-                })).json()
-                if (updatedPack.success) {
-                    console.log('Succeeded to claim response:', updatedPack)
-                } else {
-                    console.log('Failed to claim pack:', updatedPack)
-                }
-            } else {
-                await whatsapp.reply("Impossible d'activer le pack. Contacte le support si tu penses que c'est une erreur et ils l'activerons pour toi..\n\nSupport: https://wa.me/237676073559")
-            }
-
-        }
-    })
-
-
 
     ///////////////////////////////////////////////////////
     /*
