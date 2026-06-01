@@ -96,14 +96,14 @@ export class WordGameManager {
         return letters;
     }
 
-    async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
-        if (this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)].gameType === 2) {
-            const c = SaveUsersfrancs(playerJid, whatsapp, points, reason, "WORDGAME", gamescount, this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)])
-            if (c)
+    async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0, game = null) {
+        if (game?.gameType === 2) {
+            const c = SaveUsersfrancs(playerJid, whatsapp, points, reason, "WORDGAME", gamescount, game)
+            if (c && this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)])
                 this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)] = c
         } else {
-            const c = SaveUsersPoints(playerJid, whatsapp, points, reason, "WORDGAME", gamescount, this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)])
-            if (c)
+            const c = SaveUsersPoints(playerJid, whatsapp, points, reason, "WORDGAME", gamescount, game)
+            if (c && this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)])
                 this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)] = c
         }
     }
@@ -461,9 +461,9 @@ export class WordGameManager {
             [winner.jid]
         );
 
-        await this.addUserPoints(winner.jid, whatsapp, pointsToAdd, "Gagnant du jeu de mots", 0);
-        await this.addUserPoints(winner2.jid, whatsapp, pointsToAdd2, "2eme Gagnant du jeu de mots", 0);
-        await this.addUserPoints(winner3.jid, whatsapp, pointsToAdd3, "3eme Gagnant du jeu de mots", 0);
+        await this.addUserPoints(winner.jid, whatsapp, pointsToAdd, "Gagnant du jeu de mots", 0, game);
+        await this.addUserPoints(winner2.jid, whatsapp, pointsToAdd2, "2eme Gagnant du jeu de mots", 0, game);
+        await this.addUserPoints(winner3.jid, whatsapp, pointsToAdd3, "3eme Gagnant du jeu de mots", 0, game);
 
         await whatsapp.sendMessage(
             groupId,

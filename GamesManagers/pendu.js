@@ -89,14 +89,14 @@ export class PenduManager {
         this.games = loadGames()
     }
 
-    async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
-        if (this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)].gameType === 2) {
-            const c = SaveUsersfrancs(playerJid, whatsapp, points, reason, "PENDU", gamescount, this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)])
-            if (c)
+    async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0, game = null) {
+        if (game?.gameType === 2) {
+            const c = SaveUsersfrancs(playerJid, whatsapp, points, reason, "PENDU", gamescount, game)
+            if (c && this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)])
                 this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)] = c
         } else {
-            const c = SaveUsersPoints(playerJid, whatsapp, points, reason, "PENDU", gamescount, this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)])
-            if (c)
+            const c = SaveUsersPoints(playerJid, whatsapp, points, reason, "PENDU", gamescount, game)
+            if (c && this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)])
                 this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)] = c
         }
     }
@@ -272,7 +272,7 @@ export class PenduManager {
         await whatsapp.sendMessage(groupId, `Scores:\n\n${playerScores.map(p => `@${p.jid.split('@')[0]}:\n✅ *${p.correctCount}* lettres correctes\n❌ *${p.incorrectCount}* lettres incorrectes \n *+${(p.correctCount) - p.incorrectCount} points*`).join('\n\n')}`, playerScores.map(p => p.jid))
         for (let p of playerScores) {
             const points = (p.correctCount) - p.incorrectCount
-            await this.addUserPoints(p.jid, whatsapp, points, "pendu points", 1)
+            await this.addUserPoints(p.jid, whatsapp, points, "pendu points", 1, game)
         }
         await whatsapp.sendMessage(groupId, `envoie *"!pendu"* Pour jouer à nouveau`)
         delete this.games[groupId]
