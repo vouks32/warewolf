@@ -199,7 +199,7 @@ async function startBot() {
 
 
             console.log('---------------------       message -----------------------------------------')
-            console.log(msg)
+            //console.log(msg)
             // Parse the message to get type and JIDs
             const remoteJid = msg.key.remoteJid;
             const isGroup = remoteJid.endsWith('@g.us');
@@ -350,10 +350,10 @@ async function startBot() {
             console.log(
                 {
                     name: msg.pushName || whatsapp.senderJid.split('@')[0],
-                    senderJid: whatsapp.senderJid,
-                    remoteJid: whatsapp.remoteJid,
+                    //senderJid: whatsapp.senderJid,
+                    //remoteJid: whatsapp.remoteJid,
                     text: whatsapp.text,
-                    isGroup: whatsapp.isGroup,
+                    //isGroup: whatsapp.isGroup,
                 }
             )
 
