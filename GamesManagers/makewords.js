@@ -211,7 +211,7 @@ export class WordGameManager {
 
         await whatsapp.sendMessage(
             groupId,
-            `🎮 *Début du jeu de lettres !*\n\nRejoignez la partie avec *!play _pseudo_* dans les prochains 120 secondes !` + (game.gameType == 2 ? "\n\n Une partie de mots coutera " + game.misePerUser + " francs et vous remportez le totale des francs misé" : ""));
+            `🎮 *Début du jeu de lettres !*\n\nRejoignez la partie avec *!play _pseudo_* dans les prochains 120 secondes !` + (game.gameType == 2 ? "\n\n Une partie de mots coutera *" + game.misePerUser + " francs* et vous remportez le totale des francs misé" : ""));
 
         // Timer de 90 secondes pour rejoindre
         this.games[groupId].timer = setTimeout(async () => {

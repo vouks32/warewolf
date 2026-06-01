@@ -242,7 +242,7 @@ export class PenduManager {
 
         }
 
-        await whatsapp.reply("🪢 Nouvelle partie du Pendu" + (game.gameType == 2 ? "\n\n Une partie de pendu coutera " + this.games[groupId].misePerUser + " francs et vous remportez le totale des francs misé" : ""))
+        await whatsapp.reply("🪢 Nouvelle partie du Pendu" + (game.gameType == 2 ? "\n\n Une partie de pendu coutera *" + this.games[groupId].misePerUser + " francs* et vous remportez le totale des francs misé" : ""))
         await this.startGame(groupId, whatsapp)
 
     }
