@@ -27,6 +27,7 @@ let lastGroupJid = null
 
 const handler = makeRetryHandler();
 let Interval = null;
+let tipsInterval = null;
 
 
 
@@ -536,17 +537,17 @@ async function startBot() {
 
 
     let tipshr = 60 * 60 * 1
-    let timetilNext3hr = (tipshr) - (Math.floor((new Date()).valueOf() / 1000) % (tipshr))
+    let tipstimetilNext3hr = (tipshr) - (Math.floor((new Date()).valueOf() / 1000) % (tipshr))
     setTimeout(() => {
-        if (Math.random() < 0.5) {
+        if (Math.random() < 0.7) {
             await repeatTips()
         }
-        Interval = setInterval(() => {
-            if (Math.random() < 0.5) {
+        tipsInterval = setInterval(() => {
+            if (Math.random() < 0.7) {
                 await repeatTips()
             }
         }, tipshr * 1000)
-    }, timetilNext3hr * 1000)
+    }, tipstimetilNext3hr * 1000)
 
 
 
