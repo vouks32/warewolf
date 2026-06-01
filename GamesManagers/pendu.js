@@ -242,7 +242,7 @@ export class PenduManager {
 
         }
 
-        await whatsapp.reply("🪢 Nouvelle partie du Pendu" + (game.gameType == 2 ? "\n\n Une partie de pendu coutera " + this.games[groupId].perUserMise + " francs et vous remportez le totale des francs misé" : ""))
+        await whatsapp.reply("🪢 Nouvelle partie du Pendu" + (game.gameType == 2 ? "\n\n Une partie de pendu coutera " + this.games[groupId].misePerUser + " francs et vous remportez le totale des francs misé" : ""))
         await this.startGame(groupId, whatsapp)
 
     }
@@ -306,7 +306,7 @@ export class PenduManager {
         const player = game.players.find(p => p.jid === voterJid)
 
         if (!player) {
-            const user = getUser(playerJid)
+            const user = getUser(voterJid)
             if (game.gameType === 2 && user.francs < game.misePerUser) {
                 await whatsapp.reply("⚠️ Tu n'as pas assez de francs pour rejoindre une partie avec mise en jeu.");
                 return;
