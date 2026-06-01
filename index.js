@@ -1119,7 +1119,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         fn: async (whatsapp) => {
             if (whatsapp.isGroup) return await whatsapp.reply("Cette action en peut être éffectué que dans l'intimité de notre conversation")
 
-                const phone = whatsapp.sender.split('@')[0]
+                let phone = whatsapp.sender.split('@')[0]
                 if(phone.startsWith('237')) {
                     phone = phone.substring(3);
                 }
