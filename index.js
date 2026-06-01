@@ -787,7 +787,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
     ////////////////////////////////////////////////////////    ACTIVATE PACK FOR A PLAYER   ////////////////////////////////////////////////////////
     handlers.text.push({
-        regex: /^!activatepack/,
+        regex: /^!givepack/,
         fn: async (whatsapp) => {
             if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
             const participants = await whatsapp.getParticipants(whatsapp.groupJid)
