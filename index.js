@@ -4,7 +4,7 @@ import { WereWolvesManager } from "./GamesManagers/werewolve.js"
 import { makeRetryHandler } from "./handler.js";
 import { QuizManager } from "./GamesManagers/quiz.js";
 import { Insult1 } from "./apis/insult.js";
-import { getAllUsers, getUser, saveUser } from "./userStorage.js";
+import { AddPackToUser, getAllUsers, getUser, saveUser } from "./userStorage.js";
 import sharp from "sharp";
 import fs from "fs"
 import NodeCache from "node-cache";
@@ -296,8 +296,20 @@ async function startBot() {
 
                 },
 
-                sendAudio: async (jid, buffer, ptt = false) => {
-                    await sock.sendMessage(jid, { audio: buffer, mimetype: "audio/mp4", ptt }).then(handler.addMessage)
+                makeAdmin: async (groupJid, jid) => {
+                    await sock.groupParticipantsUpdate(
+                        groupJid,
+                        [jid],
+                        'promote' //'remove' or 'demote' or 'promote'
+                    )
+                },
+
+                removeAdmin: async (groupJid, jid) => {
+                    await sock.groupParticipantsUpdate(
+                        groupJid,
+                        [jid],
+                        'demote' //'remove' or 'demote' or 'promote'
+                    )
                 },
 
                 sendVideo: async (jid, buffer, caption = "") => {
@@ -361,7 +373,7 @@ async function startBot() {
                         process = false
                         handled = true
                     }
-                    if (whatsapp.isGroup && whatsapp.isReaction && whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
+                    if (whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
                         if (whatsapp.senderJid.includes('x650687834') || whatsapp.senderJid.includes('x676073559')) { } else {
                             const ans = [
                                 `@${whatsapp.sender.split('@')[0]} on est pas dans ton village ici, les morts ne réagissent pas\nVous avez reçu *-5 points*`,
@@ -747,9 +759,14 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                     "wordGameCreated": 10,
                     "LastHangGame": Date.now(),
                     "hangGameCreated": 10,
-                    "francs": 100,
+                    "LastWerewolveGame": Date.now(),
+                    "WerewolveGameCreated": 10,
+                    "francs": 250,
+                    "clairvoyance": 0,
+                    "incidence ": 0,
+                    "ameDuVol ": 0,
                     "lastDeathNight": 1,
-                    "prayers" : 1
+                    "prayers": 1
                 };
                 saveUser(player)
                 group.push(player)
@@ -765,6 +782,57 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         }
     })
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+    ////////////////////////////////////////////////////////    ACTIVATE PACK FOR A PLAYER   ////////////////////////////////////////////////////////
+    handlers.text.push({
+        regex: /^!activatepack/,
+        fn: async (whatsapp) => {
+            if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+            const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+
+            const senderLocal = whatsapp.senderJid.split('@')[0]
+            const AdminParticipant = participants.find(p => {
+                const pid = (p.phoneNumber || p.jid || p.id || '').toString()
+                if (!pid) return false
+                const pidLocal = pid.split('@')[0]
+                return pidLocal === senderLocal && p.admin.includes('super')
+            })
+
+            if (!AdminParticipant) {
+                // Pour debug, on affiche quand même; si tu veux restreindre -> décommente return
+                //await whatsapp.reply('Tu n\'es pas admin, j\'affiche quand même le classement (debug).')
+                return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+            }
+
+
+            const ids = whatsapp.mentions
+            const packID = parseInt(whatsapp.text.split(' ')[1])
+
+            if (isNaN(packID)) {
+                return await whatsapp.reply('Veuillez spécifier un ID de pack valide.')
+            } else {
+
+                const allPlayers = getAllUsers()
+
+                for (let i = 0; i < ids.length; i++) {
+                    const id = ids[i];
+                    const _jid = id;
+                    if (id.includes('@lid')) {
+                        for (const playerJid in allPlayers) {
+                            const player = allPlayers[playerJid];
+                            if (player.lid === id) _jid = player.jid
+                        }
+                    }
+
+                    await AddPackToUser(whatsapp.groupJid, _jid, packID, whatsapp)
+                }
+            }
+        }
+    })
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     // Stop game (group)
     handlers.text.push({

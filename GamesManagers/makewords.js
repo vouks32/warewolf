@@ -97,18 +97,22 @@ export class WordGameManager {
     }
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
-        if (this.games[whatsapp.groupJid].gameType === 2) {
-            const c = SaveUsersfrancs(playerJid, whatsapp, points, reason, "WORDGAME", gamescount, this.games[whatsapp.groupJid])
+        if (this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)].gameType === 2) {
+            const c = SaveUsersfrancs(playerJid, whatsapp, points, reason, "WORDGAME", gamescount, this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)])
             if (c)
-                this.games[whatsapp.groupJid] = c
+                this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)] = c
         } else {
-            const c = SaveUsersPoints(playerJid, whatsapp, points, reason, "WORDGAME", gamescount, this.games[whatsapp.groupJid])
+            const c = SaveUsersPoints(playerJid, whatsapp, points, reason, "WORDGAME", gamescount, this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)])
             if (c)
-                this.games[whatsapp.groupJid] = c
+                this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)] = c
         }
     }
 
 
+    getPlayerGroupJid(playerJid) {
+        const grouparr = Object.entries(this.games).find(arr => arr[1].players.some(_p => _p.jid === playerJid))
+        return grouparr ? grouparr[0] : null
+    }
     // ---------------- LOGIC ----------------
 
 
@@ -119,24 +123,6 @@ export class WordGameManager {
         }
 
         timers[groupId] = [null, null, null, null, null, null, null]
-
-        let user = getUser(whatsapp.senderJid);
-        if (user) {
-            if (user.LastWordGame && Date.now() - user.LastWordGame < 24 * 60 * 60 * 1000) {
-                if (user.wordGameCreated > 0) {
-                    user.wordGameCreated = (user.wordGameCreated) - 1;
-                } else {
-                    const nextCreationTime = user.LastWordGame + 24 * 60 * 60 * 1000;
-                    const nextCreationDate = new Date(nextCreationTime);
-                    await whatsapp.reply("🧩 Tu as déjà créé trop de parties de mots ! Tu dois attendre jusqu'au " + nextCreationDate.toLocaleString() + " avant d'en créer une autre.");
-                    return;
-                }
-            } else {
-                user.LastWordGame = Date.now();
-                user.wordGameCreated = 9;
-            }
-            saveUser(user);
-        }
 
         const letters = this.generateLetters();
         this.games[groupId] = {
@@ -152,7 +138,7 @@ export class WordGameManager {
         };
         this.saveGames();
 
-        await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points)\n2. Partie avec mise en jeu (francs)\n\n_ps: Une partie normale coute 10 francs_")
+        await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points) (10 parties par chaque 24hrs)\n2. Partie avec mise en jeu (francs)\n\n_ps: Une partie normale coute 10 francs_")
 
         timers[groupId][0] = setTimeout(async () => {
             if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
@@ -181,6 +167,26 @@ export class WordGameManager {
             const hostUser = this.games[groupId].hostjid ? getUser(this.games[groupId].hostjid) : null
             if (hostUser && hostUser.francs >= 10) {
                 await SaveUsersfrancs(this.games[groupId].hostjid, whatsapp, -10, "a lancé une partie de loup avec mise en jeu", "WORDGAME", 0, this.games[groupId])
+                let user = getUser(whatsapp.senderJid);
+                if (user) {
+                    if (user.LastWordGame && Date.now() - user.LastWordGame < 24 * 60 * 60 * 1000) {
+                        if (user.wordGameCreated > 0) {
+                            user.wordGameCreated = (user.wordGameCreated) - 1;
+                        } else {
+                            const nextCreationTime = user.LastWordGame + 24 * 60 * 60 * 1000;
+                            const nextCreationDate = new Date(nextCreationTime);
+                            await whatsapp.reply("🧩 Tu as déjà créé trop de parties de mots ! Tu dois attendre jusqu'au " + nextCreationDate.toLocaleString() + " avant d'en créer une autre.");
+                            delete this.games[groupId]
+                            saveGames(this.games)
+                            return;
+                        }
+                    } else {
+                        user.LastWordGame = Date.now();
+                        user.wordGameCreated = 9;
+                    }
+                    saveUser(user);
+                }
+
             } else if (hostUser && hostUser.francs < 10) {
                 await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de francs pour lancer une partie avec mise en jeu. Partie annulée.\nEnvoyez *!mots* pour réessayer.")
                 delete this.games[groupId]
