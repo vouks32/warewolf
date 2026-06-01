@@ -535,8 +535,8 @@ async function startBot() {
     }, timetilNext3hr * 1000)
 
 
-    let hr = 60 * 60 * 1
-    let timetilNext3hr = (hr) - (Math.floor((new Date()).valueOf() / 1000) % (hr))
+    let tipshr = 60 * 60 * 1
+    let timetilNext3hr = (tipshr) - (Math.floor((new Date()).valueOf() / 1000) % (tipshr))
     setTimeout(() => {
         if (Math.random() < 0.5) {
             await repeatTips()
@@ -545,7 +545,7 @@ async function startBot() {
             if (Math.random() < 0.5) {
                 await repeatTips()
             }
-        }, hr * 1000)
+        }, tipshr * 1000)
     }, timetilNext3hr * 1000)
 
 
