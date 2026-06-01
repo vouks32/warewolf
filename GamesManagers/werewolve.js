@@ -222,7 +222,7 @@ export class WereWolvesManager {
     // Dans la classe WereWolvesManager, ajoutez ces méthodes :
 
     // Méthode pour mettre à jour l'historique des rôles
-    async updateRoleHistory(playerJid, groupId, role, whatsapp) {
+    updateRoleHistory(playerJid, groupId, role, whatsapp) {
         const user = getUser(playerJid)
         if (!user) return
 
@@ -236,7 +236,6 @@ export class WereWolvesManager {
 
         // Ajouter le nouveau rôle au début de l'historique
         user.roleHistory[groupId].push(role)
-        let x = []
 
         // Garder seulement les 10 derniers rôles
         if (user.roleHistory[groupId].length > 10) {
@@ -244,6 +243,7 @@ export class WereWolvesManager {
         }
 
         saveUser(user)
+        return
     }
 
     // Méthode pour obtenir les rôles récents d'un joueur dans un groupe
@@ -337,7 +337,7 @@ export class WereWolvesManager {
 
         this.saveGames(this.games)
 
-        await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points) (10 parties par chaque 24hrs)\n2. Partie avec mise en jeu (francs)\n\n_ps: Une partie normale coute 10 francs_")
+        await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points) (10 parties pour chaque 24hrs)\n2. Partie avec mise en jeu (francs)\n\n_ps: Une partie normale coute 10 francs_")
 
         timers[groupId][0] = setTimeout(async () => {
             if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
@@ -517,7 +517,7 @@ export class WereWolvesManager {
             p.role = roles[i]
 
             // Mettre à jour l'historique des rôles
-            await this.updateRoleHistory(p.jid, groupId, p.role, whatsapp)
+            this.updateRoleHistory(p.jid, groupId, p.role, whatsapp)
 
             // Assigner un faux rôle au MadMan
             if (p.role === "MADMAN") {

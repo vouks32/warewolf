@@ -271,8 +271,8 @@ async function startBot() {
 
                 sendImage: async (jid, img, caption = "", mentions = []) => {
 
-                   // await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(caption)), mentions: mentions }).then(handler.addMessage)
-                   // return
+                    // await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(caption)), mentions: mentions }).then(handler.addMessage)
+                    // return
 
                     try {
                         if (img.includes('http')) {
@@ -382,6 +382,9 @@ async function startBot() {
                                 `@${whatsapp.sender.split('@')[0]} Si tu voulais trop réagir fallait le faire de ton vivant , *-5 points*`,
                             ]
                             await whatsapp.sendMessage(whatsapp.remoteJid, ans[Math.floor(Math.random() * ans.length)], [whatsapp.sender])
+                            try {
+                                await whatsapp.delete();
+                            } catch (e) { }
                             await wwm.addUserPoints(whatsapp.sender, whatsapp, -5, "réagis étant mort", 0)
                             process = false
                             handled = true
@@ -1490,7 +1493,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         /////////////////     HANDLE QUIZ / WEREWOLVES SHORT HAND NUMBER
         const t = whatsapp.text.trim();
         if ((t.length > 2 || Number.isNaN(parseInt(t))) && whatsapp.isGroup) {
-            console.log("WEREWOLF check if can speak", text)
+
             await wwm.checkIfCanSpeak(whatsapp.groupJid, whatsapp.sender, whatsapp)
             return
         }
