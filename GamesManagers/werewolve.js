@@ -1829,7 +1829,8 @@ export class WereWolvesManager {
                 (!user.LastWordGame ? `` : `Parties Mots restants : *${user.wordGameCreated} parties*\n`) +
                 (!user.LastHangGame ? `` : `Parties Pendu restants : *${user.hangGameCreated} parties*\n`) +
                 `\nParties joués :\n ${Object.entries(user.games).filter(([gameName, number]) => gameName.length > 2).map(([gameName, number]) => gameName + ' : *' + number + ' Parties joués*').join('\n')}` +
-                'Prières disponibles :\n' + (user.prayers || 0) + ' Prières'
+                '\n\nPrières disponibles : *' + (user.prayers || 0) + ' Prières*' +
+                '\nClairvoyance disponibles : *' + (user.clairvoyance || 0) + ' Clairvoyances*'
                 , [user.jid])
         //saveUser({ jid: playerJid, groups: [groupId], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName, points: 100, pointsTransactions: [{ "nouveau joueur": 100 }] })
         else {

@@ -1119,10 +1119,10 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         fn: async (whatsapp) => {
             if (whatsapp.isGroup) return await whatsapp.reply("Cette action en peut être éffectué que dans l'intimité de notre conversation")
 
-                let phone = whatsapp.sender.split('@')[0]
-                if(phone.startsWith('237')) {
-                    phone = phone.substring(3);
-                }
+            let phone = whatsapp.sender.split('@')[0]
+            if (phone.startsWith('237')) {
+                phone = phone.substring(3);
+            }
             const response = await (await fetch('https://vouks-apis.vercel.app/api/verify', {
                 method: 'POST',
                 headers: {
@@ -1137,22 +1137,27 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             if (response.success) {
                 const packID = response.data?.payload?.product?.name?.split('-')[2]?.trim() || null
                 console.log('Pack ID from API:', packID)
-                
+
                 if (!packID) return await whatsapp.reply("Aucun pack associé à ce compte. Contacte le support si tu penses que c'est une erreur et ils l'activerons pour toi.\n\nSupport: @237676073559")
                 await AddPackToUser(null, whatsapp.senderJid, parseInt(packID), whatsapp)
                 await whatsapp.reply(`Pack *${packID}* activé avec succès!`, [whatsapp.senderJid])
 
-                await fetch('https://vouks-apis.vercel.app/api/verify', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    claim: true,
-                    phone: phone
-                })
-            })
-            }else{
+                const updatedPack = await (await fetch('https://vouks-apis.vercel.app/api/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        claim: true,
+                        phone: phone
+                    })
+                })).json()
+                if (updatedPack.success) {
+                    console.log('Succeeded to claim response:', updatedPack)
+                } else {
+                    console.log('Failed to claim pack:', updatedPack)
+                }
+            } else {
                 await whatsapp.reply("Impossible d'activer le pack. Contacte le support si tu penses que c'est une erreur.\n\nSupport: @237676073559")
             }
 
