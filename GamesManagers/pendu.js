@@ -150,7 +150,7 @@ export class PenduManager {
             wrongLetters: [],
             rounds: -1,
             mise: 0,
-            misePerUser: 0
+            misePerUser: 25
         }
         saveGames(this.games)
         timers[groupId] = [null, null, null, null, null, null, null]
