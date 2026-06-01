@@ -540,11 +540,11 @@ async function startBot() {
     let tipstimetilNext3hr = (tipshr) - (Math.floor((new Date()).valueOf() / 1000) % (tipshr))
     setTimeout(() => {
         if (Math.random() < 0.7) {
-            await repeatTips()
+            repeatTips()
         }
         tipsInterval = setInterval(() => {
             if (Math.random() < 0.7) {
-                await repeatTips()
+                repeatTips()
             }
         }, tipshr * 1000)
     }, tipstimetilNext3hr * 1000)
