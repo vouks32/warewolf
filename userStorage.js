@@ -58,7 +58,7 @@ export function saveUser(user) {
     const SavedUser = JSON.parse(fs.readFileSync(path.join(USER_FOLDER, user.jid + '.json')))
     fs.writeFileSync(path.join(USER_FOLDER, user.jid + '.json'), JSON.stringify({
         ...SavedUser,
-        ...user,dsq
+        ...user,
     }, null, 2))
     return JSON.parse(fs.readFileSync(path.join(USER_FOLDER, user.jid + '.json')))
 }
