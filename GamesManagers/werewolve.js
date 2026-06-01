@@ -1825,12 +1825,16 @@ export class WereWolvesManager {
             await whatsapp.reply(`Profil de @${user.jid.split('@')[0]}\n\n` +
                 `Nom : *${(user.pushName || ' ').trim()}*\n` +
                 `points : *${user.points} points*\n` +
-                `francs : *${user.francs ? user.francs : 0}* frs\n\n` +
+                `francs : *${user.francs ? user.francs : 0} frs*\n\n` +
+                (!user.LastWerewolveGame ? `` : `Parties Loups restants : *${user.WerewolveGameCreated} parties*\n`) +
                 (!user.LastWordGame ? `` : `Parties Mots restants : *${user.wordGameCreated} parties*\n`) +
                 (!user.LastHangGame ? `` : `Parties Pendu restants : *${user.hangGameCreated} parties*\n`) +
-                `\nParties joués :\n ${Object.entries(user.games).filter(([gameName, number]) => gameName.length > 2).map(([gameName, number]) => gameName + ' : *' + number + ' Parties joués*').join('\n')}` +
-                '\n\nPrières disponibles : *' + (user.prayers || 0) + ' Prières*' +
-                '\nClairvoyance disponibles : *' + (user.clairvoyance || 0) + ' Clairvoyances*'
+                `\n*Parties joués* :\n${Object.entries(user.games).filter(([gameName, number]) => gameName.length > 2).map(([gameName, number]) => '- ' + gameName + ' : *' + number + ' Parties joués*').join('\n')}` +
+                '\n\n*Pouvoirs disponibles* :'+
+                '\n- Prières disponibles : *' + (user.prayers || 0) + ' Prières*' +
+                '\n- Clairvoyance disponibles : *' + (user.clairvoyance || 0) + ' Clairvoyances*'+
+                '\n- Incidence disponibles : *' + (user.incidence || 0) + ' Incidences*'+
+                '\n- Âme du Vol disponibles : *' + (user.ameDuVol || 0) + ' Âmes du Vol*'
                 , [user.jid])
         //saveUser({ jid: playerJid, groups: [groupId], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName, points: 100, pointsTransactions: [{ "nouveau joueur": 100 }] })
         else {
