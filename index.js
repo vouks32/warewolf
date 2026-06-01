@@ -1135,10 +1135,10 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             })).json()
 
             if (response.success) {
-                const packID = response.data?.payload?.product?.name
+                const packID = response.data?.payload?.product?.name?.split('-')[2]?.trim() || null
                 console.log('Pack ID from API:', packID)
-                return await whatsapp.reply(`Pack trouvé: ${packID}. Activation en cours...`, [whatsapp.senderJid])
-                if (!packID) return await whatsapp.reply("Aucun pack associé à ce compte. Contacte le support si tu penses que c'est une erreur.\n\nSupport: @237676073559")
+                
+                if (!packID) return await whatsapp.reply("Aucun pack associé à ce compte. Contacte le support si tu penses que c'est une erreur et ils l'activerons pour toi.\n\nSupport: @237676073559")
                 await AddPackToUser(null, whatsapp.senderJid, parseInt(packID), whatsapp)
                 await whatsapp.reply(`Pack *${packID}* activé avec succès!`, [whatsapp.senderJid])
 
