@@ -505,6 +505,7 @@ async function startBot() {
             });
         }
         for (const groupJid in groups) {
+            if (!groupJid || !groups[groupJid]?.length) continue;
             const group = groups[groupJid];
             const metadata = await sock.groupMetadata(groupJid);
             const participant = metadata.participants.map(p => ({ ...p, jid: p.jid || p.phoneNumber }))
@@ -864,12 +865,12 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         }
     })
 
-    
+
     handlers.commands.set("!packs", async (whatsapp) => {
         await whatsapp.reply(`Voici les packs disponibles:\n\n` +
             `1️⃣ *Pack Chrétien - Recevez toutes les protections contres les loups* :\n- *+500 francs* - Monnaie du jeu \n- *20 prières* - Protection contre les loups uniquement \nhttps://plglnbtn.mychariow.shop/001\n\n` +
             `2️⃣ *Pack Loup - Protection en tant que loup* :\n- *+750  francs* - Monnaie du jeu \n- *15 Clairvoyances* - peut voir les rôles des joueurs durant 1 tour  \n- *10 incidences* - 50% de faire en sorte qu'un incident ce produit lors de la pendaison, empêchant d'être pendu durant 1 tour (ne peut être utilisé qu'une fois par partie de moins de 10 joueurs et 2 fois pour le reste) \n- *3 âmes du Vole* - échange son rôle (n'importe lequel) avec un autre joueur \nhttps://plglnbtn.mychariow.shop/002\n\n` +
-            `3️⃣ *Pack Tout puissant - Contrôle quasi Totale* :\n- *Admin du groupe pendant 1 semaine* \n- *1000 francs* - Monnaie du jeu  \n- *10 prières* -  Protection contre les loups uniquement \nhttps://plglnbtn.mychariow.shop/003\n\n` + 
+            `3️⃣ *Pack Tout puissant - Contrôle quasi Totale* :\n- *Admin du groupe pendant 1 semaine* \n- *1000 francs* - Monnaie du jeu  \n- *10 prières* -  Protection contre les loups uniquement \nhttps://plglnbtn.mychariow.shop/003\n\n` +
             `clique sur un pack pour en savoir plus`, [whatsapp.senderJid])
     })
 
