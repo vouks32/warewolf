@@ -242,8 +242,6 @@ export class WereWolvesManager {
             user.roleHistory[groupId] = user.roleHistory[groupId].slice(user.roleHistory[groupId].length - 3); // Garder les 4 derniers rôles pour une meilleure rotation
         }
 
-        console.log(`Historique des rôles pour ${user.pushName}`, user.roleHistory[groupId])
-
         saveUser(user)
         return
     }
