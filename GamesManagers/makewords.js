@@ -478,7 +478,7 @@ export class WordGameManager {
         } else {
 
             const totalPoints = results[0].score + results[1].score + results[2].score
-            const paidMise = game.mise * (90 / 100)
+            const paidMise = game.mise * (95 / 100)
             await whatsapp.sendMessage(
                 groupId,
                 `🎉 @${winner.jid.split('@')[0]} reçoit *${results[0].score/totalPoints * paidMise} francs* !\n` +

@@ -269,7 +269,7 @@ export class PenduManager {
         })
 
         //const percentageLeft = 100 - (game.wrongLetters.length * 17.5)
-        const paidMise = game.mise * (90 / 100)
+        const paidMise = game.mise * (95 / 100)
         const totalPoints = playerScores.reduce((sum, p) => sum += (p.correctCount - p.incorrectCount), 0)
 
         if (game.gameType === 2) {
