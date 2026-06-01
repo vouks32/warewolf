@@ -1150,6 +1150,8 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                     phone: phone
                 })
             })
+            }else{
+                await whatsapp.reply("Impossible d'activer le pack. Contacte le support si tu penses que c'est une erreur.\n\nSupport: @237676073559")
             }
 
         }
