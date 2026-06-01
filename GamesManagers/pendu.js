@@ -148,7 +148,9 @@ export class PenduManager {
             displayWord: "_".repeat(word.length),
             guessedLetters: [],
             wrongLetters: [],
-            rounds: -1
+            rounds: -1,
+            mise: 0,
+            misePerUser: 0
         }
         saveGames(this.games)
         timers[groupId] = [null, null, null, null, null, null, null]
@@ -237,14 +239,10 @@ export class PenduManager {
                 return
             }
         } else {
-            const allUsers = getAllUsers()
-            const averagefrancsPerUser = Object.values(allUsers).reduce((sum, user) => sum + (user.francs || 0), 0) / allUsers.length
-            console.log(`Average francs per user: ${averagefrancsPerUser}`)
-            if (averagefrancsPerUser / 5 > 10)
-                PlayingFee = Math.floor(Math.ceil(averagefrancsPerUser / 5) / 10) * 10
+
         }
 
-        await whatsapp.reply("🪢 Nouvelle partie du Pendu" + (game.gameType == 2 ? "\n\n Une partie de loup coutera " + PlayingFee + " francs et vous remportez le totale des francs misé" : ""))
+        await whatsapp.reply("🪢 Nouvelle partie du Pendu" + (game.gameType == 2 ? "\n\n Une partie de pendu coutera " + this.games[groupId].perUserMise + " francs et vous remportez le totale des francs misé" : ""))
         await this.startGame(groupId, whatsapp)
 
     }
@@ -269,10 +267,24 @@ export class PenduManager {
 
             return { jid: p.jid, correctCount, incorrectCount }
         })
-        await whatsapp.sendMessage(groupId, `Scores:\n\n${playerScores.map(p => `@${p.jid.split('@')[0]}:\n✅ *${p.correctCount}* lettres correctes\n❌ *${p.incorrectCount}* lettres incorrectes \n *+${(p.correctCount) - p.incorrectCount} points*`).join('\n\n')}`, playerScores.map(p => p.jid))
+
+        const percentageLeft = 100 - (game.wrongLetters.length * 17.5)
+        const paidMise = game.mise * (percentageLeft / 100)
+        const totalPoints = playerScores.reduce((sum, p) => sum += (p.correctCount - p.incorrectCount), 0)
+
+        if (game.gameType === 2) {
+            await whatsapp.sendMessage(groupId, `Scores:\n\n${playerScores.map(p =>
+                `@${p.jid.split('@')[0]}:\n✅ *${p.correctCount}* lettres correctes\n❌ *${p.incorrectCount}* lettres incorrectes \n *+${Math.round((((p.correctCount - p.incorrectCount < 0 ? 0 : p.correctCount - p.incorrectCount) / totalPoints) * paidMise))} francs*`).join('\n\n')}`
+                , playerScores.map(p => p.jid))
+        } else {
+            await whatsapp.sendMessage(groupId, `Scores:\n\n${playerScores.map(p =>
+                `@${p.jid.split('@')[0]}:\n✅ *${p.correctCount}* lettres correctes\n❌ *${p.incorrectCount}* lettres incorrectes \n *+${(p.correctCount) - p.incorrectCount} points*`).join('\n\n')}`
+                , playerScores.map(p => p.jid))
+        }
+
         for (let p of playerScores) {
             const points = (p.correctCount) - p.incorrectCount
-            await this.addUserPoints(p.jid, whatsapp, points, "pendu points", 1, game)
+            await this.addUserPoints(p.jid, whatsapp, game.gameType === 2 ? Math.round((((points < 0 ? 0 : points) / totalPoints) * paidMise)) : points, "pendu points", 1, game)
         }
         await whatsapp.sendMessage(groupId, `envoie *"!pendu"* Pour jouer à nouveau`)
         delete this.games[groupId]
@@ -294,8 +306,15 @@ export class PenduManager {
         const player = game.players.find(p => p.jid === voterJid)
 
         if (!player) {
+            const user = getUser(playerJid)
+            if (game.gameType === 2 && user.francs < game.misePerUser) {
+                await whatsapp.reply("⚠️ Tu n'as pas assez de francs pour rejoindre une partie avec mise en jeu.");
+                return;
+            }
             await whatsapp.sendMessage(groupId, `Youpiii @${voterJid.split('@')[0]} a rejoin la partie`, [voterJid])
             game.players.push({ jid: voterJid, answers: [{ letter, correct: game.word.includes(letter) }], points: [] })
+            game.mise += game.gameType === 2 ? game.misePerUser : 0
+            this.addUserPoints(voterJid, whatsapp, game.gameType === 2 ? -game.misePerUser : 0, "a rejoint une partie de pendu en cours", 0, game)
         } else {
             player.answers.push({ letter, correct: game.word.includes(letter) })
         }
