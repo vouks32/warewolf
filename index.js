@@ -1112,6 +1112,40 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
 
 
+    /*       PACK      */
+    //activate pack (private DM only)
+    handlers.text.push({
+        regex: /^!activatepack\s+(\S+)/,
+        fn: async (whatsapp) => {
+            if (whatsapp.isGroup) return await whatsapp.reply("Cette action en peut être éffectué que dans l'intimité de notre conversation")
+
+                const phone = whatsapp.sender.split('@')[0]
+                if(phone.startsWith('237')) {
+                    phone = phone.substring(3);
+                }
+            const response = await (await fetch('https://vouks-apis.vercel.app/api/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    verify: true,
+                    phone: phone
+                })
+            })).json()
+
+            if (response.success) {
+                const packID = response.data?.payload?.product.name.split('-')[2].trim()
+                if (!packID) return await whatsapp.reply("Aucun pack associé à ce compte. Contacte le support si tu penses que c'est une erreur.\n\nSupport: @237676073559")
+                await AddPackToUser(null, whatsapp.senderJid, parseInt(packID), whatsapp)
+                await whatsapp.reply(`Pack *${packID}* activé avec succès!`, [whatsapp.senderJid])
+            }
+
+        }
+    })
+
+
+
     ///////////////////////////////////////////////////////
     /*
     /*
