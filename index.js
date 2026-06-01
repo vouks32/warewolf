@@ -1139,6 +1139,17 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                 if (!packID) return await whatsapp.reply("Aucun pack associé à ce compte. Contacte le support si tu penses que c'est une erreur.\n\nSupport: @237676073559")
                 await AddPackToUser(null, whatsapp.senderJid, parseInt(packID), whatsapp)
                 await whatsapp.reply(`Pack *${packID}* activé avec succès!`, [whatsapp.senderJid])
+
+                await fetch('https://vouks-apis.vercel.app/api/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    claim: true,
+                    phone: phone
+                })
+            })
             }
 
         }
