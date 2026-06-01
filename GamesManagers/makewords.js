@@ -136,7 +136,7 @@ export class WordGameManager {
             totalRounds: 5,
             roundTimer: null,
             mise: 0,
-            misePerUser: 25,
+            misePerUser: 10,
         };
         this.saveGames();
 
