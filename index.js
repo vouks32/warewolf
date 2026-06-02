@@ -937,13 +937,15 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
 
             const ids = whatsapp.mentions
-            const amount = whatsapp.text.split("!sendfrancs")[1].trim().split(' ')[whatsapp.text.split("!sendfrancs")[1].trim().split(' ').length - 1]
+
+            const uniqueids = [...new Set(ids)];
+            const amount = parseInt(whatsapp.text.split(" ")[1]?.trim())
 
             const allPlayers = getAllUsers()
 
 
-            for (let i = 0; i < ids.length; i++) {
-                const id = ids[i];
+            for (let i = 0; i < uniqueids.length; i++) {
+                const id = uniqueids[i];
                 if (id.includes('@lid')) {
                     for (const playerJid in allPlayers) {
                         const player = allPlayers[playerJid];
@@ -986,13 +988,14 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
 
             const ids = whatsapp.mentions
-            const amount = whatsapp.text.split("!sendpoints")[1].trim().split(' ')[whatsapp.text.split("!sendpoints")[1].trim().split(' ').length - 1]
+            const uniqueids = [...new Set(ids)];
+            const amount = parseInt(whatsapp.text.split(" ")[1]?.trim())
 
             const allPlayers = getAllUsers()
 
 
-            for (let i = 0; i < ids.length; i++) {
-                const id = ids[i];
+            for (let i = 0; i < uniqueids.length; i++) {
+                const id = uniqueids[i];
                 if (id.includes('@lid')) {
                     for (const playerJid in allPlayers) {
                         const player = allPlayers[playerJid];
