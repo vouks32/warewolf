@@ -4,7 +4,7 @@ import { WereWolvesManager } from "./GamesManagers/werewolve.js"
 import { makeRetryHandler } from "./handler.js";
 import { QuizManager } from "./GamesManagers/quiz.js";
 import { Insult1 } from "./apis/insult.js";
-import { AddPackToUser, getAllUsers, getUser, saveUser } from "./userStorage.js";
+import { AddPackToUser, getAllUsers, getUser, saveUser, SaveUsersfrancs, SaveUsersPoints } from "./userStorage.js";
 import sharp from "sharp";
 import fs from "fs"
 import NodeCache from "node-cache";
@@ -911,6 +911,57 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         }
     })
 
+
+
+    // Send +5 points
+    handlers.text.push({
+        regex: /^!sendfrancs/,
+        fn: async (whatsapp) => {
+            if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+            const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+            //console.log(participants)
+            // Détection d'admin plus robuste (compare la partie avant @)
+            const senderLocal = whatsapp.senderJid.split('@')[0]
+            const AdminParticipant = participants.find(p => {
+                const pid = (p.phoneNumber || p.jid || p.id || '').toString()
+                if (!pid) return false
+                const pidLocal = pid.split('@')[0]
+                return pidLocal === senderLocal && p.admin.includes('super')
+            })
+
+            if (!AdminParticipant) {
+                // Pour debug, on affiche quand même; si tu veux restreindre -> décommente return
+                //await whatsapp.reply('Tu n\'es pas admin, j\'affiche quand même le classement (debug).')
+                return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+            }
+
+
+            const ids = whatsapp.mentions
+            const amount = whatsapp.text.split("!sendfrancs")[1].trim().split(' ')[whatsapp.text.split("!sendfrancs")[1].trim().split(' ').length - 1]
+
+            const allPlayers = getAllUsers()
+
+
+            for (let i = 0; i < ids.length; i++) {
+                const id = ids[i];
+                if (id.includes('@lid')) {
+                    for (const playerJid in allPlayers) {
+                        const player = allPlayers[playerJid];
+                        if (player.lid === id) {
+                            SaveUsersfrancs(playerJid, whatsapp, parseInt(amount), "envoyé par super admin", "WEREWOLVE", 0)
+                            await whatsapp.reply(`@${id.split('@')[0]} a reçu *+${amount} francs*`, [id])
+                        }
+                    }
+
+                } else {
+                    SaveUsersfrancs(id, whatsapp, parseInt(amount), "envoyé par super admin", "WEREWOLVE", 0)
+                    await whatsapp.reply(`@${id.split('@')[0]} a reçu *+${amount} francs*`, [id])
+                }
+            }
+
+        }
+    })
+
     // Send +5 points
     handlers.text.push({
         regex: /^!sendpoints/,
@@ -946,13 +997,13 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                     for (const playerJid in allPlayers) {
                         const player = allPlayers[playerJid];
                         if (player.lid === id) {
-                            await wwm.addUserPoints(playerJid, whatsapp, parseInt(amount), "envoyé par super admin", 0)
+                            SaveUsersPoints(playerJid, whatsapp, parseInt(amount), "envoyé par super admin", "WEREWOLVE", 0)
                             await whatsapp.reply(`@${id.split('@')[0]} a reçu *+${amount} points*`, [id])
                         }
                     }
 
                 } else {
-                    await wwm.addUserPoints(id, whatsapp, parseInt(amount), "envoyé par super admin", 0)
+                    SaveUsersPoints(id, whatsapp, parseInt(amount), "envoyé par super admin", "WEREWOLVE", 0)
                     await whatsapp.reply(`@${id.split('@')[0]} a reçu *+${amount} points*`, [id])
                 }
             }
