@@ -271,8 +271,8 @@ async function startBot() {
 
                 sendImage: async (jid, img, caption = "", mentions = []) => {
 
-                    // await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(caption)), mentions: mentions }).then(handler.addMessage)
-                    // return
+                    await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(caption)), mentions: mentions }).then(handler.addMessage)
+                    return
 
                     try {
                         if (img.includes('http')) {
