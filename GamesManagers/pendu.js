@@ -270,11 +270,11 @@ export class PenduManager {
 
         //const percentageLeft = 100 - (game.wrongLetters.length * 17.5)
         const paidMise = game.mise * (95 / 100)
-        const totalPoints = playerScores.reduce((sum, p) => sum += (p.correctCount - p.incorrectCount), 0)
+        const totalPoints = playerScores.reduce((sum, p) => sum += ((p.correctCount - p.incorrectCount) < 0 ? (0) : (p.correctCount - p.incorrectCount)), 0)
 
         if (game.gameType === 2) {
             await whatsapp.sendMessage(groupId, `Scores:\n\n${playerScores.map(p =>
-                `@${p.jid.split('@')[0]}:\n✅ *${p.correctCount}* lettres correctes\n❌ *${p.incorrectCount}* lettres incorrectes \n *+${Math.round((((p.correctCount - p.incorrectCount < 0 ? 0 : p.correctCount - p.incorrectCount) / totalPoints) * paidMise))} francs*`).join('\n\n')}`
+                `@${p.jid.split('@')[0]}:\n✅ *${p.correctCount}* lettres correctes\n❌ *${p.incorrectCount}* lettres incorrectes \n *+${Math.round(((((p.correctCount - p.incorrectCount) < 0 ? (0) : (p.correctCount - p.incorrectCount)) / totalPoints) * paidMise))} francs*`).join('\n\n')}`
                 , playerScores.map(p => p.jid))
         } else {
             await whatsapp.sendMessage(groupId, `Scores:\n\n${playerScores.map(p =>

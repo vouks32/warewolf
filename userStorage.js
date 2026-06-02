@@ -184,26 +184,26 @@ export async function AddPackToUser(groupJid, _jid, packID, whatsapp) {
     switch (packID) {
         case 1:
 
-            user.francs = (user.francs || 0) + 500
+            user.francs = (user.francs || 0) + 600
             user.prayers = (user.prayers || 0) + 20
 
-            await whatsapp.reply(`@${_jid.split('@')[0]} a reçu:\n\n- *+500 francs* - Monnaie du jeu \n- *20 prières* - Protection contre les loups uniquement \nPour l'achat du *Pack Chrétien - Recevez toutes les protections contres les loups* `, [_jid])
+            await whatsapp.reply(`@${_jid.split('@')[0]} a reçu:\n\n- *+600 francs* - Monnaie du jeu \n- *20 prières* - Protection contre les loups uniquement \nPour l'achat du *Pack Chrétien - Recevez toutes les protections contres les loups* `, [_jid])
             break;
         case 2:
 
-            user.francs = (user.francs || 0) + 750
+            user.francs = (user.francs || 0) + 1150
             user.clairvoyance = (user.clairvoyance || 0) + 15
             user.incidence = (user.incidence || 0) + 20
             user.ameDuVol = (user.ameDuVol || 0) + 3
 
-            await whatsapp.reply(`@${_jid.split('@')[0]}  a reçu:\n\n- *+750  francs* - Monnaie du jeu \n- *15 Clairvoyances* - peut voir les rôles des joueurs durant 1 tour  \n- *10 incidences* - 50% de faire en sorte qu'un incident ce produit lors de la pendaison, empêchant d'être pendu durant 1 tour (ne peut être utilisé qu'une fois par partie de moins de 10 joueurs et 2 fois pour le reste) \n- *3 âmes du Vole* - échange son rôle (n'importe lequel) avec un autre joueur \n\nPour l'achat du *Pack Loup - Protection en tant que loup* `, [_jid])
+            await whatsapp.reply(`@${_jid.split('@')[0]}  a reçu:\n\n- *+1150  francs* - Monnaie du jeu \n- *15 Clairvoyances* - peut voir les rôles des joueurs durant 1 tour  \n- *20 incidences* - 50% de faire en sorte qu'un incident ce produit lors de la pendaison, empêchant d'être pendu durant 1 tour (ne peut être utilisé qu'une fois par partie de moins de 10 joueurs et 2 fois pour le reste) \n- *3 âmes du Vole* - échange son rôle (n'importe lequel) avec un autre joueur \n\nPour l'achat du *Pack Loup - Protection en tant que loup* `, [_jid])
             break;
         case 3:
 
-            user.francs = (user.francs || 0) + 500
+            user.francs = (user.francs || 0) + 1500
             user.prayers = (user.prayers || 0) + 20
             await whatsapp.makeAdmin(groupJid, _jid)
-            await whatsapp.reply(`@${_jid.split('@')[0]}  a reçu:\n\n- *Admin du groupe pendant 1 semaine* \n- *1000 francs* - Monnaie du jeu  \n- *10 prières* -  Protection contre les loups uniquement \n\nPour l'achat du *Pack Tout puissant - Contrôle quasi Totale* `, [_jid])
+            await whatsapp.reply(`@${_jid.split('@')[0]}  a reçu:\n\n- *Admin du groupe pendant 1 semaine* \n- *1500 francs* - Monnaie du jeu  \n- *20 prières* -  Protection contre les loups uniquement \n\nPour l'achat du *Pack Tout puissant - Contrôle quasi Totale* `, [_jid])
             break;
     }
 

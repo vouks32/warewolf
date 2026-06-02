@@ -332,7 +332,10 @@ export class WereWolvesManager {
             madManFakeRole: null, // Rôle factice assigné au MadMan
             alphaWerewolfInGame: false, // Si l'Alpha est présent
 
-            prayingPlayersNight: {} // Liste des joueurs qui ont utilisé la prière pour la nuit en cours
+            prayingPlayersNight: {}, // Liste des joueurs qui ont utilisé la prière pour la nuit en cours
+
+            mise: 0, // Montant total misé pour les parties avec mise en jeu
+            misePerUser: 10,
         }
 
         this.saveGames(this.games)
@@ -426,7 +429,7 @@ export class WereWolvesManager {
         }
 
         await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "startgame.jpg"), "🎮 Nouvelle partie de loup garou, *Awoooo!😭*.")
-        await whatsapp.sendMessage(groupId, "🎮 Envoie *!play _pseudo_* pour rejoindre (3 minutes restantes)" + (game.gameType == 2 ? "\n\n Une partie de loup coutera " + PlayingFee + " francs et vous remportez le totale des francs misé" : ""))
+        await whatsapp.sendMessage(groupId, "🎮 Envoie *!play _pseudo_* pour rejoindre (3 minutes restantes)" + (game.gameType == 2 ? "\n\n Une partie de loup coutera *" + game.misePerUser + " francs* et vous remportez le totale des francs misé" : ""))
 
         timers[groupId][0] = setTimeout(async () => {
             await this.startGame(groupId, whatsapp)
@@ -476,6 +479,8 @@ export class WereWolvesManager {
             return
 
         game.players.push({ ids: whatsapp.ids, jid: playerJid, name, isPlaying: true, isDead: false, hasSpokenDeathCount: 0, role: null, points: [], note: "INCONNU", alphaWerewolfHasEaten: false, alphaWerewolfHasConverted: false })
+        game.mise += game.gameType === 2 ? game.misePerUser : 0
+        this.addUserPoints(playerJid, whatsapp, game.gameType === 2 ? -game.misePerUser : 0, "a rejoint une partie de pendu en cours", 0, game)
         this.saveGames(this.games)
 
         const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
