@@ -104,7 +104,7 @@ export class WereWolvesManager {
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
         if (this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)].gameType === 2) {
-            const P = game?.players?.find(p => p.jid === playerJid)
+            const P = this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)]?.players?.find(p => p.jid === playerJid)
             if (P)
                 P.points?.push({ points, reason })
         } else {
