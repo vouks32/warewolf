@@ -172,6 +172,7 @@ export function SaveUsersfrancs(playerJid, whatsapp, points, reason, gameType, g
             user.lid = whatsapp.ids.lid
         }
         user.francs += points
+        user.francs = Math.round(user.francs)
         user.games[gameType] = (user.games[gameType] || 0) + gamescount
         user.pointsTransactions.push(arr)
         user = saveUser(user)
