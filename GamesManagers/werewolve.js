@@ -926,7 +926,7 @@ export class WereWolvesManager {
                 for (const p of game.players) {
                     const playerJid = p.jid
                     if (p.points.reduce((sum, v) => sum + v.points, 0) >= 0)
-                        SaveUsersfrancs(playerJid, whatsapp, (totalpoints > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0), "End werewolf francs", "WEREWOLVE", 0, null)
+                        SaveUsersfrancs(playerJid, whatsapp, (totalpoints > 0 ? Math.round((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0), "End werewolf francs", "WEREWOLVE", 0, null)
                     else
                         SaveUsersfrancs(playerJid, whatsapp, (0), "End werewolf francs", "WEREWOLVE", 0, null)
                 }
@@ -1147,7 +1147,7 @@ export class WereWolvesManager {
                 for (const p of game.players) {
                     const playerJid = p.jid
                         if (p.points.reduce((sum, v) => sum + v.points, 0) >= 0) {
-                            SaveUsersfrancs(playerJid, whatsapp, (totalpoints > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0), "End werewolf francs", "WEREWOLVE", 0, null)
+                            SaveUsersfrancs(playerJid, whatsapp, (totalpoints > 0 ? Math.round((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0), "End werewolf francs", "WEREWOLVE", 0, null)
                         } else {
                             SaveUsersfrancs(playerJid, whatsapp, (0), "End werewolf francs", "WEREWOLVE", 0, null)
                         }
@@ -1210,7 +1210,7 @@ export class WereWolvesManager {
                 for (const p of game.players) {
                     const playerJid = p.jid
                         if (p.points.reduce((sum, v) => sum + v.points, 0) >= 0) {
-                            SaveUsersfrancs(playerJid, whatsapp, (totalpoints > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0), "End werewolf francs", "WEREWOLVE", 0, null)
+                            SaveUsersfrancs(playerJid, whatsapp, (totalpoints > 0 ? Math.round((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0), "End werewolf francs", "WEREWOLVE", 0, null)
                         } else {
                             SaveUsersfrancs(playerJid, whatsapp, (0), "End werewolf francs", "WEREWOLVE", 0, null)
                         }
@@ -1548,7 +1548,7 @@ export class WereWolvesManager {
                     for (const p of game.players) {
                         const playerJid = p.jid
                         if (p.points.reduce((sum, v) => sum + v.points, 0) >= 0) {
-                            SaveUsersfrancs(playerJid, whatsapp, (totalpoints > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0), "End werewolf francs", "WEREWOLVE", 0, null)
+                            SaveUsersfrancs(playerJid, whatsapp, (totalpoints > 0 ? Math.round((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0), "End werewolf francs", "WEREWOLVE", 0, null)
                         } else {
                             SaveUsersfrancs(playerJid, whatsapp, (0), "End werewolf francs", "WEREWOLVE", 0, null)
                         }
