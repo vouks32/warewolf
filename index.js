@@ -766,6 +766,43 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             }).then(handler.addMessage)
         }
     })
+
+     handlers.text.push({
+        regex: /^!resetfrancs/,
+        fn: async (whatsapp) => {
+            if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
+            const participants = await whatsapp.getParticipants(whatsapp.groupJid)
+            const senderLocal = whatsapp.senderJid.split('@')[0]
+            const AdminParticipant = participants.find(p => {
+                const pid = (p.phoneNumber || p.jid || p.id || '').toString()
+                if (!pid) return false
+                const pidLocal = pid.split('@')[0]
+                return pidLocal === senderLocal && (p?.admin?.includes('super'))
+            })
+
+            if (!AdminParticipant) {
+                return await whatsapp.reply('Quand toi tu vois... Tu es Admin?!')
+            }
+
+            const groupId = whatsapp.groupJid
+
+            const allPlayers = getAllUsers()
+            let group = []
+            for (const playerJid in allPlayers) {
+                const player = allPlayers[playerJid];
+                player.francs = 250
+                saveUser(player)
+                group.push(player)
+            }
+
+            /* const metadata = await sock.groupMetadata(groupId);
+
+           await sock.sendMessage(groupId, {
+                text: `Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) => ('[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n')
+                , mentions: group.map((p) => p.jid)
+            }).then(handler.addMessage)*/
+        }
+    })
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
