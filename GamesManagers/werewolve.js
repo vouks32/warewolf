@@ -177,29 +177,25 @@ export class WereWolvesManager {
         // Lovers win
         if (alive.length === 2 && alive[0].lover === alive[1].jid) {
             alive.forEach(async p => {
-                if (game.gameType === 1)
+                
                     await this.addUserPoints(p.jid, { groupJid: game.groupId }, pointsList(game).WinAsLover, "Gagné en tant qu'amoureux", 0)
             });
             return { name: "LOVERS", players: [alive[0], alive[1]] }
         }
         if (wolvesAlive.length === 0) {
             nonWolves.filter(p => p.role !== 'TANNER').forEach(async p => {
-                if (game.gameType === 1)
                     await this.addUserPoints(p.jid, { groupJid: game.groupId }, pointsList(game).WinAsVillager, "Gagné en tant que villageoi", 0)
             });
             wolves.forEach(async p => {
-                if (game.gameType === 1)
                     await this.addUserPoints(p.jid, { groupJid: game.groupId }, -Math.floor(pointsList(game).WinAsWolve / 2), "perdu en tant que loup", 0)
             });
             return { name: "VILLAGERS", players: nonWolves }
         }
         if (wolvesAlive.length >= nonWolvesAlive.length) {
             wolves.forEach(async p => {
-                if (game.gameType === 1)
                     await this.addUserPoints(p.jid, { groupJid: game.groupId }, pointsList(game).WinAsWolve, "Gagné en tant que Loup", 0)
             });
             nonWolves.forEach(async p => {
-                if (game.gameType === 1)
                     await this.addUserPoints(p.jid, { groupJid: game.groupId }, -Math.floor(pointsList(game).WinAsVillager), "Perdu en tant que villageoi", 0)
             });
             return { name: "WOLVES", players: wolves }
@@ -917,7 +913,7 @@ export class WereWolvesManager {
                     ` *${p.name}* (@${p.jid.split('@')[0]}) ` +
                     (!p.isDead ? `😀` : `☠️`) +
                     ' [' + p.role + "]\n- *(" +
-                    (p.points.reduce((sum, v) => sum + v.points, 0) >= 0 ? '+' : '') + p.points.reduce((sum, v) => sum + v.points, 0) + " points)*" + (game.gameType == 2 ? "- (" + (totalpoints > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0) + " francs)" : "")).join("\n\n")
+                    (p.points.reduce((sum, v) => sum + v.points, 0) >= 0 ? '+' : '') + p.points.reduce((sum, v) => sum + v.points, 0) + " points)*" + (game.gameType == 2 ? "- (" + Math.round(totalpoints > 0 && p.points.reduce((sum, v) => sum + v.points, 0) > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0) + " francs)" : "")).join("\n\n")
             const mentions = game.players.map((p, i) => p.jid)
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n" + names, mentions)
             await whatsapp.sendMessage(groupId, `envoie *"!werewolve"* pour rejouer`)
@@ -1201,7 +1197,7 @@ export class WereWolvesManager {
                     ` *${p.name}* (@${p.jid.split('@')[0]}) ` +
                     (!p.isDead ? `😀` : `☠️`) +
                     ' [' + p.role + "]\n- *(" +
-                    (p.points.reduce((sum, v) => sum + v.points, 0) >= 0 ? '+' : '') + p.points.reduce((sum, v) => sum + v.points, 0) + " points)*" + (game.gameType == 2 ? "- (" + (totalpoints > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0) + " francs)" : "")).join("\n\n")
+                    (p.points.reduce((sum, v) => sum + v.points, 0) >= 0 ? '+' : '') + p.points.reduce((sum, v) => sum + v.points, 0) + " points)*" + (game.gameType == 2 ? "- (" + Math.round(totalpoints > 0 && p.points.reduce((sum, v) => sum + v.points, 0) > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0) + " francs)" : "")).join("\n\n")
             const mentions = game.players.map((p, i) => p.jid)
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n" + names, mentions)
             await whatsapp.sendMessage(groupId, `envoie *"!werewolve"* pour rejouer`)
@@ -1539,7 +1535,7 @@ export class WereWolvesManager {
                         ` *${p.name}* (@${p.jid.split('@')[0]}) ` +
                         (!p.isDead ? `😀` : `☠️`) +
                         ' [' + p.role + "]\n- *(" +
-                        (p.points.reduce((sum, v) => sum + v.points, 0) >= 0 ? '+' : '') + p.points.reduce((sum, v) => sum + v.points, 0) + " points)*" + (game.gameType == 2 ? "- (" + (totalpoints > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0) + " francs)" : "")).join("\n\n")
+                        (p.points.reduce((sum, v) => sum + v.points, 0) >= 0 ? '+' : '') + p.points.reduce((sum, v) => sum + v.points, 0) + " points)*" + (game.gameType == 2 ? "- (" + Math.round(totalpoints > 0 && p.points.reduce((sum, v) => sum + v.points, 0) > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0) + " francs)" : "")).join("\n\n")
                 const mentions = game.players.map((p, i) => p.jid)
                 await whatsapp.sendMessage(groupId, "Joueurs :\n\n" + names, mentions)
                 await whatsapp.sendMessage(groupId, `envoie *"!werewolve"* pour rejouer`)
