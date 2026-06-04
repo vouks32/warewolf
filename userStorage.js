@@ -79,13 +79,16 @@ export function saveGroup(group) {
      const thisDate = new Date()    
     const Day = `${thisDate.getDate()}-${thisDate.getMonth() + 1}-${thisDate.getFullYear()}`
 
+    if (!fs.existsSync(GROUP_FOLDER)) fs.mkdirSync(GROUP_FOLDER, { recursive: true })
+    if (!fs.existsSync(path.join(GROUP_FOLDER, group.jid))) fs.mkdirSync(path.join(GROUP_FOLDER, group.jid), { recursive: true })
+
     if (!fs.existsSync(path.join(GROUP_FOLDER, group.jid + '/' + Day + '.json'))) {
         fs.writeFileSync(path.join(GROUP_FOLDER, group.jid + '/' + Day + '.json'), JSON.stringify({
             ...group,
         }, null, 2))
         return group
     }
-    
+
     const SavedGroup = JSON.parse(fs.readFileSync(path.join(GROUP_FOLDER, group.jid + '/' + Day + '.json')))
     fs.writeFileSync(path.join(GROUP_FOLDER, group.jid + '/' + Day + '.json'), JSON.stringify({
         ...SavedGroup,
@@ -98,6 +101,7 @@ export function getGroup(jid) {
     const thisDate = new Date()    
     const Day = `${thisDate.getDate()}-${thisDate.getMonth() + 1}-${thisDate.getFullYear()}`
     if (!fs.existsSync(GROUP_FOLDER)) fs.mkdirSync(GROUP_FOLDER, { recursive: true })
+    if (!fs.existsSync(path.join(GROUP_FOLDER, jid))) fs.mkdirSync(path.join(GROUP_FOLDER, jid), { recursive: true })
     if (!jid) return null
     if (!fs.existsSync(path.join(GROUP_FOLDER, jid + '/' + Day + '.json'))) return null
     try {
