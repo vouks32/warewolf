@@ -103,15 +103,15 @@ export class WereWolvesManager {
 
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
-        /* if (this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)].gameType === 2) {
-             const c = SaveUsersfrancs(playerJid, whatsapp, points, reason, "WEREWOLVE", gamescount, this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)])
-             if (c)
-                 this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)] = c
-         } else {*/
-        const c = SaveUsersPoints(playerJid, whatsapp, points, reason, "WEREWOLVE", gamescount, this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)])
-        if (c)
-            this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)] = c
-        //}
+        if (this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)].gameType === 2) {
+            const P = game?.players?.find(p => p.jid === playerJid)
+            if (P)
+                P.points?.push({ points, reason })
+        } else {
+            const c = SaveUsersPoints(playerJid, whatsapp, points, reason, "WEREWOLVE", gamescount, this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)])
+            if (c)
+                this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)] = c
+        }
     }
 
 
@@ -486,8 +486,8 @@ export class WereWolvesManager {
         game.players.push({ ids: whatsapp.ids, jid: playerJid, name, isPlaying: true, isDead: false, hasSpokenDeathCount: 0, role: null, points: [], note: "INCONNU", alphaWerewolfHasEaten: false, alphaWerewolfHasConverted: false })
 
         if (game.gameType === 2) {
-            game.mise += game.gameType === 2 ? game.misePerUser : 0
-            this.addUserPoints(playerJid, whatsapp, game.gameType === 2 ? -game.misePerUser : 0, "a rejoint une partie de loup garou en cours", 0, game)
+            game.mise += game.misePerUser
+            SaveUsersfrancs(playerJid, whatsapp, -game.misePerUser, "JOIN werewolf francs", "WEREWOLVE", 0, game)
         }
 
         this.saveGames(this.games)
@@ -925,7 +925,7 @@ export class WereWolvesManager {
             if (game.gameType == 2)
                 for (const p of game.players) {
                     const playerJid = p.jid
-                    const c = SaveUsersfrancs(playerJid, whatsapp, (totalpoints > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0), "End werewolf francs", "WEREWOLVE", gamescount, game)
+                    const c = SaveUsersfrancs(playerJid, whatsapp, (totalpoints > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0), "End werewolf francs", "WEREWOLVE", 0, game)
                 }
 
 
@@ -1108,7 +1108,7 @@ export class WereWolvesManager {
             const paidMise = game.mise * (95 / 100)
 
             await whatsapp.sendMessage(groupId, `🏆 Partie terminée! \nLe *TANNEUR* gagne!\nIl reçois:\n- *+${pointsList(game).votedAsTanner} points*\n- *+${paidMise} francs*`)
-            SaveUsersfrancs(playerJid, whatsapp, paidMise, "End werewolf francs TANNER", "WEREWOLVE", gamescount, game)
+            SaveUsersfrancs(playerJid, whatsapp, paidMise, "End werewolf francs TANNER", "WEREWOLVE", 0, game)
 
             const names = game.players.sort((p, q) => (q.role === "TANNER" ? 1 : -1)).map((p, i) => (p.role === "TANNER" ? '🏆' : '💩') + ` *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️`) + ' [' + p.role + "]\n- *(" + (p.points.reduce((sum, v) => sum + v.points, 0) >= 0 ? '+' : '') + p.points.reduce((sum, v) => sum + v.points, 0) + " points)*\n- " + paidMise + " francs").join("\n\n")
             const mentions = game.players.map((p, i) => p.jid)
@@ -1144,7 +1144,7 @@ export class WereWolvesManager {
                 for (const p of game.players) {
                     const playerJid = p.jid
                     if (winners.some(w => w.jid === p.jid)) {
-                        SaveUsersfrancs(playerJid, whatsapp, (totalpoints > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0), "End werewolf francs", "WEREWOLVE", gamescount, game)
+                        SaveUsersfrancs(playerJid, whatsapp, (totalpoints > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0), "End werewolf francs", "WEREWOLVE", 0, game)
                     }
                 }
 
@@ -1454,7 +1454,7 @@ export class WereWolvesManager {
                 if (game.gameType == 2)
                     for (const p of game.players) {
                         const playerJid = p.jid
-                        const c = SaveUsersfrancs(playerJid, whatsapp, (totalpoints > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0), "End werewolf francs", "WEREWOLVE", gamescount, game)
+                        const c = SaveUsersfrancs(playerJid, whatsapp, (totalpoints > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0), "End werewolf francs", "WEREWOLVE", 0, game)
                     }
 
 
