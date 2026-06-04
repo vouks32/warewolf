@@ -131,7 +131,7 @@ export class PenduManager {
             await whatsapp.reply("🔄️ la partie va être réinitialisée !")
         }
 
-        const words = fs.readJSONSync(WORDS_FILE).filter(w => w.label.length > 3)
+        const words = fs.readJSONSync(WORDS_FILE).filter(w => w.label.length > 6)
         const word = words[Math.floor(Math.random() * words.length)].label
 
 
@@ -157,7 +157,7 @@ export class PenduManager {
 
 
 
-        await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points) (10 parties par chaque 24hrs)\n2. Partie avec mise en jeu (francs)\n\n_ps: Une partie normale coute 10 francs_")
+        await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points) (10 parties par chaque 24hrs)\n2. Partie avec mise en jeu (francs)\n\n_ps: Une partie normale coute 5 francs_")
 
         timers[groupId][0] = setTimeout(async () => {
             if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
@@ -206,8 +206,8 @@ export class PenduManager {
 
         if (this.games[groupId].gameType === 1) {
             const hostUser = this.games[groupId].hostjid ? getUser(this.games[groupId].hostjid) : null
-            if (hostUser && hostUser.francs >= 10) {
-                await SaveUsersfrancs(this.games[groupId].hostjid, whatsapp, -10, "a lancé une partie de loup avec points", "PENDU", 0, this.games[groupId])
+            if (hostUser && hostUser.francs >= 5) {
+                await SaveUsersfrancs(this.games[groupId].hostjid, whatsapp, -5, "a lancé une partie de loup avec points", "PENDU", 0, this.games[groupId])
                 let user = getUser(whatsapp.senderJid);
                 if (user) {
                     if ((user.LastHangGame && Date.now() - user.LastHangGame < 24 * 60 * 60 * 1000)) {
@@ -227,7 +227,7 @@ export class PenduManager {
                     }
                     saveUser(user);
                 }
-            } else if (hostUser && hostUser.francs < 10) {
+            } else if (hostUser && hostUser.francs < 5) {
                 await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de francs pour lancer une partie points. Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
                 delete this.games[groupId]
                 saveGames(this.games)
@@ -288,7 +288,7 @@ export class PenduManager {
             const points = (p.correctCount) - p.incorrectCount
              let playerFraction = ((points < 0 ? 0 : points) / totalPoints)
             console.log("POINTS ====== ", points, " TOTAL POINTS ====== ", totalPoints, " PAID MISE ====== ", paidMise)
-            await this.addUserPoints(p.jid, whatsapp, game.gameType === 2 ? (totalpoints <= 0? 0 : Math.round((playerFraction * paidMise))) : points, "pendu points", 1, game)
+            await this.addUserPoints(p.jid, whatsapp, game.gameType === 2 ? (totalPoints <= 0? 0 : Math.round((playerFraction * paidMise))) : points, "pendu points", 1, game)
         }
         await whatsapp.sendMessage(groupId, `envoie *"!pendu"* Pour jouer à nouveau`)
         delete this.games[groupId]

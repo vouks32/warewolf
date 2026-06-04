@@ -44,7 +44,7 @@ export const FRANCS_LIST = {
     doctorProtected: killWithPowers,
     witchProtected: killWithPowers,
     cupidonlinkWolf: killWithPowers,
-    votedAsTanner: 7,
+    votedAsTanner: 10,
 }
 
 export function saveUser(user) {

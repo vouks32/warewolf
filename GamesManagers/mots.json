@@ -1,33 +1,8 @@
 [
     {
-        "type": "dét.",
-        "frequency": 1050561,
-        "label": "le"
-    },
-    {
-        "type": "prép.",
-        "frequency": 862100,
-        "label": "de"
-    },
-    {
-        "type": "dét.",
-        "frequency": 419564,
-        "label": "un"
-    },
-    {
-        "type": "conj.",
-        "frequency": 362093,
-        "label": "et"
-    },
-    {
         "type": "verbe",
         "frequency": 351960,
         "label": "être"
-    },
-    {
-        "type": "pron.",
-        "frequency": 270395,
-        "label": "il"
     },
     {
         "type": "verbe",
@@ -35,79 +10,14 @@
         "label": "avoir"
     },
     {
-        "type": "adv.",
-        "frequency": 186755,
-        "label": "ne"
-    },
-    {
-        "type": "pron.",
-        "frequency": 184186,
-        "label": "je"
-    },
-    {
-        "type": "dét.",
-        "frequency": 181161,
-        "label": "son"
-    },
-    {
-        "type": "conj.",
-        "frequency": 176161,
-        "label": "que"
-    },
-    {
-        "type": "pron.",
-        "frequency": 168684,
-        "label": "se"
-    },
-    {
-        "type": "pron.",
-        "frequency": 148392,
-        "label": "qui"
-    },
-    {
-        "type": "prép.",
-        "frequency": 143565,
-        "label": "en"
-    },
-    {
-        "type": "dét.",
-        "frequency": 141389,
-        "label": "ce"
-    },
-    {
         "type": "prép.",
         "frequency": 139185,
         "label": "dans"
     },
     {
-        "type": "dét.",
-        "frequency": 127384,
-        "label": "du"
-    },
-    {
         "type": "pron.",
         "frequency": 126397,
         "label": "elle"
-    },
-    {
-        "type": "dét.",
-        "frequency": 123502,
-        "label": "au"
-    },
-    {
-        "type": "dét.",
-        "frequency": 119106,
-        "label": "de"
-    },
-    {
-        "type": "pron.",
-        "frequency": 107074,
-        "label": "ce"
-    },
-    {
-        "type": "pron.",
-        "frequency": 105873,
-        "label": "le"
     },
     {
         "type": "prép.",
@@ -7303,5 +7213,105 @@
         "type": "verbe",
         "frequency": 602,
         "label": "dégager"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1425,
+        "label": "comprendre"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1420,
+        "label": "ordinateur"
+    },
+    {
+        "type": "adj.",
+        "frequency": 1412,
+        "label": "rapide"
+    },
+    {
+        "type": "adv.",
+        "frequency": 1395,
+        "label": "rapidement"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1380,
+        "label": "partager"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1354,
+        "label": "solution"
+    },
+    {
+        "type": "adj.",
+        "frequency": 1320,
+        "label": "efficace"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1290,
+        "label": "projet"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1265,
+        "label": "créer"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1210,
+        "label": "technologie"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1450,
+        "label": "environnement"
+    },
+    {
+        "type": "adj.",
+        "frequency": 1410,
+        "label": "incroyable"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1390,
+        "label": "développer"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1375,
+        "label": "expérience"
+    },
+    {
+        "type": "adv.",
+        "frequency": 1340,
+        "label": "absolument"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1315,
+        "label": "connaissance"
+    },
+    {
+        "type": "adj.",
+        "frequency": 1285,
+        "label": "magnifique"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1260,
+        "label": "organiser"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1230,
+        "label": "différence"
+    },
+    {
+        "type": "adj.",
+        "frequency": 1195,
+        "label": "essentiel"
     }
 ]

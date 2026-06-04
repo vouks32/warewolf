@@ -140,7 +140,7 @@ export class WordGameManager {
         };
         this.saveGames();
 
-        await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points) (10 parties par chaque 24hrs)\n2. Partie avec mise en jeu (francs)\n\n_ps: Une partie normale coute 10 francs_")
+        await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points) (10 parties par chaque 24hrs)\n2. Partie avec mise en jeu (francs)\n\n_ps: Une partie normale coute 5 francs_")
 
         timers[groupId][0] = setTimeout(async () => {
             if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
@@ -167,8 +167,8 @@ export class WordGameManager {
 
         if (this.games[groupId].gameType === 1) {
             const hostUser = this.games[groupId].hostjid ? getUser(this.games[groupId].hostjid) : null
-            if (hostUser && hostUser.francs >= 10) {
-                await SaveUsersfrancs(this.games[groupId].hostjid, whatsapp, -10, "a lancé une partie de loup avec mise en jeu", "WORDGAME", 0, this.games[groupId])
+            if (hostUser && hostUser.francs >= 5) {
+                await SaveUsersfrancs(this.games[groupId].hostjid, whatsapp, -5, "a lancé une partie de loup avec mise en jeu", "WORDGAME", 0, this.games[groupId])
                 let user = getUser(whatsapp.senderJid);
                 if (user) {
                     if (user.LastWordGame && Date.now() - user.LastWordGame < 24 * 60 * 60 * 1000) {
@@ -189,7 +189,7 @@ export class WordGameManager {
                     saveUser(user);
                 }
 
-            } else if (hostUser && hostUser.francs < 10) {
+            } else if (hostUser && hostUser.francs < 5) {
                 await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de francs pour lancer une partie avec mise en jeu. Partie annulée.\nEnvoyez *!mots* pour réessayer.")
                 delete this.games[groupId]
                 saveGames(this.games)
