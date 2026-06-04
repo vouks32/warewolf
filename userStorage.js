@@ -75,27 +75,33 @@ export function getUser(jid) {
 }
 
 export function saveGroup(group) {
-    if (!fs.existsSync(path.join(GROUP_FOLDER, group.jid + '.json'))) {
-        fs.writeFileSync(path.join(GROUP_FOLDER, group.jid + '.json'), JSON.stringify({
+
+     const thisDate = new Date()    
+    const Day = `${thisDate.getDate()}-${thisDate.getMonth() + 1}-${thisDate.getFullYear()}`
+
+    if (!fs.existsSync(path.join(GROUP_FOLDER, group.jid + '/' + Day + '.json'))) {
+        fs.writeFileSync(path.join(GROUP_FOLDER, group.jid + '/' + Day + '.json'), JSON.stringify({
             ...group,
         }, null, 2))
         return group
     }
-
-    const SavedGroup = JSON.parse(fs.readFileSync(path.join(GROUP_FOLDER, group.jid + '.json')))
-    fs.writeFileSync(path.join(GROUP_FOLDER, group.jid + '.json'), JSON.stringify({
+    
+    const SavedGroup = JSON.parse(fs.readFileSync(path.join(GROUP_FOLDER, group.jid + '/' + Day + '.json')))
+    fs.writeFileSync(path.join(GROUP_FOLDER, group.jid + '/' + Day + '.json'), JSON.stringify({
         ...SavedGroup,
         ...group
     }, null, 2))
-    return JSON.parse(fs.readFileSync(path.join(GROUP_FOLDER, group.jid + '.json')))
+    return JSON.parse(fs.readFileSync(path.join(GROUP_FOLDER, group.jid + '/' + Day + '.json')))
 }
 
 export function getGroup(jid) {
+    const thisDate = new Date()    
+    const Day = `${thisDate.getDate()}-${thisDate.getMonth() + 1}-${thisDate.getFullYear()}`
     if (!fs.existsSync(GROUP_FOLDER)) fs.mkdirSync(GROUP_FOLDER, { recursive: true })
     if (!jid) return null
-    if (!fs.existsSync(path.join(GROUP_FOLDER, jid + '.json'))) return null
+    if (!fs.existsSync(path.join(GROUP_FOLDER, jid + '/' + Day + '.json'))) return null
     try {
-        return JSON.parse(fs.readFileSync(path.join(GROUP_FOLDER, jid + '.json')))
+        return JSON.parse(fs.readFileSync(path.join(GROUP_FOLDER, jid + '/' + Day + '.json')))
     } catch (error) {
         return null
     }
