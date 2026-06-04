@@ -795,6 +795,11 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                 group.push(player)
             }
 
+             await sock.sendMessage(groupId, {
+                text: `Francs remis à 250 francs`
+                , mentions: group.map((p) => p.jid)
+            }).then(handler.addMessage)
+
             /* const metadata = await sock.groupMetadata(groupId);
 
            await sock.sendMessage(groupId, {
