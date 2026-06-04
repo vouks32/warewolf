@@ -284,6 +284,7 @@ export class PenduManager {
 
         for (let p of playerScores) {
             const points = (p.correctCount) - p.incorrectCount
+            console.log("POINTS ====== ", points, " TOTAL POINTS ====== ", totalPoints, " PAID MISE ====== ", paidMise)
             await this.addUserPoints(p.jid, whatsapp, game.gameType === 2 ? Math.round((((points < 0 ? 0 : points) / totalPoints) * paidMise)) : points, "pendu points", 1, game)
         }
         await whatsapp.sendMessage(groupId, `envoie *"!pendu"* Pour jouer à nouveau`)

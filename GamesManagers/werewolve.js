@@ -103,15 +103,15 @@ export class WereWolvesManager {
 
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0) {
-        if (this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)].gameType === 2) {
+       /* if (this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)].gameType === 2) {
             const c = SaveUsersfrancs(playerJid, whatsapp, points, reason, "WEREWOLVE", gamescount, this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)])
             if (c)
                 this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)] = c
-        } else {
+        } else {*/
             const c = SaveUsersPoints(playerJid, whatsapp, points, reason, "WEREWOLVE", gamescount, this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)])
             if (c)
                 this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)] = c
-        }
+        //}
     }
 
 
@@ -479,8 +479,12 @@ export class WereWolvesManager {
             return
 
         game.players.push({ ids: whatsapp.ids, jid: playerJid, name, isPlaying: true, isDead: false, hasSpokenDeathCount: 0, role: null, points: [], note: "INCONNU", alphaWerewolfHasEaten: false, alphaWerewolfHasConverted: false })
-        game.mise += game.gameType === 2 ? game.misePerUser : 0
-        this.addUserPoints(playerJid, whatsapp, game.gameType === 2 ? -game.misePerUser : 0, "a rejoint une partie de pendu en cours", 0, game)
+
+        if (game.gameType === 2) {
+            game.mise += game.gameType === 2 ? game.misePerUser : 0
+            this.addUserPoints(playerJid, whatsapp, game.gameType === 2 ? -game.misePerUser : 0, "a rejoint une partie de loup garou en cours", 0, game)
+        }
+
         this.saveGames(this.games)
 
         const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
@@ -1376,6 +1380,8 @@ export class WereWolvesManager {
             }
             this.saveGames(this.games)
 
+        ///////////////// MAKE A UNIVERSAL FUNCTION FOR THIS SHIT BC IT'S USED MULTIPLE TIMES IN THE CODE /////////////////
+        ///////////////// FOR game.gameType == 2, use points to share mise
             const { name: result, players: winners } = this.checkWin(game)
             if (result) {
                 const winpoints = result === "LOVERS" ? pointsList(game).WinAsLover : result === "WOLVES" ? pointsList(game).WinAsWolve : pointsList(game).WinAsVillager

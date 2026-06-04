@@ -392,7 +392,7 @@ async function startBot() {
                     }
                     if (whatsapp.text.toLowerCase().includes('@all') || whatsapp.text.toLowerCase().includes('@tous')) {
                         if (!whatsapp.senderJid.includes('650687834') && !whatsapp.senderJid.includes('676073559')) {
-                            await whatsapp.reply(whatsapp.remoteJid, `@${whatsapp.senderJid.split('@')[0]}` + ', tu n\'as pas le droit de mentionner tout le monde comme ça !\nC\'est pas la cour du roi pétaud!', [whatsapp.senderJid])
+                            await whatsapp.reply(`@${whatsapp.senderJid.split('@')[0]}` + ', tu n\'as pas le droit de mentionner tout le monde comme ça !\nC\'est pas la cour du roi pétaud!', [whatsapp.senderJid])
                             await whatsapp.delete()
                         }
                     }
