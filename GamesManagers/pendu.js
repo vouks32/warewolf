@@ -2,7 +2,7 @@
 import fs from "fs-extra"
 import path from "path"
 import RoleManager from "./werewolve-utils/roleManager.js"
-import { getAllUsers, getUser, saveUser, SaveUsersPoints, SaveUsersfrancs } from "../userStorage.js";
+import { getAllUsers, getUser, saveUser, SaveUsersPoints, SaveUsersfrancs, saveGroup, getGroup } from "../userStorage.js";
 import { time } from "console";
 
 
@@ -273,23 +273,46 @@ export class PenduManager {
         const totalPoints = playerScores.reduce((sum, p) => sum += ((p.correctCount - p.incorrectCount) < 0 ? (0) : (p.correctCount - p.incorrectCount)), 0)
 
         if (game.gameType === 2) {
-            await whatsapp.sendMessage(groupId, `Scores:\n\n${playerScores.map(p => {
+            await whatsapp.sendMessage(groupId, `Scores:\n\n${playerScores.sort((a, b) => (b.correctCount - b.incorrectCount) - (a.correctCount - a.incorrectCount)).map(p => {
                 let playerFraction = (((p.correctCount - p.incorrectCount) < 0 ? (0) : (p.correctCount - p.incorrectCount)) / totalPoints)
                 return `@${p.jid.split('@')[0]}:\n✅ *${p.correctCount}* lettres correctes\n❌ *${p.incorrectCount}* lettres incorrectes \n *+${Math.round((playerFraction * paidMise))} francs*`
             }).join('\n\n')}`
                 , playerScores.map(p => p.jid))
         } else {
-            await whatsapp.sendMessage(groupId, `Scores:\n\n${playerScores.map(p =>
+            await whatsapp.sendMessage(groupId, `Scores:\n\n${playerScores.sort((a, b) => (b.correctCount - b.incorrectCount) - (a.correctCount - a.incorrectCount)).map(p =>
                 `@${p.jid.split('@')[0]}:\n✅ *${p.correctCount}* lettres correctes\n❌ *${p.incorrectCount}* lettres incorrectes \n *+${(p.correctCount) - p.incorrectCount} points*`).join('\n\n')}`
                 , playerScores.map(p => p.jid))
         }
 
         for (let p of playerScores) {
             const points = (p.correctCount) - p.incorrectCount
-             let playerFraction = ((points < 0 ? 0 : points) / totalPoints)
+            let playerFraction = ((points < 0 ? 0 : points) / totalPoints)
             console.log("POINTS ====== ", points, " TOTAL POINTS ====== ", totalPoints, " PAID MISE ====== ", paidMise)
-            await this.addUserPoints(p.jid, whatsapp, game.gameType === 2 ? (totalPoints <= 0? 0 : Math.round((playerFraction * paidMise))) : points, "pendu points", 1, game)
+            await this.addUserPoints(p.jid, whatsapp, game.gameType === 2 ? (totalPoints <= 0 ? 0 : Math.round((playerFraction * paidMise))) : points, "pendu points", 1, game)
         }
+
+        // Save game result to group data
+        const groupData = getGroup(groupId)
+        if (!groupData) {
+            saveGroup({
+                jid: groupId,
+                games: [
+                    {
+                        gameType: "PENDU",
+                        game: game,
+                        time: Date.now()
+                    }
+                ]
+            })
+        } else {
+            groupData.games.push({
+                gameType: "PENDU",
+                game: game,
+                time: Date.now()
+            })
+            saveGroup(groupData)
+        }
+
         await whatsapp.sendMessage(groupId, `envoie *"!pendu"* Pour jouer à nouveau`)
         delete this.games[groupId]
 

@@ -78,7 +78,6 @@ export function saveGroup(group) {
     if (!fs.existsSync(path.join(GROUP_FOLDER, group.jid + '.json'))) {
         fs.writeFileSync(path.join(GROUP_FOLDER, group.jid + '.json'), JSON.stringify({
             ...group,
-            roleHistory: {} // Nouveau champ pour l'historique des rôles par groupe
         }, null, 2))
         return group
     }
@@ -86,9 +85,7 @@ export function saveGroup(group) {
     const SavedGroup = JSON.parse(fs.readFileSync(path.join(GROUP_FOLDER, group.jid + '.json')))
     fs.writeFileSync(path.join(GROUP_FOLDER, group.jid + '.json'), JSON.stringify({
         ...SavedGroup,
-        ...group,
-        // Conserver l'historique des rôles lors des mises à jour
-        roleHistory: SavedGroup.roleHistory || {}
+        ...group
     }, null, 2))
     return JSON.parse(fs.readFileSync(path.join(GROUP_FOLDER, group.jid + '.json')))
 }

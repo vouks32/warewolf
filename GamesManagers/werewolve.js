@@ -2,7 +2,7 @@
 import fs from "fs"
 import path from "path"
 import RoleManager from "./werewolve-utils/roleManager.js"
-import { getUser, saveUser, POINTS_LIST, SaveUsersPoints, FRANCS_LIST, SaveUsersfrancs, getAllUsers } from "../userStorage.js"
+import { getUser, saveUser, POINTS_LIST, SaveUsersPoints, FRANCS_LIST, SaveUsersfrancs, getAllUsers, getGroup, saveGroup } from "../userStorage.js"
 import { get } from "http";
 
 let pointsList = (game) => {
@@ -928,6 +928,31 @@ export class WereWolvesManager {
                     const c = SaveUsersfrancs(playerJid, whatsapp, (totalpoints > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0), "End werewolf francs", "WEREWOLVE", 0, game)
                 }
 
+            // Save game result to group data
+            const groupData = getGroup(groupId)
+            if (!groupData) {
+                saveGroup({
+                    jid: groupId,
+                    games: [
+                        {
+                            gameType: "WEREWOLVE",
+                            game: game,
+                            WinnerRoles: result,
+                            winners: winners,
+                            time: Date.now()
+                        }
+                    ]
+                })
+            } else {
+                groupData.games.push({
+                    gameType: "WEREWOLVE",
+                    game: game,
+                    WinnerRoles: result,
+                    winners: winners,
+                    time: Date.now()
+                })
+                saveGroup(groupData)
+            }
 
             delete this.games[groupId]
             this.saveGames(this.games)
@@ -1115,6 +1140,33 @@ export class WereWolvesManager {
             await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
             await whatsapp.sendMessage(groupId, `envoie *"!werewolve"* pour rejouer`)
 
+            // Save game result to group data
+            const groupData = getGroup(groupId)
+            if (!groupData) {
+                saveGroup({
+                    jid: groupId,
+                    games: [
+                        {
+                            gameType: "WEREWOLVE",
+                            game: game,
+                            WinnerRoles: "TANNER",
+                            winners: game.players.find(p => p.role === "TANNER") ? [game.players.find(p => p.role === "TANNER")] : [],
+                            time: Date.now()
+                        }
+                    ]
+                })
+            } else {
+                groupData.games.push({
+                    gameType: "WEREWOLVE",
+                    game: game,
+                    WinnerRoles: "TANNER",
+                    winners: game.players.find(p => p.role === "TANNER") ? [game.players.find(p => p.role === "TANNER")] : [],
+                    time: Date.now()
+                })
+                saveGroup(groupData)
+            }
+
+
             delete this.games[groupId]
             this.saveGames(this.games)
             return
@@ -1147,6 +1199,31 @@ export class WereWolvesManager {
                         SaveUsersfrancs(playerJid, whatsapp, (totalpoints > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0), "End werewolf francs", "WEREWOLVE", 0, game)
                     }
                 }
+            // Save game result to group data
+            const groupData = getGroup(groupId)
+            if (!groupData) {
+                saveGroup({
+                    jid: groupId,
+                    games: [
+                        {
+                            gameType: "WEREWOLVE",
+                            game: game,
+                            WinnerRoles: result,
+                            winners: winners,
+                            time: Date.now()
+                        }
+                    ]
+                })
+            } else {
+                groupData.games.push({
+                    gameType: "WEREWOLVE",
+                    game: game,
+                    WinnerRoles: result,
+                    winners: winners,
+                    time: Date.now()
+                })
+                saveGroup(groupData)
+            }
 
 
             delete this.games[groupId]
@@ -1456,6 +1533,31 @@ export class WereWolvesManager {
                         const playerJid = p.jid
                         const c = SaveUsersfrancs(playerJid, whatsapp, (totalpoints > 0 ? ((p.points.reduce((sum, v) => sum + v.points, 0) / totalpoints) * paidMise) : 0), "End werewolf francs", "WEREWOLVE", 0, game)
                     }
+                // Save game result to group data
+                const groupData = getGroup(groupId)
+                if (!groupData) {
+                    saveGroup({
+                        jid: groupId,
+                        games: [
+                            {
+                                gameType: "WEREWOLVE",
+                                game: game,
+                                WinnerRoles: result,
+                                winners: winners,
+                                time: Date.now()
+                            }
+                        ]
+                    })
+                } else {
+                    groupData.games.push({
+                        gameType: "WEREWOLVE",
+                        game: game,
+                        WinnerRoles: result,
+                        winners: winners,
+                        time: Date.now()
+                    })
+                    saveGroup(groupData)
+                }
 
 
                 delete this.games[groupId]

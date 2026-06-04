@@ -129,7 +129,6 @@ async function startBot() {
 
             // init games
             setTimeout(async () => {
-
                 const iniWha = {
                     sender: null,
                     sendMessage: async (jid, message, mentions = undefined) => {

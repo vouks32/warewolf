@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { getUser, saveUser, getAllUsers, SaveUsersfrancs, SaveUsersPoints } from "../userStorage.js";
+import { getUser, saveUser, getAllUsers, SaveUsersfrancs, SaveUsersPoints, getGroup, saveGroup } from "../userStorage.js";
 import { parseWiktionary } from "./guessword-utils/checkword.js";
 
 const DATA_FILE = path.join(process.cwd(), "games/wordgame.json");
@@ -481,15 +481,15 @@ export class WordGameManager {
             const paidMise = game.mise * (95 / 100)
             await whatsapp.sendMessage(
                 groupId,
-                `🎉 @${winner.jid.split('@')[0]} reçoit *${Math.round(results[0].score/totalPoints * paidMise)} francs* !\n` +
-                `🎉 @${winner2.jid.split('@')[0]} reçoit *${Math.round(results[1].score/totalPoints * paidMise)} francs* !\n` +
-                `🎉 @${winner3.jid.split('@')[0]} reçoit *${Math.round(results[2].score/totalPoints * paidMise)} francs* !\n`,
+                `🎉 @${winner.jid.split('@')[0]} reçoit *${Math.round(results[0].score / totalPoints * paidMise)} francs* !\n` +
+                `🎉 @${winner2.jid.split('@')[0]} reçoit *${Math.round(results[1].score / totalPoints * paidMise)} francs* !\n` +
+                `🎉 @${winner3.jid.split('@')[0]} reçoit *${Math.round(results[2].score / totalPoints * paidMise)} francs* !\n`,
                 [winner.jid]
             );
-            
-            await this.addUserPoints(winner.jid, whatsapp, Math.round(results[0].score/totalPoints * paidMise), "Gagnant du jeu de mots", 0, game);
-            await this.addUserPoints(winner2.jid, whatsapp, Math.round(results[1].score/totalPoints * paidMise), "2eme Gagnant du jeu de mots", 0, game);
-            await this.addUserPoints(winner3.jid, whatsapp, Math.round(results[2].score/totalPoints * paidMise), "3eme Gagnant du jeu de mots", 0, game);
+
+            await this.addUserPoints(winner.jid, whatsapp, Math.round(results[0].score / totalPoints * paidMise), "Gagnant du jeu de mots", 0, game);
+            await this.addUserPoints(winner2.jid, whatsapp, Math.round(results[1].score / totalPoints * paidMise), "2eme Gagnant du jeu de mots", 0, game);
+            await this.addUserPoints(winner3.jid, whatsapp, Math.round(results[2].score / totalPoints * paidMise), "3eme Gagnant du jeu de mots", 0, game);
         }
 
 
@@ -497,6 +497,28 @@ export class WordGameManager {
             groupId,
             `Envoie *"!mots"* pour jouer à nouveau !`,
         );
+
+        // Save game result to group data
+        const groupData = getGroup(groupId)
+        if (!groupData) {
+            saveGroup({
+                jid: groupId,
+                games: [
+                    {
+                        gameType: "MOTS",
+                        game: game,
+                        time: Date.now()
+                    }
+                ]
+            })
+        } else {
+            groupData.games.push({
+                gameType: "MOTS",
+                game: game,
+                time: Date.now()
+            })
+            saveGroup(groupData)
+        }
         delete this.games[groupId];
         this.saveGames();
     }
