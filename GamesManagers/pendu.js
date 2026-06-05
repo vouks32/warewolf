@@ -146,7 +146,7 @@ export class PenduManager {
             players: [],
             unNormalizedWord: word,
             word: (new String(word)).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(),
-            displayWord: "∐".repeat(word.length).map((c, i) => word[i] === " " ? " " : word[i] === "'" ? "'" : word[i] === "," ? "," :word[i] === "!" ? "!" : word[i] === "?" ? "?" : word[i] === "." ? "." : word[i] === "-" ? "-" : c).join(""),
+            displayWord: "∐".repeat(word.length).split('').map((c, i) => word[i] === " " ? " " : word[i] === "'" ? "'" : word[i] === "," ? "," :word[i] === "!" ? "!" : word[i] === "?" ? "?" : word[i] === "." ? "." : word[i] === "-" ? "-" : c).join(""),
             guessedLetters: [],
             wrongLetters: [],
             rounds: -1,
