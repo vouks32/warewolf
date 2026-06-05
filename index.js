@@ -509,7 +509,11 @@ async function startBot() {
         for (const groupJid in groups) {
             if (!groupJid || !groups[groupJid]?.length) continue;
             const group = groups[groupJid];
-            const metadata = await sock.groupMetadata(groupJid);
+            try {
+                const metadata = await sock.groupMetadata(groupJid);
+            } catch (e) {
+                continue
+            }
             const participant = metadata.participants.map(p => ({ ...p, jid: p.jid || p.phoneNumber }))
             group.sort((p1, p2) => p2.points - p1.points)
 
