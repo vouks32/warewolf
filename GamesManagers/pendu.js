@@ -275,7 +275,7 @@ export class PenduManager {
 
         if (game.gameType === 2) {
             await whatsapp.sendMessage(groupId, `Scores:\n\n${playerScores.sort((a, b) => (b.correctCount - b.incorrectCount) - (a.correctCount - a.incorrectCount)).map(p => {
-                let playerFraction = (((p.correctCount - p.incorrectCount) < 0 ? (0) : (p.correctCount - p.incorrectCount)) / totalPoints)
+                let playerFraction = totalPoints > 0? ((p.correctCount - p.incorrectCount) < 0 ? (0) : (p.correctCount - p.incorrectCount)) / totalPoints : 0
                 return `@${p.jid.split('@')[0]}:\n✅ *${p.correctCount}* lettres correctes\n❌ *${p.incorrectCount}* lettres incorrectes \n *+${Math.round((playerFraction * paidMise))} francs*`
             }).join('\n\n')}`
                 , playerScores.map(p => p.jid))
@@ -287,7 +287,7 @@ export class PenduManager {
 
         for (let p of playerScores) {
             const points = (p.correctCount) - p.incorrectCount
-            let playerFraction = ((points < 0 ? 0 : points) / totalPoints)
+            let playerFraction = totalPoints > 0? ((points < 0 ? 0 : points) / totalPoints) : 0
             console.log("POINTS ====== ", points, " TOTAL POINTS ====== ", totalPoints, " PAID MISE ====== ", paidMise)
             await this.addUserPoints(p.jid, whatsapp, game.gameType === 2 ? (totalPoints <= 0 ? 0 : Math.round((playerFraction * paidMise))) : points, "pendu points", 1, game)
         }
