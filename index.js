@@ -520,12 +520,13 @@ async function startBot() {
                 "*Astuce:*\n\n En lançant une partie, vous avez 2 options !\n\n1. *jouer pour gagner des points*. Ici vous jouez pour gagner des points et avancer dans le classement. les 3 premiers du classement sont promus admin et obtiennent de nombreux avatages\n2. *jouer pour gagner de l'argent via les mises*. Ici chaque jouer mise une somme lorsqu'il participe et cette somme est repartager aux gagnants à la fin de la partie (en fonction de leur points).\n\nEssayez les 2 modes pour voir celui que vous préférez !",
                 "*Astuce:*\n\n N'hésitez pas à inviter vos amis à rejoindre le groupe et jouer avec vous ! Plus on est de fous, plus on rit !",
                 "*Astuce:*\n\n Vous pouvez acheter des packs pour obtenir des francs et des pouvoir spéciaux!\n\nEnvoyez *!packs* pour voir les packs disponibles et leurs avantages !",
-                "*Astuce:*\n\n Envoyez *!packs* pour voir les packs disponibles et leurs avantages !",
-                "*Astuce:*\n\n Consultez la liste des packs et leurs pouvoir en envoyant *!packs*",
+                "*Astuce:*\n\n Si vous envoyez *!werewolve*, puis choisissez *2*, vous pouvez lancer une partie avec mise d'argent.\n\nVous misez *10 francs* et les gagnants se partagent la cagnotte à la fin de la partie en fonction de leurs points !\n\nPlus vous avez de points, plus vous gagnez de francs !",
+                "*Astuce:*\n\n Jouez avec d'autres joueurs à *!werewolve*, *!mots*, et *!pendu* avec mises de francs pour gagner de l'argent\n\nVous pouvez retirer vos francs à tout moment (2000 francs minimum) !",
+                "*Astuce:*\n\n Gagnez des points en jouant à *!werewolve*, *!mots*, et *!pendu* puis en choisissant *1* !",
             ]
 
             await sock.sendMessage(groupJid, {
-                text: fancyTransform(tips[Math.floor(Math.random() * tips.length)])
+                text: fancyTransform(tips[Math.floor(Math.random() * tips.length)]), mentions: Object.keys(allPlayers)
             }).then(handler.addMessage)
         }
         return true
@@ -766,7 +767,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
         }
     })
 
-     handlers.text.push({
+    handlers.text.push({
         regex: /^!resetfrancs/,
         fn: async (whatsapp) => {
             if (!whatsapp.isGroup) return await whatsapp.reply('Quand toi tu vois... on es dans un groupe?!')
@@ -794,7 +795,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                 group.push(player)
             }
 
-             await sock.sendMessage(groupId, {
+            await sock.sendMessage(groupId, {
                 text: `Francs remis à 250 francs`
                 , mentions: group.map((p) => p.jid)
             }).then(handler.addMessage)

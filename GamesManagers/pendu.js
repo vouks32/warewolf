@@ -145,7 +145,7 @@ export class PenduManager {
             hostjid: whatsapp.senderJid,
             players: [],
             word: (new String(word)).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(),
-            displayWord: "_".repeat(word.length),
+            displayWord: "_".repeat(word.length).map((c, i) => word[i] === " " ? " " : word[i] === "'" ? "'" : c).join(""),
             guessedLetters: [],
             wrongLetters: [],
             rounds: -1,

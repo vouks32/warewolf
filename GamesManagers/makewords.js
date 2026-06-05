@@ -481,15 +481,15 @@ export class WordGameManager {
             const paidMise = game.mise * (95 / 100)
             await whatsapp.sendMessage(
                 groupId,
-                `🎉 @${winner.jid.split('@')[0]} reçoit *${Math.round(0.5 * paidMise)} francs* !\n` +
-                `🎉 @${winner2.jid.split('@')[0]} reçoit *${Math.round(0.35 * paidMise)} francs* !\n` +
-                `🎉 @${winner3.jid.split('@')[0]} reçoit *${Math.round(0.15 * paidMise)} francs* !\n`,
+                `🎉 @${winner.jid.split('@')[0]} reçoit *${Math.round(0.7 * paidMise)} francs* !\n` +
+                `🎉 @${winner2.jid.split('@')[0]} reçoit *${Math.round(0.2 * paidMise)} francs* !\n` +
+                `🎉 @${winner3.jid.split('@')[0]} reçoit *${Math.round(0.1 * paidMise)} francs* !\n`,
                 [winner.jid]
             );
 
-            await this.addUserPoints(winner.jid, whatsapp, Math.round(0.5 * paidMise), "Gagnant du jeu de mots", 0, game);
-            await this.addUserPoints(winner2.jid, whatsapp, Math.round(0.35 * paidMise), "2eme Gagnant du jeu de mots", 0, game);
-            await this.addUserPoints(winner3.jid, whatsapp, Math.round(0.15 * paidMise), "3eme Gagnant du jeu de mots", 0, game);
+            await this.addUserPoints(winner.jid, whatsapp, Math.round(0.7 * paidMise), "Gagnant du jeu de mots", 0, game);
+            await this.addUserPoints(winner2.jid, whatsapp, Math.round(0.2 * paidMise), "2eme Gagnant du jeu de mots", 0, game);
+            await this.addUserPoints(winner3.jid, whatsapp, Math.round(0.1 * paidMise), "3eme Gagnant du jeu de mots", 0, game);
         }
 
 

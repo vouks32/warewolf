@@ -1385,11 +1385,6 @@
         "label": "maître"
     },
     {
-        "type": "adv.",
-        "frequency": 4915,
-        "label": "aujourd'hui"
-    },
-    {
         "type": "subst.",
         "frequency": 4908,
         "label": "besoin"
@@ -1736,11 +1731,6 @@
     },
     {
         "type": "pron.",
-        "frequency": 3910,
-        "label": "l'un"
-    },
-    {
-        "type": "pron.",
         "frequency": 3890,
         "label": "chacun"
     },
@@ -1793,11 +1783,6 @@
         "type": "subst.",
         "frequency": 3783,
         "label": "oeil"
-    },
-    {
-        "type": "adv.",
-        "frequency": 3783,
-        "label": "d'abord"
     },
     {
         "type": "verbe",
@@ -2333,11 +2318,6 @@
         "type": "subst.",
         "frequency": 2875,
         "label": "papier"
-    },
-    {
-        "type": "dét.",
-        "frequency": 2865,
-        "label": "d'autres"
     },
     {
         "type": "subst.",
@@ -3640,11 +3620,6 @@
         "label": "campagne"
     },
     {
-        "type": "pron.",
-        "frequency": 1838,
-        "label": "quelqu'un"
-    },
-    {
         "type": "subst.",
         "frequency": 1832,
         "label": "juge"
@@ -3808,11 +3783,6 @@
         "type": "subst.",
         "frequency": 1736,
         "label": "genre"
-    },
-    {
-        "type": "pron.",
-        "frequency": 1734,
-        "label": "d'autres"
     },
     {
         "type": "adj.",
@@ -4113,11 +4083,6 @@
         "type": "numér.",
         "frequency": 1591,
         "label": "douze"
-    },
-    {
-        "type": "pron.",
-        "frequency": 1587,
-        "label": "l'une"
     },
     {
         "type": "subst.",
