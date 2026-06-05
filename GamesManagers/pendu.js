@@ -255,7 +255,7 @@ export class PenduManager {
 
         game.state = "PLAYING"
 
-        await whatsapp.sendMessage(groupId, `La partie commence !\n\n${HANGMANPICS[0]}\n\n${game.unNormalizedWord.toUppercase().includes(' ') ? 'Mot' : 'Expression'} à deviner :\n ${game.displayWord.toUppercase().split("").join(" ")}\n\nEnvoyez une lettre pour commencer à jouer !`)
+        await whatsapp.sendMessage(groupId, `La partie commence !\n\n${HANGMANPICS[0]}\n\n${game.unNormalizedWord.toUpperCase().includes(' ') ? 'Mot' : 'Expression'} à deviner :\n ${game.displayWord.toUpperCase().split("").join(" ")}\n\nEnvoyez une lettre pour commencer à jouer !`)
 
     }
 
@@ -363,19 +363,19 @@ export class PenduManager {
 
             game.displayWord = newDisplay
 
-            await whatsapp.sendMessage(groupId, `🎉 Bravo ! La lettre *${letter}* est dans le ${game.unNormalizedWord.toUppercase().includes(' ') ? 'mot' : 'expression'}.\n\n${HANGMANPICS[game.wrongLetters.length]}\n\n${game.unNormalizedWord.toUppercase().includes(' ') ? 'Mot' : 'Expression'} à deviner :\n ${game.displayWord.toUppercase().split("").join(" ")}`)
+            await whatsapp.sendMessage(groupId, `🎉 Bravo ! La lettre *${letter}* est dans le ${game.unNormalizedWord.toUpperCase().includes(' ') ? 'mot' : 'expression'}.\n\n${HANGMANPICS[game.wrongLetters.length]}\n\n${game.unNormalizedWord.toUpperCase().includes(' ') ? 'Mot' : 'Expression'} à deviner :\n ${game.displayWord.toUpperCase().split("").join(" ")}`)
         } else {
             // Wrong letter
             game.wrongLetters.push(letter)
-            await whatsapp.sendMessage(groupId, `❌ Oops ! La lettre *${letter}* n'est pas dans le ${game.unNormalizedWord.toUppercase().includes(' ') ? 'mot' : 'expression'}.\n\n${HANGMANPICS[game.wrongLetters.length]}\n\n${game.unNormalizedWord.toUppercase().includes(' ') ? 'Mot' : 'Expression'} à deviner :\n ${game.displayWord.toUppercase().split("").join(" ")}`)
+            await whatsapp.sendMessage(groupId, `❌ Oops ! La lettre *${letter}* n'est pas dans le ${game.unNormalizedWord.toUpperCase().includes(' ') ? 'mot' : 'expression'}.\n\n${HANGMANPICS[game.wrongLetters.length]}\n\n${game.unNormalizedWord.toUpperCase().includes(' ') ? 'Mot' : 'Expression'} à deviner :\n ${game.displayWord.toUpperCase().split("").join(" ")}`)
         }
         if (game.displayWord === game.word) {
-            await whatsapp.sendMessage(groupId, `🏆 Félicitations ! ${game.unNormalizedWord.toUppercase().includes(' ') ? 'Le mot' : 'L\'expression'} *${game.unNormalizedWord}* a été deviné correctement !`)
+            await whatsapp.sendMessage(groupId, `🏆 Félicitations ! ${game.unNormalizedWord.toUpperCase().includes(' ') ? 'Le mot' : 'L\'expression'} *${game.unNormalizedWord}* a été deviné correctement !`)
             await this.resolveGame(groupId, whatsapp)
             return
         }
         if (game.wrongLetters.length >= HANGMANPICS.length - 1) {
-            await whatsapp.sendMessage(groupId, `💀 La partie est terminée ! ${game.unNormalizedWord.toUppercase().includes(' ') ? 'Le mot' : 'L\'expression'} était *${game.unNormalizedWord}*.\n\n${HANGMANPICS[HANGMANPICS.length - 1]}`)
+            await whatsapp.sendMessage(groupId, `💀 La partie est terminée ! ${game.unNormalizedWord.toUpperCase().includes(' ') ? 'Le mot' : 'L\'expression'} était *${game.unNormalizedWord}*.\n\n${HANGMANPICS[HANGMANPICS.length - 1]}`)
             await this.resolveGame(groupId, whatsapp)
             return
         }
