@@ -7278,5 +7278,1505 @@
         "type": "adj.",
         "frequency": 1195,
         "label": "essentiel"
+    },
+     {
+        "type": "verbe",
+        "frequency": 3000,
+        "label": "Je pense, donc je suis"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2990,
+        "label": "L'État, c'est moi"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2980,
+        "label": "Après moi, le déluge"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2970,
+        "label": "Paris vaut bien une messe"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2960,
+        "label": "Qu'ils mangent de la brioche"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2950,
+        "label": "Travail, Famille, Patrie"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2940,
+        "label": "Liberté, Égalité, Fraternité"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2930,
+        "label": "Aux armes, citoyens"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2920,
+        "label": "On ne passe pas"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2910,
+        "label": "Résistez"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2900,
+        "label": "Vive le Québec libre"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2890,
+        "label": "À bas la calotte"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2880,
+        "label": "C'est la guerre"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2870,
+        "label": "Morts pour la France"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2860,
+        "label": "Ils ne passeront pas"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2850,
+        "label": "Merde"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2840,
+        "label": "La Garde meurt mais ne se rend pas"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2830,
+        "label": "Un roi, une loi, une foi"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2820,
+        "label": "Plus jamais ça"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2810,
+        "label": "Appel du 18 Juin"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2800,
+        "label": "C'est magnifique, mais ce n'est pas la guerre"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2790,
+        "label": "L'audace, encore l'audace, toujours l'audace"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2780,
+        "label": "Du pain et des jeux"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2770,
+        "label": "La propriété, c'est le vol"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2760,
+        "label": "Dieu et mon droit"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2750,
+        "label": "Honneur et Patrie"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2740,
+        "label": "Tous unis pour la patrie"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2730,
+        "label": "Le Roi est mort, vive le Roi"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2720,
+        "label": "À la guerre comme à la guerre"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2710,
+        "label": "Rira bien qui rira le dernier"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2700,
+        "label": "L'habit ne fait pas le moine"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2690,
+        "label": "Tout est perdu fors l'honneur"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2680,
+        "label": "Surtout, pas de zèle"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2670,
+        "label": "Vive la France"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2660,
+        "label": "À mort"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2650,
+        "label": "Les carottes sont cuites"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2640,
+        "label": "C'est la bérézina"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2630,
+        "label": "La paix des braves"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2620,
+        "label": "Ni Dieu, ni maître"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2610,
+        "label": "L'imagination au pouvoir"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2600,
+        "label": "Il est interdit d'interdire"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2590,
+        "label": "Sous les pavés, la plage"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2580,
+        "label": "Je vous ai compris"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2570,
+        "label": "Pour une poignée de cerises"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2560,
+        "label": "La raison du plus fort est toujours la meilleure"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2550,
+        "label": "Impossible n'est pas français"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2540,
+        "label": "Douce France"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2530,
+        "label": "Tant va la cruche à l'eau qu'à la fin elle se brise"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2520,
+        "label": "Pas de liberté pour les ennemis de la liberté"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2510,
+        "label": "Mieux vaut faire que dire"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2500,
+        "label": "Vivre libre ou mourir"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2490,
+        "label": "La patrie en danger"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2480,
+        "label": "On ne badine pas avec l'amour"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2470,
+        "label": "Le vent se lève, il faut tenter de vivre"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2460,
+        "label": "À chacun selon ses besoins"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2450,
+        "label": "Prolétaires de tous les pays, unissez-vous"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2440,
+        "label": "La terre est bleue comme une orange"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2430,
+        "label": "Ô liberté, que de crimes on commet en ton nom"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2420,
+        "label": "Mourir pour des idées, c'est bien beau mais lesquelles ?"
+    },
+    {
+        "type": "adj.",
+        "frequency": 2410,
+        "label": "C'est du propre"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2400,
+        "label": "Fais ce que dois, advienne que pourra"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2390,
+        "label": "L'essentiel est invisible pour les yeux"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2380,
+        "label": "Connais-toi toi-même"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2370,
+        "label": "Le travail, c'est la santé"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2360,
+        "label": "Métro, boulot, dodo"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2350,
+        "label": "L'argent n'a pas d'odeur"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2340,
+        "label": "Les absents ont toujours tort"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2330,
+        "label": "Qui vivra verra"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2320,
+        "label": "Après la pluie, le beau temps"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2310,
+        "label": "Pierre qui roule n'amasse pas mousse"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2300,
+        "label": "Qui sème le vent récolte la tempête"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2290,
+        "label": "Paris ne s'est pas fait en un jour"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2280,
+        "label": "Tous les chemins mènent à Rome"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2270,
+        "label": "La vengeance est un plat qui se mange froid"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2260,
+        "label": "L'espoir fait vivre"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2250,
+        "label": "La vérité sort de la bouche des enfants"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2240,
+        "label": "Les chiens aboient, la caravane passe"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2230,
+        "label": "Quand le chat n'est pas là, les souris dansent"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2220,
+        "label": "Mieux vaut prévenir que guérir"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2210,
+        "label": "Un malheur ne vient jamais seul"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2200,
+        "label": "À cœur vaillant rien d'impossible"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2190,
+        "label": "Bon sang ne saurait mentir"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2180,
+        "label": "Chaque chose en son temps"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2170,
+        "label": "L'appétit vient en mangeant"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2160,
+        "label": "Qui veut la fin veut les moyens"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2150,
+        "label": "Tel père, tel fils"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2140,
+        "label": "La parole est d'argent, le silence est d'or"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2130,
+        "label": "Il faut battre le fer pendant qu'il est chaud"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2120,
+        "label": "Quand on parle du loup, on en voit la queue"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2110,
+        "label": "Rien ne sert de courir, il faut partir à point"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2100,
+        "label": "Tout vient à point à qui sait attendre"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2090,
+        "label": "Un tiens vaut mieux que deux tu l'auras"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2080,
+        "label": "L'union fait la force"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2070,
+        "label": "Charité bien ordonnée commence par soi-même"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2060,
+        "label": "Qui n'avance pas, recule"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2050,
+        "label": "Vouloir, c'est pouvoir"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2040,
+        "label": "Les murs ont des oreilles"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2030,
+        "label": "À trompeur, trompeur et demi"
+    },
+    {
+        "type": "subst.",
+        "frequency": 2020,
+        "label": "Petit à petit, l'oiseau fait son nid"
+    },
+    {
+        "type": "verbe",
+        "frequency": 2010,
+        "label": "C'est en forgeant qu'on devient forgeron"
+    },
+     {
+        "type": "subst.",
+        "frequency": 2000,
+        "label": "Honneur aux vaincus"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1990,
+        "label": "La victoire en chantant"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1980,
+        "label": "Debout les damnés de la terre"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1970,
+        "label": "C'est un début"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1960,
+        "label": "La France a perdu une bataille, mais la France n'a pas perdu la guerre"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1950,
+        "label": "Morts pour la patrie"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1940,
+        "label": "La liberté guidant le peuple"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1930,
+        "label": "Le pouvoir ne se partage pas"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1920,
+        "label": "La France libre"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1910,
+        "label": "Ils étaient cent, ils sont mille"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1900,
+        "label": "C'est la lutte finale"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1890,
+        "label": "Le socialisme ou la mort"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1880,
+        "label": "Laissez-les venir"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1870,
+        "label": "Que Dieu me garde de mes amis"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1860,
+        "label": "La force tranquille"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1850,
+        "label": "Changer la vie"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1840,
+        "label": "La République des lettres"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1830,
+        "label": "Le temps, c'est de l'argent"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1820,
+        "label": "L'habit ne fait pas le moine"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1810,
+        "label": "Chassez le naturel, il revient au galop"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1800,
+        "label": "L'enfer est pavé de bonnes intentions"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1790,
+        "label": "Les morts ont toujours tort"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1780,
+        "label": "Nul n'est prophète en son pays"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1770,
+        "label": "Paris ne s'est pas fait en un jour"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1760,
+        "label": "Tant va la cruche à l'eau qu'à la fin elle se brise"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1750,
+        "label": "Qui ne risque rien n'a rien"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1740,
+        "label": "Qui trop embrasse mal étreint"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1730,
+        "label": "C'est la fin des haricots"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1720,
+        "label": "Rien ne sert de pleurer"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1710,
+        "label": "L'habit ne fait pas le moine"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1700,
+        "label": "Mendiants et orgueilleux ne sont jamais contents"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1690,
+        "label": "À cheval donné, on ne regarde pas la bride"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1680,
+        "label": "Les grands esprits se rencontrent"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1670,
+        "label": "Quand on n'a pas ce que l'on aime, il faut aimer ce que l'on a"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1660,
+        "label": "L'oisiveté est mère de tous les vices"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1650,
+        "label": "La faim fait sortir le loup du bois"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1640,
+        "label": "La nuit porte conseil"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1630,
+        "label": "Qui va à la chasse perd sa place"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1620,
+        "label": "Le jeu n'en vaut pas la chandelle"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1610,
+        "label": "La chance ne sourit qu'aux audacieux"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1600,
+        "label": "À malin, malin et demi"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1590,
+        "label": "Les petits ruisseaux font les grandes rivières"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1580,
+        "label": "Il n'y a pas de fumée sans feu"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1570,
+        "label": "L'erreur est humaine"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1560,
+        "label": "La vérité blesse"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1550,
+        "label": "Les paroles s'envolent, les écrits restent"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1540,
+        "label": "Qui aime bien châtie bien"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1530,
+        "label": "La grenouille qui voulait se faire aussi grosse que le bœuf"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1520,
+        "label": "Le remède est pire que le mal"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1510,
+        "label": "Vive la sociale"
+    },
+     {
+        "type": "subst.",
+        "frequency": 1500,
+        "label": "Honneur, patrie, valeur"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1490,
+        "label": "Debout, les morts"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1480,
+        "label": "La science sans conscience n'est que ruine de l'âme"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1470,
+        "label": "Il faut cultiver notre jardin"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1460,
+        "label": "Le monde va trop vite"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1450,
+        "label": "On ne meurt qu'une fois"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1440,
+        "label": "La beauté du diable"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1430,
+        "label": "L'amour de la patrie"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1420,
+        "label": "C'était mieux avant"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1410,
+        "label": "Le parti de l'étranger"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1400,
+        "label": "La France ne se rendra pas"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1390,
+        "label": "L'exemple vient d'en haut"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1380,
+        "label": "Toute vérité n'est pas bonne à dire"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1370,
+        "label": "L'habit fait le moine"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1360,
+        "label": "Qui ne dit mot consent"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1350,
+        "label": "Un sou est un sou"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1340,
+        "label": "L'argent ne fait pas le bonheur"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1330,
+        "label": "Il n'y a pas de petites économies"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1320,
+        "label": "Jamais deux sans trois"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1310,
+        "label": "Les yeux pour pleurer"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1300,
+        "label": "Paris s'éveille"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1290,
+        "label": "Le temps perdu ne se rattrape jamais"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1280,
+        "label": "Ne remets pas à demain ce que tu peux faire aujourd'hui"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1270,
+        "label": "La roue tourne"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1260,
+        "label": "La faim justifie les moyens"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1250,
+        "label": "Le silence est d'or"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1240,
+        "label": "Quand on veut, on peut"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1230,
+        "label": "Il n'y a que les montagnes qui ne se rencontrent jamais"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1220,
+        "label": "Les absents sont toujours fautifs"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1210,
+        "label": "La patience est amère, mais son fruit est doux"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1200,
+        "label": "Qui vivra verra"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1190,
+        "label": "L'occasion fait le larron"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1180,
+        "label": "Une hirondelle ne fait pas le printemps"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1170,
+        "label": "L'habit ne fait pas le religieux"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1160,
+        "label": "Le chant du cygne"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1150,
+        "label": "Ne pas mélanger les torchons et les serviettes"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1140,
+        "label": "La douceur de vivre"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1130,
+        "label": "Vivre comme des coqs en pâte"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1120,
+        "label": "L'espoir change tout"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1110,
+        "label": "La France éternelle"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1100,
+        "label": "Méfiez-vous des eaux calmes"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1090,
+        "label": "Paris, je t'aime"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1080,
+        "label": "S'il vous plaît"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1070,
+        "label": "Le bonheur est dans le pré"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1060,
+        "label": "C'est la vie"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1050,
+        "label": "La part du diable"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1040,
+        "label": "Tout vient à point à qui sait attendre"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1030,
+        "label": "Le bruit des bottes"
+    },
+    {
+        "type": "verbe",
+        "frequency": 1020,
+        "label": "Vive l'empereur"
+    },
+    {
+        "type": "subst.",
+        "frequency": 1010,
+        "label": "Le pain quotidien"
+    },
+     {
+        "type": "verbe",
+        "frequency": 1000,
+        "label": "Soyons réalistes, demandons l'impossible"
+    },
+    {
+        "type": "subst.",
+        "frequency": 995,
+        "label": "La lutte des classes"
+    },
+    {
+        "type": "verbe",
+        "frequency": 990,
+        "label": "Je est un autre"
+    },
+    {
+        "type": "subst.",
+        "frequency": 985,
+        "label": "Le surréalisme, c'est moi"
+    },
+    {
+        "type": "verbe",
+        "frequency": 980,
+        "label": "Vive le vent, vive le vent"
+    },
+    {
+        "type": "subst.",
+        "frequency": 975,
+        "label": "La France aux Français"
+    },
+    {
+        "type": "verbe",
+        "frequency": 970,
+        "label": "Il faut manger pour vivre et non vivre pour manger"
+    },
+    {
+        "type": "subst.",
+        "frequency": 965,
+        "label": "Le travail libère"
+    },
+    {
+        "type": "subst.",
+        "frequency": 960,
+        "label": "Chacun chez soi, chacun pour soi"
+    },
+    {
+        "type": "verbe",
+        "frequency": 955,
+        "label": "Un peuple prêt à mourir pour la patrie"
+    },
+    {
+        "type": "subst.",
+        "frequency": 950,
+        "label": "L'appel de la forêt"
+    },
+    {
+        "type": "verbe",
+        "frequency": 945,
+        "label": "Tu mourras moins bête"
+    },
+    {
+        "type": "subst.",
+        "frequency": 940,
+        "label": "Les nez des ennemis de la France"
+    },
+    {
+        "type": "verbe",
+        "frequency": 935,
+        "label": "C'est le bouquet"
+    },
+    {
+        "type": "subst.",
+        "frequency": 930,
+        "label": "La faute à Voltaire, la faute à Rousseau"
+    },
+    {
+        "type": "verbe",
+        "frequency": 925,
+        "label": "On n'est pas couché"
+    },
+    {
+        "type": "subst.",
+        "frequency": 920,
+        "label": "L'argent sale"
+    },
+    {
+        "type": "verbe",
+        "frequency": 915,
+        "label": "Circulez, y a rien à voir"
+    },
+    {
+        "type": "subst.",
+        "frequency": 910,
+        "label": "Touche pas à mon pote"
+    },
+    {
+        "type": "verbe",
+        "frequency": 905,
+        "label": "On a les dirigeants qu'on mérite"
+    },
+    {
+        "type": "subst.",
+        "frequency": 900,
+        "label": "L'alcool tue"
+    },
+    {
+        "type": "verbe",
+        "frequency": 895,
+        "label": "Fumer tue"
+    },
+    {
+        "type": "subst.",
+        "frequency": 890,
+        "label": "L'enfant roi"
+    },
+    {
+        "type": "verbe",
+        "frequency": 885,
+        "label": "Vive l'anarchie"
+    },
+    {
+        "type": "subst.",
+        "frequency": 880,
+        "label": "L'ordre règne à Varsovie"
+    },
+    {
+        "type": "verbe",
+        "frequency": 875,
+        "label": "La Marseillaise, c'est la guerre"
+    },
+    {
+        "type": "subst.",
+        "frequency": 870,
+        "label": "Le vol de l'aigle"
+    },
+    {
+        "type": "verbe",
+        "frequency": 865,
+        "label": "Cassons les codes"
+    },
+    {
+        "type": "subst.",
+        "frequency": 860,
+        "label": "Les chemins de la liberté"
+    },
+    {
+        "type": "subst.",
+        "frequency": 855,
+        "label": "La part du pauvre"
+    },
+    {
+        "type": "verbe",
+        "frequency": 850,
+        "label": "N'ayez pas peur"
+    },
+    {
+        "type": "subst.",
+        "frequency": 845,
+        "label": "Le cri du peuple"
+    },
+    {
+        "type": "verbe",
+        "frequency": 840,
+        "label": "Allons enfants de la patrie"
+    },
+    {
+        "type": "subst.",
+        "frequency": 835,
+        "label": "Le jour de gloire est arrivé"
+    },
+    {
+        "type": "verbe",
+        "frequency": 830,
+        "label": "Entendez-vous dans les campagnes"
+    },
+    {
+        "type": "subst.",
+        "frequency": 825,
+        "label": "Le bruit des fusils"
+    },
+    {
+        "type": "verbe",
+        "frequency": 820,
+        "label": "Amour, gloire et beauté"
+    },
+    {
+        "type": "subst.",
+        "frequency": 815,
+        "label": "L'ombre de la guillotine"
+    },
+    {
+        "type": "verbe",
+        "frequency": 810,
+        "label": "Brisons nos chaînes"
+    },
+    {
+        "type": "subst.",
+        "frequency": 805,
+        "label": "La révolte des canuts"
+    },
+    {
+        "type": "verbe",
+        "frequency": 800,
+        "label": "Vivre sa vie"
+    },
+    {
+        "type": "subst.",
+        "frequency": 795,
+        "label": "Le souffle de la révolte"
+    },
+    {
+        "type": "verbe",
+        "frequency": 790,
+        "label": "Laissons les bons temps rouler"
+    },
+    {
+        "type": "subst.",
+        "frequency": 785,
+        "label": "La nostalgie de la boue"
+    },
+    {
+        "type": "verbe",
+        "frequency": 780,
+        "label": "J'accuse"
+    },
+    {
+        "type": "subst.",
+        "frequency": 775,
+        "label": "La vérité en marche"
+    },
+    {
+        "type": "verbe",
+        "frequency": 770,
+        "label": "Osez le féminisme"
+    },
+    {
+        "type": "subst.",
+        "frequency": 765,
+        "label": "Les femmes en colère"
+    },
+    {
+        "type": "verbe",
+        "frequency": 760,
+        "label": "Touche pas à mon frigo"
+    },
+    {
+        "type": "subst.",
+        "frequency": 755,
+        "label": "La pause clope"
+    },
+     {
+        "type": "subst.",
+        "frequency": 750,
+        "label": "Les dés sont jetés"
+    },
+    {
+        "type": "verbe",
+        "frequency": 745,
+        "label": "Venez, je vous ai sauvé la vie, sauvez la mienne"
+    },
+    {
+        "type": "subst.",
+        "frequency": 740,
+        "label": "La porte étroite"
+    },
+    {
+        "type": "verbe",
+        "frequency": 735,
+        "label": "Il faut souffrir pour être belle"
+    },
+    {
+        "type": "subst.",
+        "frequency": 730,
+        "label": "Le ciel peut attendre"
+    },
+    {
+        "type": "verbe",
+        "frequency": 725,
+        "label": "On ne choisit pas sa famille"
+    },
+    {
+        "type": "subst.",
+        "frequency": 720,
+        "label": "L'enfant sauvage"
+    },
+    {
+        "type": "verbe",
+        "frequency": 715,
+        "label": "Coupe ta tête, je te donne une couronne"
+    },
+    {
+        "type": "subst.",
+        "frequency": 710,
+        "label": "Le baiser de la France"
+    },
+    {
+        "type": "verbe",
+        "frequency": 705,
+        "label": "Mourir pour la patrie est le sort le plus beau"
+    },
+    {
+        "type": "subst.",
+        "frequency": 700,
+        "label": "La gloire du commandeur"
+    },
+    {
+        "type": "verbe",
+        "frequency": 695,
+        "label": "Rentre chez toi, Satan"
+    },
+    {
+        "type": "subst.",
+        "frequency": 690,
+        "label": "Le mépris des riches"
+    },
+    {
+        "type": "verbe",
+        "frequency": 685,
+        "label": "Je m'en vais, mais l'État demeurera toujours"
+    },
+    {
+        "type": "subst.",
+        "frequency": 680,
+        "label": "La trêve hivernale"
+    },
+    {
+        "type": "verbe",
+        "frequency": 675,
+        "label": "Ne dites jamais jamais"
+    },
+    {
+        "type": "subst.",
+        "frequency": 670,
+        "label": "Le droit du sol"
+    },
+    {
+        "type": "verbe",
+        "frequency": 665,
+        "label": "Aimez-vous les uns les autres"
+    },
+    {
+        "type": "subst.",
+        "frequency": 660,
+        "label": "Le pain, la paix, la liberté"
+    },
+    {
+        "type": "verbe",
+        "frequency": 655,
+        "label": "C'est pas sorcier"
+    },
+    {
+        "type": "subst.",
+        "frequency": 650,
+        "label": "La machine à remonter le temps"
+    },
+    {
+        "type": "verbe",
+        "frequency": 645,
+        "label": "T'es pas cap"
+    },
+    {
+        "type": "subst.",
+        "frequency": 640,
+        "label": "Le crime ne paie pas"
+    },
+    {
+        "type": "verbe",
+        "frequency": 635,
+        "label": "Tout le monde il est beau, tout le monde il est gentil"
+    },
+    {
+        "type": "subst.",
+        "frequency": 630,
+        "label": "La vérité si je mens"
+    },
+    {
+        "type": "verbe",
+        "frequency": 625,
+        "label": "Respire, on va y arriver"
+    },
+    {
+        "type": "subst.",
+        "frequency": 620,
+        "label": "Les bronzés font du ski"
+    },
+    {
+        "type": "verbe",
+        "frequency": 615,
+        "label": "Que le meilleur gagne"
+    },
+    {
+        "type": "subst.",
+        "frequency": 610,
+        "label": "La loi du plus fort"
+    },
+    {
+        "type": "verbe",
+        "frequency": 605,
+        "label": "Un pour tous, tous pour un"
+    },
+    {
+        "type": "subst.",
+        "frequency": 600,
+        "label": "La guerre des boutons"
+    },
+    {
+        "type": "verbe",
+        "frequency": 595,
+        "label": "Ça ne prend pas la tête"
+    },
+    {
+        "type": "subst.",
+        "frequency": 590,
+        "label": "Le sens de la vie"
+    },
+    {
+        "type": "verbe",
+        "frequency": 585,
+        "label": "Viens, on va au bout du monde"
+    },
+    {
+        "type": "subst.",
+        "frequency": 580,
+        "label": "Les fourmis noires"
+    },
+    {
+        "type": "verbe",
+        "frequency": 575,
+        "label": "La vie est un long fleuve tranquille"
+    },
+    {
+        "type": "subst.",
+        "frequency": 570,
+        "label": "Le père Noël est une ordure"
+    },
+    {
+        "type": "verbe",
+        "frequency": 565,
+        "label": "On va déguster"
+    },
+    {
+        "type": "subst.",
+        "frequency": 560,
+        "label": "La soupe aux choux"
+    },
+    {
+        "type": "verbe",
+        "frequency": 555,
+        "label": "Ça plane pour moi"
+    },
+    {
+        "type": "subst.",
+        "frequency": 550,
+        "label": "L'as des as"
+    },
+    {
+        "type": "verbe",
+        "frequency": 545,
+        "label": "Ne me quitte pas"
+    },
+    {
+        "type": "subst.",
+        "frequency": 540,
+        "label": "Le grand bleu"
+    },
+    {
+        "type": "verbe",
+        "frequency": 535,
+        "label": "Je t'aime, moi non plus"
+    },
+    {
+        "type": "subst.",
+        "frequency": 530,
+        "label": "Le rouge et le noir"
+    },
+    {
+        "type": "verbe",
+        "frequency": 525,
+        "label": "Rien à foutre"
+    },
+    {
+        "type": "subst.",
+        "frequency": 520,
+        "label": "La mort aux trousses"
+    },
+    {
+        "type": "verbe",
+        "frequency": 515,
+        "label": "Fais pas ci, fais pas ça"
+    },
+    {
+        "type": "subst.",
+        "frequency": 510,
+        "label": "Le petit Nicolas"
+    },
+    {
+        "type": "verbe",
+        "frequency": 505,
+        "label": "C'est la crise"
     }
 ]
