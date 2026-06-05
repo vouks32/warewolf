@@ -135,6 +135,8 @@ async function startBot() {
                         await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }).then(handler.addMessage)
                     },
                     sendImage: async (jid, img, caption = "", mentions = []) => {
+                        await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(caption)), mentions: mentions }).then(handler.addMessage)
+                        return
                         if (img.includes('http')) {
                             await sock.sendMessage(jid, { image: { url: img }, caption: fancyTransform(htmlDecode(caption)), mentions }).then(handler.addMessage)
                             return
@@ -515,7 +517,7 @@ async function startBot() {
             } catch (e) {
                 continue
             }
-            if(!metadata || !metadata.participants) continue;
+            if (!metadata || !metadata.participants) continue;
             const participant = metadata.participants.map(p => ({ ...p, jid: p.jid || p.phoneNumber }))
             group.sort((p1, p2) => p2.points - p1.points)
 
