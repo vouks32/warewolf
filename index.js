@@ -162,11 +162,23 @@ async function startBot() {
         }
     })
     sock.ev.on('groups.update', async ([event]) => {
-        const metadata = await sock.groupMetadata(event.id)
+        let metadata = null
+            try {
+                metadata = await sock.groupMetadata(groupJid);
+            } catch (e) {
+                return
+            }
+            if (!metadata || !metadata.participants) return
         groupCache.set(event.id, metadata)
     })
     sock.ev.on('group-participants.update', async (event) => {
-        const metadata = await sock.groupMetadata(event.id)
+        let metadata = null
+            try {
+                metadata = await sock.groupMetadata(groupJid);
+            } catch (e) {
+                return 
+            }
+            if (!metadata || !metadata.participants) return
         groupCache.set(event.id, metadata)
 
         console.log('---------------------       group-participants.update -----------------------------------------')
@@ -450,7 +462,16 @@ async function startBot() {
         }
         for (const groupJid in groups) {
             const group = groups[groupJid];
-            const metadata = await sock.groupMetadata(groupJid);
+            let metadata = null
+
+            try {
+                metadata = await sock.groupMetadata(groupJid);
+            } catch (e) {
+                continue
+            }
+
+            if (!metadata || !metadata.participants) continue;
+
             const participant = metadata.participants.map(p => ({ ...p, jid: p.jid || p.phoneNumber }))
             group.sort((p1, p2) => p2.points - p1.points)
 
@@ -765,8 +786,13 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                 group.push(player)
 
             }
-
-            const metadata = await sock.groupMetadata(groupId);
+            let metadata = null
+            try {
+                metadata = await sock.groupMetadata(groupJid);
+            } catch (e) {
+                return await whatsapp.reply('Erreur lors de la récupération des données du groupe.')
+            }
+            if (!metadata || !metadata.participants) return await whatsapp.reply('Erreur lors de la récupération des données du groupe.');
 
             await sock.sendMessage(groupId, {
                 text: `Liste des Joueurs de *${metadata.subject}*:\n\n` + group.map((p, i) => ('[' + (i + 1) + ']') + ` - @${p.jid.split('@')[0]} *(${p.points} points)*`).join('\n')
