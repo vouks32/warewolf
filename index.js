@@ -879,7 +879,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
                 for (let i = 0; i < ids.length; i++) {
                     const id = ids[i];
-                    const _jid = id;
+                    let _jid = id;
                     if (id.includes('@lid')) {
                         for (const playerJid in allPlayers) {
                             const player = allPlayers[playerJid];
