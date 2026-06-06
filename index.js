@@ -163,22 +163,22 @@ async function startBot() {
     })
     sock.ev.on('groups.update', async ([event]) => {
         let metadata = null
-            try {
-                metadata = await sock.groupMetadata(groupJid);
-            } catch (e) {
-                return
-            }
-            if (!metadata || !metadata.participants) return
+        try {
+            metadata = await sock.groupMetadata(groupJid);
+        } catch (e) {
+            return
+        }
+        if (!metadata || !metadata.participants) return
         groupCache.set(event.id, metadata)
     })
     sock.ev.on('group-participants.update', async (event) => {
         let metadata = null
-            try {
-                metadata = await sock.groupMetadata(groupJid);
-            } catch (e) {
-                return 
-            }
-            if (!metadata || !metadata.participants) return
+        try {
+            metadata = await sock.groupMetadata(groupJid);
+        } catch (e) {
+            return
+        }
+        if (!metadata || !metadata.participants) return
         groupCache.set(event.id, metadata)
 
         console.log('---------------------       group-participants.update -----------------------------------------')
@@ -733,6 +733,23 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
 
     ////////////////////////////////////////////////////////    RESET ALL PLAYERS IN GROUP    ////////////////////////////////////////////////////////
+    handlers.text.push({
+        regex: /^!resetlid/,
+        fn: async (whatsapp) => {
+
+            const allPlayers = getAllUsers()
+            for (const playerJid in allPlayers) {
+                const player = allPlayers[playerJid];
+                player.lid = null
+                saveUser(player)
+            }
+
+            await sock.sendMessage(whatsapp.senderJid, {
+                text: `Les lids ont été réinitialisés.`
+            }).then(handler.addMessage)
+        }
+    })
+
     handlers.text.push({
         regex: /^!resetgroup/,
         fn: async (whatsapp) => {
