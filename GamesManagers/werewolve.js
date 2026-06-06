@@ -791,8 +791,8 @@ export class WereWolvesManager {
                         await whatsapp.sendMessage(groupId,
                             [`💄Après s'être faite écarter les jambes, en rentrant chez elle, la prostitué s'est faite écarter la cage thoracique \n`,
                                 `💄Après s'être faite Manger le Kpetou, la pute s'est faite remanger... les entrailles \n`,
-                                `💄Le zizi du client était tellement bien que la pute, perdu dans ses pensées, n'a pas entendu les loups marcher derrière elle \n`
-                                    `💄Une baise intense s'en est suivie d'une mort, Le déhors est mauvais \n`
+                                `💄Le zizi du client était tellement bien que la pute, perdu dans ses pensées, n'a pas entendu les loups marcher derrière elle \n`,
+                                `💄Une baise intense s'en est suivie d'une mort, Le déhors est mauvais \n`
                             ][Math.floor(Math.random() * 3)] +
                             `La prostitué est morte`)
                         victim.isDead = true
