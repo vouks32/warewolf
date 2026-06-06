@@ -184,7 +184,7 @@ export class WordGameManager {
                         }
                     } else {
                         user.LastWordGame = Date.now();
-                        user.wordGameCreated = 6;
+                        user.wordGameCreated = 3;
                     }
                     saveUser(user);
                 }

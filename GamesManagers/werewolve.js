@@ -400,12 +400,12 @@ export class WereWolvesManager {
                             const nextCreationDate = new Date(nextCreationTime);
                             await whatsapp.reply("🧩 Tu as déjà créé trop de parties de loup ! Tu dois attendre jusqu'au " + nextCreationDate.toLocaleString() + " avant d'en créer une autre.");
                             delete this.games[groupId]
-                            saveGames(this.games)
+                            this.saveGames(this.games)
                             return;
                         }
                     } else {
                         user.LastWerewolveGame = Date.now();
-                        user.WerewolveGameCreated = 6;
+                        user.WerewolveGameCreated = 3;
                     }
                     saveUser(user);
                 }
@@ -2010,15 +2010,15 @@ export class WereWolvesManager {
         let user = getUser(whatsapp.sender)
 
         if (user && user.LastHangGame && Date.now() - user.LastHangGame > 24 * 60 * 60 * 1000) {
-            user.hangGameCreated = 7
+            user.hangGameCreated = 4
             user.LastHangGame = Date.now();
         }
         if (user && user.LastWordGame && Date.now() - user.LastWordGame > 24 * 60 * 60 * 1000) {
-            user.wordGameCreated = 7
+            user.wordGameCreated = 4
             user.LastWordGame = Date.now();
         }
         if (user && user.LastWerewolveGame && Date.now() - user.LastWerewolveGame > 24 * 60 * 60 * 1000) {
-            user.WerewolveGameCreated = 7
+            user.WerewolveGameCreated = 4
             user.LastWerewolveGame = Date.now();
         }
 
@@ -2038,11 +2038,11 @@ export class WereWolvesManager {
                 "pointsTransactions": [],
                 "roleHistory": {},
                 "LastWordGame": Date.now(),
-                "wordGameCreated": 7,
+                "wordGameCreated": 4,
                 "LastHangGame": Date.now(),
-                "hangGameCreated": 7,
+                "hangGameCreated": 4,
                 "LastWerewolveGame": Date.now(),
-                "WerewolveGameCreated": 7,
+                "WerewolveGameCreated": 4,
                 "francs": 250,
                 "clairvoyance": 0,
                 "incidence ": 0,
