@@ -245,6 +245,10 @@ export class WordGameManager {
         }
 
         const user = getUser(playerJid)
+        if (user) {
+            user.lid = whatsapp.ids.lid || user.lid || null
+            saveUser(user)
+        }
         if (game.gameType === 2 && user.francs < game.misePerUser) {
             await whatsapp.reply("⚠️ Tu n'as pas assez de francs pour rejoindre une partie avec mise en jeu.");
             return;

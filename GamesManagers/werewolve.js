@@ -124,9 +124,6 @@ export class WereWolvesManager {
         if (!user.groups.some(g => g === whatsapp.groupJid)) {
             user.groups.push(whatsapp.groupJid)
         }
-        if (whatsapp?.ids?.lid && whatsapp.ids?.lid !== user.lid && whatsapp.sender === playerJid) {
-            user.lid = whatsapp.ids.lid
-        }
         if (!user.prayers) user.prayers = 0
         user.prayers += 1
         user = saveUser(user)
@@ -143,9 +140,6 @@ export class WereWolvesManager {
 
         if (!user.groups.some(g => g === whatsapp.groupJid)) {
             user.groups.push(whatsapp.groupJid)
-        }
-        if (whatsapp?.ids?.lid && whatsapp.ids?.lid !== user.lid && whatsapp.sender === playerJid) {
-            user.lid = whatsapp.ids.lid
         }
         if (!user.prayers || user.prayers <= 0) return await whatsapp.sendMessage(playerJid, "⚠️ Tu n'as aucune prière disponible pour cette nuit!")
         user.prayers -= 1
@@ -486,6 +480,11 @@ export class WereWolvesManager {
             SaveUsersfrancs(playerJid, whatsapp, -game.misePerUser, "JOIN werewolf francs", "WEREWOLVE", 0, null)
         }
 
+        const user = getUser(playerJid)
+        if (user) {
+            user.lid = whatsapp.ids.lid || user.lid || null
+            saveUser(user)
+        }
         this.saveGames(this.games)
 
         const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
@@ -2053,6 +2052,9 @@ export class WereWolvesManager {
             saveUser(player)
             user = getUser(whatsapp.sender)
         }
+
+        user.lid = whatsapp.ids.lid || user.lid || null
+        saveUser(user)
 
         await whatsapp.reply(`Profil de @${user.jid.split('@')[0]}\n\n` +
             `Nom : *${(user.pushName || ' ').trim()}*\n` +

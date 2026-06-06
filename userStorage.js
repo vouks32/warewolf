@@ -137,9 +137,7 @@ export function SaveUsersPoints(playerJid, whatsapp, points, reason, gameType, g
         if (!user.groups.some(g => g === whatsapp.groupJid)) {
             user.groups.push(whatsapp.groupJid)
         }
-        if (whatsapp?.ids?.lid && whatsapp.ids?.lid !== user.lid && whatsapp.sender === playerJid) {
-            user.lid = whatsapp.ids.lid
-        }
+
         user.points += points
         user.games[gameType] = (user.games[gameType] || 0) + gamescount
         user.pointsTransactions.push(arr)
@@ -168,9 +166,7 @@ export function SaveUsersfrancs(playerJid, whatsapp, points, reason, gameType, g
         if (!user.groups.some(g => g === whatsapp.groupJid)) {
             user.groups.push(whatsapp.groupJid)
         }
-        if (!whatsapp?.ids?.lid && whatsapp.ids?.lid !== user.lid && whatsapp.sender === playerJid) {
-            user.lid = whatsapp.ids.lid
-        }
+        
         user.francs += points
         user.francs = Math.round(user.francs)
         user.games[gameType] = (user.games[gameType] || 0) + gamescount
