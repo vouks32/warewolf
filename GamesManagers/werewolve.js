@@ -2070,7 +2070,7 @@ export class WereWolvesManager {
         user.lid = whatsapp.ids.lid || user.lid || null
         saveUser(user)
 
-        await whatsapp.sendMessage(groupId, `Profil de @${user.jid.split('@')[0]}\n\n` +
+        await whatsapp.sendMessage(whatsapp.remoteJid, `Profil de @${user.jid.split('@')[0]}\n\n` +
             `Nom : *${(user.pushName || ' ').trim()}*\n` +
             `points : *${user.points} points*\n` +
             `francs : *${user.francs ? user.francs : 0} frs*\n\n` +
