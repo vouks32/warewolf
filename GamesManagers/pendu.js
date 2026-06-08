@@ -76,7 +76,7 @@ function delay(ms) {
 // --- Main Manager ---
 export class PenduManager {
     constructor() {
-        this.games = loadGames()
+        this.games = this.loadGames()
     }
 
     async init(whatsapp) {
