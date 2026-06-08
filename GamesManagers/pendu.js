@@ -104,7 +104,6 @@ export class PenduManager {
                             await whatsapp.sendMessage(groupId, "⏰ Temps écoulé pour choisir le type de partie! Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
                             delete this.games[groupId]
                             this.saveGames(this.games)
-                            break;
                         }
                     }, 30 * 1000)
                     timers[groupId][1] = setTimeout(async () => {
