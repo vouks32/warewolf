@@ -123,8 +123,8 @@ async function startBot() {
         } else if (connection === "open") {
             console.log("✅ Bot is online!")
             messagesCount = MAX_MESSAGES
-            if (lastGroupJid)
-                await sock.sendMessage(lastGroupJid, { text: fancyTransform(' --- BOT de nouveau actif --- \nJe suis de nouveau opérationnel'), }).then(handler.addMessage)
+           /* if (lastGroupJid)*
+                await sock.sendMessage(lastGroupJid, { text: fancyTransform(' --- BOT de nouveau actif --- \nJe suis de nouveau opérationnel'), }).then(handler.addMessage)*/
             lastGroupJid = null
 
             // init games
@@ -132,7 +132,7 @@ async function startBot() {
                 const iniWha = {
                     sender: null,
                     sendMessage: async (jid, message, mentions = undefined) => {
-                        await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }).then(handler.addMessage)
+                        await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(message)), mentions: mentions }).then(handler.addMessage)
                     },
                     sendImage: async (jid, img, caption = "", mentions = []) => {
                         await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(caption)), mentions: mentions }).then(handler.addMessage)
@@ -186,7 +186,7 @@ async function startBot() {
 
         for (const p of event.participants) {
             if (event.action === "add") {
-                const text = `Bienvenue @${p.phoneNumber.split('@')[0]},\n\nJe suis un bot donc pas la peine de me repondre, je m'en fou\n\nIci personne ne se connait donc ne soit pas peur, parle nous\n\nIci il y a plein de jeux mais on joue tout le temps au jeu du loups donc...\n\nEnvoie *!info* pour en savoir plus`
+                const text = `Bienvenue @${p.phoneNumber.split('@')[0]},\n\nJe suis un bot donc pas la peine de me repondre, je m'en fou\n\nIci personne ne se connait donc ne soit pas peur, parle nous\n\nDans ce groupe tu peux jouer à différents jeux\nEnvoie *!info* pour en savoir plus`
                 await sock.sendMessage(event.id, { text: fancyTransform(text), mentions: [p.phoneNumber, '237676073559@s.whatsapp.net'] }).then(handler.addMessage)
             }
         }
@@ -245,7 +245,7 @@ async function startBot() {
                 lastGroupJid = remoteJid
             }
             if (text.startsWith('!') && !game && messagesCount <= 0 && isGroup) {
-                await sock.sendMessage(lastGroupJid, { text: fancyTransform(' *--- Redémarrage de sécurité ---* \n\nLa relation toxique que j\'ai avec whatsapp m\'oblige à me redémarrer \n Patiente un peu'), }, { quoted: msg }).then(handler.addMessage)
+               // await sock.sendMessage(lastGroupJid, { text: fancyTransform(' *--- Redémarrage de sécurité ---* \n\nLa relation toxique que j\'ai avec whatsapp m\'oblige à me redémarrer \n Patiente un peu'), }, { quoted: msg }).then(handler.addMessage)
                 await startBot()
                 continue
             }
@@ -272,14 +272,14 @@ async function startBot() {
                 raw: msg,
 
                 reply: async (message, mentions = undefined) => {
-                    await sock.sendMessage(remoteJid, { text: fancyTransform(htmlDecode(!GamblingDay ? message : message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }, { quoted: getContentType(msg) ? msg : undefined }).then(handler.addMessage)
+                    await sock.sendMessage(remoteJid, { text: fancyTransform(htmlDecode(!GamblingDay ? message : message)), mentions: mentions }, { quoted: getContentType(msg) ? msg : undefined }).then(handler.addMessage)
                 },
                 delete: async () => {
                     await sock.sendMessage(remoteJid, { delete: msg.key })
                 },
 
                 sendMessage: async (jid, message, mentions = undefined) => {
-                    await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(!GamblingDay ? message : message) + (message.length > 300 ? '\n\n𝐯𝐨𝐮𝐤𝐬 𝐛𝐨𝐭' : "")), mentions: mentions }).then(handler.addMessage)
+                    await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(!GamblingDay ? message : message) ), mentions: mentions }).then(handler.addMessage)
                 },
 
                 sendImage: async (jid, img, caption = "", mentions = []) => {
@@ -308,6 +308,55 @@ async function startBot() {
                         "\n\n======================"
                     await sock.sendMessage(jid, { text: fancyTransform(text), mentions: mentions }).then(handler.addMessage)*/
 
+                },
+
+                sendSticker: async (jid, img, caption = "", mentions = []) => {
+                    try {
+                        let stickerBuffer
+                        if (img.includes('http')) {
+                            const response = await fetch(img)
+                            if (!response.ok) throw new Error(`Failed to fetch sticker from url: ${response.status}`)
+                            stickerBuffer = Buffer.from(await response.arrayBuffer())
+                        } else {
+                            stickerBuffer = fs.readFileSync(img)
+                        }
+
+                        await sock.sendMessage(jid, { sticker: stickerBuffer }).then(handler.addMessage)
+                    } catch (error) {
+                        console.log("Error sending sticker, fallback to caption text", error)
+                        if (caption && caption.length > 0) {
+                            await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(caption)), mentions: mentions }).then(handler.addMessage)
+                        }
+                    }
+                },
+
+                downloadSticker: async (jid, img, caption = "", mentions = []) => {
+                    let localPath = img
+
+                    try {
+                        if (img.includes('http')) {
+                            const downloadDir = './downloaded_links'
+                            if (!fs.existsSync(downloadDir)) fs.mkdirSync(downloadDir, { recursive: true })
+
+                            const fileName = img.split('/').pop().split('?')[0] || `downloaded_${Date.now()}.bin`
+                            localPath = `${downloadDir}/${Date.now()}_${fileName}`
+
+                            const response = await fetch(img)
+                            if (!response.ok) throw new Error(`Failed to fetch image from url: ${response.status}`)
+                            const buffer = Buffer.from(await response.arrayBuffer())
+                            fs.writeFileSync(localPath, buffer)
+                        }
+
+                        await sock.sendMessage(jid, {
+                            image: fs.readFileSync(localPath),
+                            caption: fancyTransform(htmlDecode(caption)),
+                            mentions: mentions
+                        }).then(handler.addMessage)
+
+                    } catch (error) {
+                        console.log("Error downloading or sending image, maybe try to optimize it ? ", error)
+                        await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(caption)), mentions: mentions }).then(handler.addMessage)
+                    }
                 },
 
                 makeAdmin: async (groupJid, jid) => {

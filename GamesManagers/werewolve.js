@@ -65,8 +65,23 @@ export class WereWolvesManager {
                 timers[groupId] = [null, null, null, null, null, null, null]
 
             const game = this.games[groupId]
-            await whatsapp.sendMessage(groupId, "*--- Partie en cours ---*\n\nUne partie de *!werewolves* était en cours avant que le bot ne redémarre. Reprise de la partie")
+            // await whatsapp.sendMessage(groupId, "*--- Partie en cours ---*\n\nUne partie de *!werewolves* était en cours avant que le bot ne redémarre. Reprise de la partie")
             switch (game.state) {
+                case "CHOOSING_GAME_TYPE":
+                    await whatsapp.sendMessage(groupId, "⏰ 30 secondes restantes pour choisir le type de partie!")
+                    timers[groupId][0] = setTimeout(async () => {
+                        if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
+                            await whatsapp.sendMessage(groupId, "⏰ Temps écoulé pour choisir le type de partie! Partie annulée.\nEnvoyez *!werewolve* pour réessayer.")
+                            delete this.games[groupId]
+                            this.saveGames(this.games)
+                            break
+                        }
+                    }, 30 * 1000)
+                    timers[groupId][1] = setTimeout(async () => {
+                        await whatsapp.sendMessage(groupId, "🎮 15 secs restantes pour rejoindre la partie! \nEnvoie *1* ou *2*")
+                    }, 15 * 1000)
+
+                    break;
                 case "WAITING_PLAYERS":
                     timers[groupId][0] = setTimeout(async () => {
                         await this.startGame(groupId, whatsapp)
@@ -430,16 +445,16 @@ export class WereWolvesManager {
             await this.startGame(groupId, whatsapp)
         }, 3 * 60 * 1000)
         timers[groupId][1] = setTimeout(async () => {
-            await whatsapp.sendMessage(groupId, "🎮 2 minute restantes pour rejoindre la partie! \nEnvoie *!play _pseudo_*")
+            await whatsapp.sendMessage(groupId, "🎮 2 minute restantes pour rejoindre la partie! \nEnvoie *!play _pseudo_*" + (game.gameType === 2 ? "\n\n💸 Partie avec mise de *" + game.mise + " francs*" : "\n\n🪙 Partie normale, pas de mise en jeu"))
         }, 1 * 60 * 1000)
         timers[groupId][2] = setTimeout(async () => {
-            await whatsapp.sendMessage(groupId, "🎮 1 minute restante pour rejoindre la partie! \nEnvoie *!play _pseudo_*")
+            await whatsapp.sendMessage(groupId, "🎮 1 minute restante pour rejoindre la partie! \nEnvoie *!play _pseudo_*" + (game.gameType === 2 ? "\n\n💸 Partie avec mise de *" + game.mise + " francs*" : "\n\n🪙 Partie normale, pas de mise en jeu"))
         }, 2 * 60 * 1000)
         timers[groupId][3] = setTimeout(async () => {
-            await whatsapp.sendMessage(groupId, "🎮 30 secondes restantes pour rejoindre la partie! \nEnvoie *!play _pseudo_*.")
+            await whatsapp.sendMessage(groupId, "🎮 30 secondes restantes pour rejoindre la partie! \nEnvoie *!play _pseudo_*" + (game.gameType === 2 ? "\n\n💸 Partie avec mise de *" + game.mise + " francs*" : "\n\n🪙 Partie normale, pas de mise en jeu"))
         }, 30000 + (2 * 60 * 1000))
         timers[groupId][4] = setTimeout(async () => {
-            await whatsapp.sendMessage(groupId, "🎮 15 secondes restantes pour rejoindre la partie! \nEnvoie *!play _pseudo_*.")
+            await whatsapp.sendMessage(groupId, "🎮 15 secondes restantes pour rejoindre la partie! \nEnvoie *!play _pseudo_*." + (game.gameType === 2 ? "\n\n💸 Partie avec mise de *" + game.mise + " francs*" : "\n\n🪙 Partie normale, pas de mise en jeu"))
         }, 45000 + (2 * 60 * 1000))
     }
 
@@ -676,7 +691,7 @@ export class WereWolvesManager {
             "🌙 La nuit est tombée... \n👿 Seule les agents du mal sont encore debout, et Les putes aussi..., \n\nVous avez *2 minutes*",
         ]
         console.log('sending night msg')
-        await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "nightfall.jpg"), nightText[Math.floor(Math.random() * nightText.length)])
+        await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "nightfall.jpg"), nightText[Math.floor(Math.random() * nightText.length)] + (game.gameType === 2 ? "\n\nPartie avec mise de *" + game.mise + " francs*" : "Partie normale, pas de mise en jeu"))
         const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
         const mentions = game.players.map((p, i) => p.jid)
         await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
@@ -688,16 +703,16 @@ export class WereWolvesManager {
             await this.resolveNight(groupId, whatsapp)
         }, 120 * 1000)
         timers[groupId][1] = setTimeout(async () => {
-            await whatsapp.sendMessage(groupId, "🎮 90 secondes restante avant le lever du soleil!")
+            await whatsapp.sendMessage(groupId, "🎮 90 secondes restante avant le lever du soleil!" + (game.gameType === 2 ? "\n\n💸 Partie avec mise de *" + game.mise + " francs*" : "\n\n🪙 Partie normale, pas de mise en jeu"))
         }, 30 * 1000)
         timers[groupId][2] = setTimeout(async () => {
-            await whatsapp.sendMessage(groupId, "🎮 60 secondes restantes avant le lever du soleil!")
+            await whatsapp.sendMessage(groupId, "🎮 60 secondes restantes avant le lever du soleil!" + (game.gameType === 2 ? "\n\n💸 Partie avec mise de *" + game.mise + " francs*" : "\n\n🪙 Partie normale, pas de mise en jeu"))
         }, 60 * 1000)
         timers[groupId][3] = setTimeout(async () => {
-            await whatsapp.sendMessage(groupId, "🎮 30 secondes restantes avant le lever du soleil!")
+            await whatsapp.sendMessage(groupId, "🎮 30 secondes restantes avant le lever du soleil!" + (game.gameType === 2 ? "\n\n💸 Partie avec mise de *" + game.mise + " francs*" : "\n\n🪙 Partie normale, pas de mise en jeu"))
         }, 90 * 1000)
         timers[groupId][4] = setTimeout(async () => {
-            await whatsapp.sendMessage(groupId, "🎮 15 secondes restantes avant le lever du soleil!")
+            await whatsapp.sendMessage(groupId, "🎮 15 secondes restantes avant le lever du soleil!" + (game.gameType === 2 ? "\n\n💸 Partie avec mise de *" + game.mise + " francs*" : "\n\n🪙 Partie normale, pas de mise en jeu"))
         }, 105 * 1000)
     }
 

@@ -29,9 +29,24 @@ export class WordGameManager {
                 timers[groupId] = [null, null, null, null, null, null, null]
 
             const game = this.games[groupId]
-            await whatsapp.sendMessage(groupId, "*--- Partie en cours ---*\n\nUne partie de *!mots* était en cours avant que le bot ne redémarre. Reprise de la partie")
+            //await whatsapp.sendMessage(groupId, "*--- Partie en cours ---*\n\nUne partie de *!mots* était en cours avant que le bot ne redémarre. Reprise de la partie")
             whatsapp.groupJid = groupId
             switch (game.state) {
+                case "CHOOSING_GAME_TYPE":
+                    await whatsapp.sendMessage(groupId, "⏰ 30 secondes restantes pour choisir le type de partie!")
+                    timers[groupId][0] = setTimeout(async () => {
+                        if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
+                            await whatsapp.sendMessage(groupId, "⏰ Temps écoulé pour choisir le type de partie! Partie annulée.\nEnvoyez *!mots* pour réessayer.")
+                            delete this.games[groupId]
+                            this.saveGames(this.games)
+                            break
+                        }
+                    }, 30 * 1000)
+                    timers[groupId][1] = setTimeout(async () => {
+                        await whatsapp.sendMessage(groupId, "🎮 15 secs restantes pour rejoindre la partie! \nEnvoie *1* ou *2*")
+                    }, 15 * 1000)
+
+                    break;
                 case "WAITING_PLAYERS":
                     await whatsapp.sendMessage(groupId, "🎮 60 secs restantes pour rejoindre la partie! \nEnvoie *!play _pseudo_*")
                     timers[groupId][0] = setTimeout(async () => {
@@ -53,7 +68,7 @@ export class WordGameManager {
                     await this.endGame(groupId, whatsapp)
                     break;
                 default:
-                    whatsapp.sendMessage(groupId, 'Partie annulé, veillez envoyer *!makewords* pour relancer une partie')
+                    whatsapp.sendMessage(groupId, 'Partie annulé, veillez envoyer *!mots* pour relancer une partie')
                     delete this.games[groupId]
                     this.saveGames(this.games)
                     break;
@@ -64,7 +79,6 @@ export class WordGameManager {
     // ---------------- UTILS ----------------
 
     loadGames() {
-        return {}
         if (!fs.existsSync(DATA_FILE)) return {}
         return JSON.parse(fs.readFileSync(DATA_FILE))
     }
@@ -211,7 +225,7 @@ export class WordGameManager {
 
         await whatsapp.sendMessage(
             groupId,
-            `🎮 *Début du jeu de lettres !*\n\nRejoignez la partie avec *!play _pseudo_* dans les prochains 120 secondes !` + (game.gameType == 2 ? "\n\n Une partie de mots coutera *" + game.misePerUser + " francs* et vous remportez le totale des francs misé" : ""));
+            `🎮 *Début du jeu de lettres !*\n\nRejoignez la partie avec *!play _pseudo_* dans les prochains 120 secondes !` + (game.gameType == 2 ? "\n\n💸 Une partie de mots coutera *" + game.misePerUser + " francs* et vous remportez le totale des francs misé" : "🪙 partie normale, sans mise"));
 
         // Timer de 90 secondes pour rejoindre
         this.games[groupId].timer = setTimeout(async () => {
@@ -221,13 +235,13 @@ export class WordGameManager {
         // Rappels
         setTimeout(async () => {
             if (this.games[groupId]?.state === "WAITING_PLAYERS") {
-                await whatsapp.sendMessage(groupId, "⏰ 60 secondes restantes pour rejoindre !");
+                await whatsapp.sendMessage(groupId, "⏰ 60 secondes restantes pour rejoindre !" + (game.gameType === 2 ? "\n\n💸 Partie avec mise de *" + game.mise + " francs*" : "\n\n🪙 Partie normale, pas de mise en jeu"));
             }
         }, 60 * 1000);
 
         setTimeout(async () => {
             if (this.games[groupId]?.state === "WAITING_PLAYERS") {
-                await whatsapp.sendMessage(groupId, "⏰ 30 secondes restantes pour rejoindre !");
+                await whatsapp.sendMessage(groupId, "⏰ 30 secondes restantes pour rejoindre !" + (game.gameType === 2 ? "\n\n💸 Partie avec mise de *" + game.mise + " francs*" : "\n\n🪙 Partie normale, pas de mise en jeu"));
             }
         }, 90 * 1000);
     }
@@ -309,7 +323,7 @@ export class WordGameManager {
 
         await whatsapp.sendMessage(
             groupId,
-            `🔄 *Manche ${game.currentRound}/${game.totalRounds}*\n\nVous avez 90 secondes pour proposer un mot !\n\nLettres : \n*${game.letters.join(" ")}*`,
+            `🔄 *Manche ${game.currentRound}/${game.totalRounds}*\n\nVous avez 90 secondes pour proposer un mot !\n\nLettres : \n*${game.letters.join(" ")}*` + (game.gameType === 2 ? "\n\n💸 Partie avec mise de *" + game.mise + " francs*" : "\n\n🪙 Partie normale, pas de mise en jeu"),
             game.players.map(p => p.jid)
         );
 
@@ -326,11 +340,11 @@ export class WordGameManager {
         }, 90 * 1000);
         // Timer de la manche (30 secondes)
         game.roundTimer = setTimeout(async () => {
-            await whatsapp.sendMessage(groupId, `⏰ 30 secondes restantes !\n\nLettres : \n*${game.letters.join(" ")}*`);
+            await whatsapp.sendMessage(groupId, `⏰ 30 secondes restantes !\n\nLettres : \n*${game.letters.join(" ")}*` + (game.gameType === 2 ? "\n\n💸 Partie avec mise de *" + game.mise + " francs*" : "\n\n🪙 Partie normale, pas de mise en jeu"));
         }, 60 * 1000);
         // Timer de la manche (30 secondes)
         game.roundTimer = setTimeout(async () => {
-            await whatsapp.sendMessage(groupId, `⏰ 15 secondes restantes !\n\nLettres : \n*${game.letters.join(" ")}*`);
+            await whatsapp.sendMessage(groupId, `⏰ 15 secondes restantes !\n\nLettres : \n*${game.letters.join(" ")}*` + (game.gameType === 2 ? "\n\n💸 Partie avec mise de *" + game.mise + " francs*" : "\n\n🪙 Partie normale, pas de mise en jeu"));
         }, 75 * 1000);
     }
 

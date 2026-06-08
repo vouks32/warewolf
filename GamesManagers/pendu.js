@@ -73,20 +73,75 @@ function delay(ms) {
     });
 }
 
-function loadGames() {
-    return {}
-}
-
-function saveGames(games) {
-    let temp = { ...games }
-    fs.writeFileSync(DATA_FILE, JSON.stringify(temp, null, 2))
-}
-
-
 // --- Main Manager ---
 export class PenduManager {
     constructor() {
         this.games = loadGames()
+    }
+
+    async init(whatsapp) {
+        for (const groupId in this.games) {
+            if (timers[groupId])
+                for (let i = 0; i < timers[groupId].length; i++) {
+                    const timer = timers[groupId][i];
+                    if (!timer) continue
+                    try {
+                        clearTimeout(timer)
+                    } catch (e) {
+                    }
+                }
+            else
+                timers[groupId] = [null, null, null, null, null, null, null]
+
+            const game = this.games[groupId]
+            //await whatsapp.sendMessage(groupId, "*--- Partie en cours ---*\n\nUne partie de *!mots* était en cours avant que le bot ne redémarre. Reprise de la partie")
+            whatsapp.groupJid = groupId
+            switch (game.state) {
+                case "CHOOSING_GAME_TYPE":
+                    await whatsapp.sendMessage(groupId, "⏰ 30 secondes restantes pour choisir le type de partie!")
+                    timers[groupId][0] = setTimeout(async () => {
+                        if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
+                            await whatsapp.sendMessage(groupId, "⏰ Temps écoulé pour choisir le type de partie! Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
+                            delete this.games[groupId]
+                            this.saveGames(this.games)
+                            break;
+                        }
+                    }, 30 * 1000)
+                    timers[groupId][1] = setTimeout(async () => {
+                        await whatsapp.sendMessage(groupId, "🎮 15 secs restantes pour rejoindre la partie! \nEnvoie *1* ou *2*")
+                    }, 15 * 1000)
+
+                    break;
+                case "SET_WORD":
+                    game.state = "SET_WORD"
+                    await this.createGame(groupId, whatsapp)
+                    break;
+                case "PLAYING":
+                    game.state = "SET_WORD"
+                    await this.startGame(groupId, whatsapp)
+                    break;
+                case "ENDED":
+                    game.state = "PLAYING"
+                    await this.resolveGame(groupId, whatsapp)
+                    break;
+                default:
+                    whatsapp.sendMessage(groupId, 'Partie annulé, veillez envoyer *!pendu* pour relancer une partie')
+                    delete this.games[groupId]
+                    this.saveGames(this.games)
+                    break;
+            }
+        }
+    }
+
+    loadGames() {
+        if (!fs.existsSync(DATA_FILE)) return {}
+        return JSON.parse(fs.readFileSync(DATA_FILE))
+    }
+
+    saveGames(games) {
+        let temp = { ...games }
+        Object.entries(temp).forEach(arr => { temp[arr[0]].timer = null })
+        fs.writeFileSync(DATA_FILE, JSON.stringify(temp, null, 2))
     }
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0, game = null) {
@@ -146,7 +201,7 @@ export class PenduManager {
             players: [],
             unNormalizedWord: word,
             word: (new String(word)).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(),
-            displayWord: "□".repeat(word.length).split('').map((c, i) => word[i] === " " ? " " : word[i] === "'" ? "'" : word[i] === "," ? "," :word[i] === "!" ? "!" : word[i] === "?" ? "?" : word[i] === "." ? "." : word[i] === "-" ? "-" : /^\d$/.test(word[i])? word[i] : c).join(""),
+            displayWord: "□".repeat(word.length).split('').map((c, i) => word[i] === " " ? " " : word[i] === "'" ? "'" : word[i] === "," ? "," : word[i] === "!" ? "!" : word[i] === "?" ? "?" : word[i] === "." ? "." : word[i] === "-" ? "-" : /^\d$/.test(word[i]) ? word[i] : c).join(""),
             guessedLetters: [],
             wrongLetters: [],
             rounds: -1,
@@ -164,7 +219,8 @@ export class PenduManager {
             if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
                 await whatsapp.sendMessage(groupId, "⏰ Temps écoulé pour choisir le type de partie! Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
                 delete this.games[groupId]
-                saveGames(this.games)
+                this.saveGames(this.games)
+                return
             }
         }, 1 * 60 * 1000)
         timers[groupId][1] = setTimeout(async () => {
@@ -275,7 +331,7 @@ export class PenduManager {
 
         if (game.gameType === 2) {
             await whatsapp.sendMessage(groupId, `Scores:\n\n${playerScores.sort((a, b) => (b.correctCount - b.incorrectCount) - (a.correctCount - a.incorrectCount)).map(p => {
-                let playerFraction = totalPoints > 0? ((p.correctCount - p.incorrectCount) < 0 ? (0) : (p.correctCount - p.incorrectCount)) / totalPoints : 0
+                let playerFraction = totalPoints > 0 ? ((p.correctCount - p.incorrectCount) < 0 ? (0) : (p.correctCount - p.incorrectCount)) / totalPoints : 0
                 return `@${p.jid.split('@')[0]}:\n✅ *${p.correctCount}* lettres correctes\n❌ *${p.incorrectCount}* lettres incorrectes \n *+${Math.round((playerFraction * paidMise))} francs*`
             }).join('\n\n')}`
                 , playerScores.map(p => p.jid))
@@ -287,7 +343,7 @@ export class PenduManager {
 
         for (let p of playerScores) {
             const points = (p.correctCount) - p.incorrectCount
-            let playerFraction = totalPoints > 0? ((points < 0 ? 0 : points) / totalPoints) : 0
+            let playerFraction = totalPoints > 0 ? ((points < 0 ? 0 : points) / totalPoints) : 0
             console.log("POINTS ====== ", points, " TOTAL POINTS ====== ", totalPoints, " PAID MISE ====== ", paidMise)
             await this.addUserPoints(p.jid, whatsapp, game.gameType === 2 ? (totalPoints <= 0 ? 0 : Math.round((playerFraction * paidMise))) : points, "pendu points", 1, game)
         }
@@ -316,6 +372,8 @@ export class PenduManager {
 
         await whatsapp.sendMessage(groupId, `envoie *"!pendu"* Pour jouer à nouveau`)
         delete this.games[groupId]
+        this.saveGames(this.games)
+        return
 
     }
 
@@ -343,7 +401,7 @@ export class PenduManager {
             game.players.push({ jid: voterJid, answers: [{ letter, correct: game.word.includes(letter) }], points: [] })
             game.mise += game.gameType === 2 ? game.misePerUser : 0
             this.addUserPoints(voterJid, whatsapp, game.gameType === 2 ? -game.misePerUser : 0, "a rejoint une partie de pendu en cours", 0, game)
-           
+
             if (user) {
                 user.lid = whatsapp.ids.lid || user.lid || null
                 saveUser(user)
@@ -368,19 +426,19 @@ export class PenduManager {
 
             game.displayWord = newDisplay
 
-            await whatsapp.sendMessage(groupId, `🎉 Bravo ! La lettre *${letter}* est dans le ${game.unNormalizedWord.toUpperCase().includes(' ') ? 'mot' : 'expression'}.\n\n${HANGMANPICS[game.wrongLetters.length]}\n\n${game.unNormalizedWord.toUpperCase().includes(' ') ? 'Mot' : 'Expression'} à deviner :\n ${game.displayWord.toUpperCase().split("").join("")}`)
+            await whatsapp.sendMessage(groupId, `🎉 Bravo ! La lettre *${letter}* est dans le ${game.unNormalizedWord.toUpperCase().includes(' ') ? 'mot' : 'expression'}.\n\n${HANGMANPICS[game.wrongLetters.length]}\n\n${game.unNormalizedWord.toUpperCase().includes(' ') ? 'Mot' : 'Expression'} à deviner :\n ${game.displayWord.toUpperCase().split("").join("")}` + (game.gameType === 2 ? "\n\n💸 Partie avec mise de *" + game.mise + " francs*" : "\n\n🪙 Partie normale, pas de mise en jeu"))
         } else {
             // Wrong letter
             game.wrongLetters.push(letter)
-            await whatsapp.sendMessage(groupId, `❌ Oops ! La lettre *${letter}* n'est pas dans le ${game.unNormalizedWord.toUpperCase().includes(' ') ? 'mot' : 'expression'}.\n\n${HANGMANPICS[game.wrongLetters.length]}\n\n${game.unNormalizedWord.toUpperCase().includes(' ') ? 'Mot' : 'Expression'} à deviner :\n ${game.displayWord.toUpperCase().split("").join("")}`)
+            await whatsapp.sendMessage(groupId, `❌ Oops ! La lettre *${letter}* n'est pas dans le ${game.unNormalizedWord.toUpperCase().includes(' ') ? 'mot' : 'expression'}.\n\n${HANGMANPICS[game.wrongLetters.length]}\n\n${game.unNormalizedWord.toUpperCase().includes(' ') ? 'Mot' : 'Expression'} à deviner :\n ${game.displayWord.toUpperCase().split("").join("")}` + (game.gameType === 2 ? "\n\n💸 Partie avec mise de *" + game.mise + " francs*" : "\n\n🪙 Partie normale, pas de mise en jeu"))
         }
         if (game.displayWord === game.word) {
-            await whatsapp.sendMessage(groupId, `🏆 Félicitations ! ${game.unNormalizedWord.toUpperCase().includes(' ') ? 'Le mot' : 'L\'expression'} *${game.unNormalizedWord}* a été deviné correctement !`)
+            await whatsapp.sendMessage(groupId, `🏆 Félicitations ! ${game.unNormalizedWord.toUpperCase().includes(' ') ? 'Le mot' : 'L\'expression'} *${game.unNormalizedWord}* a été deviné correctement !` + (game.gameType === 2 ? "\n\n💸 Partie avec mise de *" + game.mise + " francs*" : "\n\n🪙 Partie normale, pas de mise en jeu"))
             await this.resolveGame(groupId, whatsapp)
             return
         }
         if (game.wrongLetters.length >= HANGMANPICS.length - 1) {
-            await whatsapp.sendMessage(groupId, `💀 La partie est terminée ! ${game.unNormalizedWord.toUpperCase().includes(' ') ? 'Le mot' : 'L\'expression'} était *${game.unNormalizedWord}*.\n\n${HANGMANPICS[HANGMANPICS.length - 1]}`)
+            await whatsapp.sendMessage(groupId, `💀 La partie est terminée ! ${game.unNormalizedWord.toUpperCase().includes(' ') ? 'Le mot' : 'L\'expression'} était *${game.unNormalizedWord}*.\n\n${HANGMANPICS[HANGMANPICS.length - 1]}` + (game.gameType === 2 ? "\n\n💸 Partie avec mise de *" + game.mise + " francs*" : "\n\n🪙 Partie normale, pas de mise en jeu"))
             await this.resolveGame(groupId, whatsapp)
             return
         }
@@ -396,7 +454,7 @@ export class PenduManager {
         await whatsapp.sendMessage(groupId, `*🏆 Partie annulé!*`)
         await whatsapp.sendMessage(groupId, `envoie *"!pendu"* pour jouer à nouveau`)
         delete this.games[groupId]
-        saveGames(this.games)
+        this.saveGames(this.games)
         return
     }
 
