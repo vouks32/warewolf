@@ -305,7 +305,7 @@ export class WereWolvesManager {
 
     async chooseGameType(groupId, whatsapp) {
         if (this.games[groupId]) {
-            await whatsapp.reply("Une partie est déjà en cours wesh!")
+            await whatsapp.sendMessage(groupId, "Une partie est déjà en cours wesh!")
             return
         }
         timers[groupId] = [null, null, null, null, null, null, null]
@@ -406,7 +406,7 @@ export class WereWolvesManager {
                         } else {
                             const nextCreationTime = user.LastWerewolveGame + 24 * 60 * 60 * 1000;
                             const nextCreationDate = new Date(nextCreationTime);
-                            await whatsapp.reply("🧩 Tu as déjà créé trop de parties de loup ! Tu dois attendre jusqu'au " + nextCreationDate.toLocaleString() + " avant d'en créer une autre.");
+                            await whatsapp.sendMessage(groupId, "🧩 Tu as déjà créé trop de parties de loup ! Tu dois attendre jusqu'au " + nextCreationDate.toLocaleString() + " avant d'en créer une autre.");
                             delete this.games[groupId]
                             this.saveGame(this.games)
                             return;
@@ -465,22 +465,22 @@ export class WereWolvesManager {
 
         const game = this.games[groupId]
         if (!game || game.state !== "WAITING_PLAYERS") {
-            await whatsapp.reply("⚠️ Aucune partie dans laquelle tu peux entrer pour l'instant frangin.")
+            await whatsapp.sendMessage(groupId, "⚠️ Aucune partie dans laquelle tu peux entrer pour l'instant frangin.")
             return
         }
 
         if (game.players.find(p => p.jid === playerJid)) {
-            await whatsapp.reply("😐 Tu es déjà dans la partie nor?")
+            await whatsapp.sendMessage(groupId, "😐 Tu es déjà dans la partie nor?")
             return
         }
 
         if (this.getPlayerGroupJid(playerJid)) {
-            await whatsapp.reply("⚠️ Tu es dans une partie dans un autre groupe, Infidèle!")
+            await whatsapp.sendMessage(groupId, "⚠️ Tu es dans une partie dans un autre groupe, Infidèle!")
             return
         }
 
         if ((await this.addUserPoints(playerJid, whatsapp, 0, 'Rejoin une partie', 1)) === false) {
-            await whatsapp.reply("⚠️ Une erreur est survenue lors de l'ajout de tes points utilisateur. Rejoins la partie à nouveau.")
+            await whatsapp.sendMessage(groupId, "⚠️ Une erreur est survenue lors de l'ajout de tes points utilisateur. Rejoins la partie à nouveau.")
             return
         }
 
@@ -504,7 +504,7 @@ export class WereWolvesManager {
         const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
         const mentions = game.players.map((p, i) => p.jid)
 
-        await whatsapp.reply(`✅ Tu as rejoint!\n\nListe des joueurs:\n\n${names}`, mentions)
+        await whatsapp.sendMessage(groupId, `✅ Tu as rejoint!\n\nListe des joueurs:\n\n${names}`, mentions)
     }
 
     async startGame(groupId, whatsapp) {
@@ -1931,28 +1931,28 @@ export class WereWolvesManager {
 
         if (!voter || voter.isDead) {
             if (!voter)
-                await whatsapp.reply("⚠️ Tu ne peux pas voter, reste posé.")
+                await whatsapp.sendMessage(groupId, "⚠️ Tu ne peux pas voter, reste posé.")
             else if (voter.isDead)
                 await this.checkIfCanSpeak(groupId, voterJid, whatsapp)
             return
         }
         if (!target) {
-            await whatsapp.reply("⚠️ Cible de vote très invalide, remet toi en question.")
+            await whatsapp.sendMessage(groupId, "⚠️ Cible de vote très invalide, remet toi en question.")
             return
         }
         if (target.jid === voterJid) {
-            await whatsapp.reply("⚠️ Le suicide n'est jamais une solution.\n\nSi tu as besoin d'aide contacte un centre d'appel anti-suicide, ou tire un coup")
+            await whatsapp.sendMessage(groupId, "⚠️ Le suicide n'est jamais une solution.\n\nSi tu as besoin d'aide contacte un centre d'appel anti-suicide, ou tire un coup")
             return
         }
 
 
         if (game.playerChangeVoteCounts[voterJid] === 1 || game.playerChangeVoteCounts[voterJid] === 2) {
             if (user.points < pointsList(game).changeVotePenalty * game.playerChangeVoteCounts[voterJid]) {
-                await whatsapp.reply(`Tu n'as pas assez de points`)
+                await whatsapp.sendMessage(groupId, `Tu n'as pas assez de points`)
                 return
             }
             await this.addUserPoints(voterJid, whatsapp, pointsList(game).changeVotePenalty * game.playerChangeVoteCounts[voterJid], "Changé son vote", 0)
-            await whatsapp.reply(`⚠️ Changer votre vote ou revoter vous coûte *${pointsList(game).changeVotePenalty * game.playerChangeVoteCounts[voterJid]} points.`)
+            await whatsapp.sendMessage(groupId, `⚠️ Changer votre vote ou revoter vous coûte *${pointsList(game).changeVotePenalty * game.playerChangeVoteCounts[voterJid]} points.`)
         } else if (game.playerChangeVoteCounts[voterJid] > 2) {
             await whatsapp.sendMessage(groupId, `🚫 *${voter.name}* (@${voter.jid.split('@')[0]}), Vous ne pouvez plus changer votre vote ou revoter.*`, [voter.jid])
             return
@@ -2070,7 +2070,7 @@ export class WereWolvesManager {
         user.lid = whatsapp.ids.lid || user.lid || null
         saveUser(user)
 
-        await whatsapp.reply(`Profil de @${user.jid.split('@')[0]}\n\n` +
+        await whatsapp.sendMessage(groupId, `Profil de @${user.jid.split('@')[0]}\n\n` +
             `Nom : *${(user.pushName || ' ').trim()}*\n` +
             `points : *${user.points} points*\n` +
             `francs : *${user.francs ? user.francs : 0} frs*\n\n` +
@@ -2095,13 +2095,13 @@ export class WereWolvesManager {
                 const element = user.pointsTransactions[index];
                 transactionText += '- *' + Object.keys(element)[0] + '* : ' + Object.values(element)[0] + ' points\n'
             }
-            await whatsapp.reply(`Points de @${user.jid.split('@')[0]}\n\n` +
+            await whatsapp.sendMessage(groupId, `Points de @${user.jid.split('@')[0]}\n\n` +
                 `points : *${user.points} points*\n` +
                 `francs : *${user.francs ? user.francs : 0}* frs\n\n` +
                 `*Historique* :\n` + transactionText, [user.jid])
             //saveUser({ jid: playerJid, groups: [groupId], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName, points: 100, pointsTransactions: [{ "nouveau joueur": 100 }] })
         } else {
-            await whatsapp.reply(`🚫 Tu n'es pas encore enregistré, joue d'abord à une partie!`)
+            await whatsapp.sendMessage(groupId, `🚫 Tu n'es pas encore enregistré, joue d'abord à une partie!`)
         }
     }
 
@@ -2183,7 +2183,7 @@ export class WereWolvesManager {
         }
 
         if (playerJid === whatsapp.sender) {
-            await whatsapp.reply("Tu ne peux pas te noter toi même")
+            await whatsapp.sendMessage(groupId, "Tu ne peux pas te noter toi même")
             return
         }
 
@@ -2224,7 +2224,7 @@ export class WereWolvesManager {
                 await whatsapp.sendMessage(groupId, `` + 'Les esprits ça parle pas!\nVous avez été déduis *-5 points*')
                 await whatsapp.delete()
             } else {
-                await whatsapp.reply('⚠️ Attention, vous êtes mort, donc fermez votre bouche sinon vous serez déduis *-5 points*')
+                await whatsapp.sendMessage(groupId, '⚠️ Attention, vous êtes mort, donc fermez votre bouche sinon vous serez déduis *-5 points*')
                 player.hasSpokenDeathCount += 1
             }
         }

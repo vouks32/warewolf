@@ -131,7 +131,7 @@ export class WordGameManager {
 
     async chooseGameType(groupId, whatsapp) {
         if (this.games[groupId]) {
-            await whatsapp.reply("🧩 Une partie est déjà en cours !");
+            await whatsapp.sendMessage(groupId, "🧩 Une partie est déjà en cours !");
             return;
         }
 
@@ -190,7 +190,7 @@ export class WordGameManager {
                         } else {
                             const nextCreationTime = user.LastWordGame + 24 * 60 * 60 * 1000;
                             const nextCreationDate = new Date(nextCreationTime);
-                            await whatsapp.reply("🧩 Tu as déjà créé trop de parties de mots ! Tu dois attendre jusqu'au " + nextCreationDate.toLocaleString() + " avant d'en créer une autre.");
+                            await whatsapp.sendMessage(groupId, "🧩 Tu as déjà créé trop de parties de mots ! Tu dois attendre jusqu'au " + nextCreationDate.toLocaleString() + " avant d'en créer une autre.");
                             delete this.games[groupId]
                             this.saveGame(this.games)
                             return;
@@ -248,12 +248,12 @@ export class WordGameManager {
     async joinGame(groupId, playerJid, pseudo, whatsapp) {
         const game = this.games[groupId];
         if (!game || game.state !== "WAITING_PLAYERS") {
-            await whatsapp.reply("❌ Aucune partie en attente de joueurs !");
+            await whatsapp.sendMessage(groupId, "❌ Aucune partie en attente de joueurs !");
             return;
         }
 
         if (game.players.some(p => p.jid === playerJid)) {
-            await whatsapp.reply("❌ Tu as déjà rejoint la partie !");
+            await whatsapp.sendMessage(groupId, "❌ Tu as déjà rejoint la partie !");
             return;
         }
 
@@ -263,7 +263,7 @@ export class WordGameManager {
             saveUser(user)
         }
         if (game.gameType === 2 && user.francs < game.misePerUser) {
-            await whatsapp.reply("⚠️ Tu n'as pas assez de francs pour rejoindre une partie avec mise en jeu.");
+            await whatsapp.sendMessage(groupId, "⚠️ Tu n'as pas assez de francs pour rejoindre une partie avec mise en jeu.");
             return;
         }
 
@@ -284,7 +284,7 @@ export class WordGameManager {
         const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
         const mentions = game.players.map((p, i) => p.jid)
 
-        await whatsapp.reply(`✅ Tu as rejoint!\n\nListe des joueurs:\n\n${names}`, mentions)
+        await whatsapp.sendMessage(groupId, `✅ Tu as rejoint!\n\nListe des joueurs:\n\n${names}`, mentions)
     }
 
     async startGame(groupId, whatsapp) {
@@ -402,7 +402,7 @@ export class WordGameManager {
 
         // Vérifier que le joueur est dans la partie
         if (!player) {
-            // await whatsapp.reply("❌ Tu n'es pas dans cette partie !");
+            // await whatsapp.sendMessage(groupId, "❌ Tu n'es pas dans cette partie !");
             return;
         }
 
@@ -410,7 +410,7 @@ export class WordGameManager {
         for (const char of word) {
             const idx = letters.indexOf(char);
             if (idx === -1) {
-                await whatsapp.reply(`❌ @${player.jid.split('@')[0]} la Lettre "${char}" n'est pas parmit les lettres que tu peux utiliser !`, [player.jid]);
+                await whatsapp.sendMessage(groupId, `❌ @${player.jid.split('@')[0]} la Lettre "${char}" n'est pas parmit les lettres que tu peux utiliser !`, [player.jid]);
                 return;
             }
             letters.splice(idx, 1);
@@ -418,23 +418,23 @@ export class WordGameManager {
 
 
         if (game.players.some(p => p.currentWord === word)) {
-            await whatsapp.reply(`❌ @${player.jid.split('@')[0]} Le mot *"${word}"* a déjà été proposé par un autre joueur dans cette manche! remet toi en question!`, [player.jid]);
+            await whatsapp.sendMessage(groupId, `❌ @${player.jid.split('@')[0]} Le mot *"${word}"* a déjà été proposé par un autre joueur dans cette manche! remet toi en question!`, [player.jid]);
             return;
         }
 
         const wordDef = await parseWiktionary(word);
 
         if (!wordDef || !wordDef.found) {
-            await whatsapp.reply(`❌ @${player.jid.split('@')[0]} Le mot "${word}" n'existe ni en anglais, ni en français, fallait faire l'école.`, [player.jid]);
+            await whatsapp.sendMessage(groupId, `❌ @${player.jid.split('@')[0]} Le mot "${word}" n'existe ni en anglais, ni en français, fallait faire l'école.`, [player.jid]);
             return;
         }
 
         const score = word.length; // 1 point par lettre
 
         if (player.currentWord) {
-            await whatsapp.reply(`🔄️ @${player.jid.split('@')[0]} a remplacé *"${player.currentWord}"* par *"${word}"*`, [player.jid]);
+            await whatsapp.sendMessage(groupId, `🔄️ @${player.jid.split('@')[0]} a remplacé *"${player.currentWord}"* par *"${word}"*`, [player.jid]);
         } else {
-            await whatsapp.reply(`✅ @${player.jid.split('@')[0]} a proposé *"${word}"* (+${score} points)`, [player.jid]);
+            await whatsapp.sendMessage(groupId, `✅ @${player.jid.split('@')[0]} a proposé *"${word}"* (+${score} points)`, [player.jid]);
         }
         // Remplacer le mot actuel du joueur
         player.currentWord = word;

@@ -182,7 +182,7 @@ export class PenduManager {
 
     async chooseGameType(groupId, whatsapp) {
         if (this.games[groupId]) {
-            await whatsapp.reply("🔄️ la partie va être réinitialisée !")
+            await whatsapp.sendMessage(groupId, "🔄️ la partie va être réinitialisée !")
         }
 
         const words = fs.readJSONSync(WORDS_FILE).filter(w => w.label.length > 6)
@@ -191,7 +191,7 @@ export class PenduManager {
 
         console.log(word);
         if (!word) {
-            await whatsapp.reply("❌ Une erreur est survenue lors de la création du mot. Veuillez réessayer.")
+            await whatsapp.sendMessage(groupId, "❌ Une erreur est survenue lors de la création du mot. Veuillez réessayer.")
             return
         }
         this.games[groupId] = {
@@ -272,7 +272,7 @@ export class PenduManager {
                         } else {
                             const nextCreationTime = user.LastHangGame + 24 * 60 * 60 * 1000;
                             const nextCreationDate = new Date(nextCreationTime);
-                            await whatsapp.reply("🧩 Tu as déjà créé trop de parties du pendu ! Tu dois attendre jusqu'au *" + nextCreationDate.toLocaleString() + "* avant d'en créer une autre.");
+                            await whatsapp.sendMessage(groupId, "🧩 Tu as déjà créé trop de parties du pendu ! Tu dois attendre jusqu'au *" + nextCreationDate.toLocaleString() + "* avant d'en créer une autre.");
                             delete this.games[groupId]
                             this.saveGame(this.games)
                             return;
@@ -298,7 +298,7 @@ export class PenduManager {
 
         }
 
-        await whatsapp.reply("🪢 Nouvelle partie du Pendu" + (game.gameType == 2 ? "\n\n Une partie de pendu coutera *" + this.games[groupId].misePerUser + " francs* et vous remportez le totale des francs misé" : ""))
+        await whatsapp.sendMessage(groupId, "🪢 Nouvelle partie du Pendu" + (game.gameType == 2 ? "\n\n Une partie de pendu coutera *" + this.games[groupId].misePerUser + " francs* et vous remportez le totale des francs misé" : ""))
         await this.startGame(groupId, whatsapp)
 
     }
@@ -393,7 +393,7 @@ export class PenduManager {
         if (!player) {
             const user = getUser(voterJid)
             if (game.gameType === 2 && user.francs < game.misePerUser) {
-                await whatsapp.reply("⚠️ Tu n'as pas assez de francs pour rejoindre une partie avec mise en jeu.");
+                await whatsapp.sendMessage(groupId, "⚠️ Tu n'as pas assez de francs pour rejoindre une partie avec mise en jeu.");
                 return;
             }
             await whatsapp.sendMessage(groupId, `Youpiii @${voterJid.split('@')[0]} a rejoin la partie`, [voterJid])
