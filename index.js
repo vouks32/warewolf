@@ -153,6 +153,7 @@ async function startBot() {
                 }
 
                 await wwm.init(iniWha)
+                await pendum.init(iniWha)
                 await word.init(iniWha)
             }, 1000)
         }
