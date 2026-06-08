@@ -189,7 +189,7 @@ export class PenduManager {
         const word = words[Math.floor(Math.random() * words.length)].label
 
 
-        console.log(word);
+        console.log("\n\n"+ word + "\n\n");
         if (!word) {
             await whatsapp.sendMessage(groupId, "❌ Une erreur est survenue lors de la création du mot. Veuillez réessayer.")
             return
