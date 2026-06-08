@@ -73,7 +73,7 @@ export class WereWolvesManager {
                         if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
                             await whatsapp.sendMessage(groupId, "⏰ Temps écoulé pour choisir le type de partie! Partie annulée.\nEnvoyez *!werewolve* pour réessayer.")
                             delete this.games[groupId]
-                            this.saveGames(this.games)
+                            this.saveGame(this.games)
                         }
                     }, 30 * 1000)
                     timers[groupId][1] = setTimeout(async () => {
@@ -107,7 +107,7 @@ export class WereWolvesManager {
                 default:
                     whatsapp.sendMessage(groupId, 'Partie annulé, veillez envoyer *!werewolve* pour relancer une partie')
                     delete this.games[groupId]
-                    this.saveGames(this.games)
+                    this.saveGame(this.games)
                     break;
             }
         }
@@ -169,7 +169,7 @@ export class WereWolvesManager {
         return JSON.parse(fs.readFileSync(DATA_FILE))
     }
 
-    saveGames(games) {
+    saveGame(games) {
         let temp = { ...games }
         Object.entries(temp).forEach(arr => { temp[arr[0]].timer = null })
         fs.writeFileSync(DATA_FILE, JSON.stringify(temp, null, 2))
@@ -347,7 +347,7 @@ export class WereWolvesManager {
             misePerUser: 10,
         }
 
-        this.saveGames(this.games)
+        this.saveGame(this.games)
 
         await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points) (10 parties pour chaque 24hrs)\n2. Partie avec mise en jeu (francs)\n\n_ps: Une partie normale coute 5 francs_")
 
@@ -355,7 +355,7 @@ export class WereWolvesManager {
             if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
                 await whatsapp.sendMessage(groupId, "⏰ Temps écoulé pour choisir le type de partie! Partie annulée.\nEnvoyez *!werewolve* pour réessayer.")
                 delete this.games[groupId]
-                this.saveGames(this.games)
+                this.saveGame(this.games)
             }
         }, 1 * 60 * 1000)
         timers[groupId][1] = setTimeout(async () => {
@@ -389,7 +389,7 @@ export class WereWolvesManager {
     async createGame(groupId, whatsapp) {
 
         this.games[groupId].state = "WAITING_PLAYERS"
-        this.saveGames(this.games)
+        this.saveGame(this.games)
         const game = this.games[groupId]
 
         const PlayingFee = 0
@@ -408,7 +408,7 @@ export class WereWolvesManager {
                             const nextCreationDate = new Date(nextCreationTime);
                             await whatsapp.reply("🧩 Tu as déjà créé trop de parties de loup ! Tu dois attendre jusqu'au " + nextCreationDate.toLocaleString() + " avant d'en créer une autre.");
                             delete this.games[groupId]
-                            this.saveGames(this.games)
+                            this.saveGame(this.games)
                             return;
                         }
                     } else {
@@ -421,12 +421,12 @@ export class WereWolvesManager {
             } else if (hostUser && hostUser.francs < 5) {
                 await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de francs pour lancer une partie avec mise en jeu. Partie annulée.\nEnvoyez *!werewolve* pour réessayer.")
                 delete this.games[groupId]
-                this.saveGames(this.games)
+                this.saveGame(this.games)
                 return
             } else {
                 await whatsapp.sendMessage(groupId, "❌ Une érreur est survenue lors de la vérification des francs du créateur de la partie. Partie annulée.\nEnvoyez *!werewolve* pour réessayer.")
                 delete this.games[groupId]
-                this.saveGames(this.games)
+                this.saveGame(this.games)
                 return
             }
         } else {
@@ -499,7 +499,7 @@ export class WereWolvesManager {
             user.lid = whatsapp.ids.lid || user.lid || null
             saveUser(user)
         }
-        this.saveGames(this.games)
+        this.saveGame(this.games)
 
         const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
         const mentions = game.players.map((p, i) => p.jid)
@@ -515,7 +515,7 @@ export class WereWolvesManager {
             await whatsapp.sendMessage(groupId, "⚠️ Pas assez de joueurs (faut au moins 4).\nC'est quoi? vous avez pas assez d'amis? \n*Jeu annulé.*")
             await whatsapp.sendMessage(groupId, `Envoyez *"!werewolve"* pour réessayer`)
             delete this.games[groupId]
-            this.saveGames(this.games)
+            this.saveGame(this.games)
             return
         }
 
@@ -531,7 +531,7 @@ export class WereWolvesManager {
             await whatsapp.sendMessage(groupId, "⚠️ Une erreur lors de l'assignation des rôles, my bad ✋😐🤚. Jeu annulé.");
             await whatsapp.sendMessage(groupId, `envoyez encore *"!werewolve"* pour voir si je donne bien cette fois`)
             delete this.games[groupId]
-            this.saveGames(this.games)
+            this.saveGame(this.games)
             return;
         }
 
@@ -559,7 +559,7 @@ export class WereWolvesManager {
 
         }
 
-        this.saveGames(this.games)
+        this.saveGame(this.games)
 
         // DM role to each player
         for (const p of game.players) {
@@ -613,7 +613,7 @@ export class WereWolvesManager {
 
 
 
-        this.saveGames(this.games)
+        this.saveGame(this.games)
 
         // DM prompts
         for (const p of game.players) {
@@ -827,7 +827,7 @@ export class WereWolvesManager {
                     if (victim.role === "HUNTER") {
                         if (counts[victimId] == 1 && Math.random() < 0.3) {
                             wolf.isDead = true
-                            this.saveGames(this.games)
+                            this.saveGame(this.games)
                             await whatsapp.sendMessage(groupId, `Le loup a visité le chasseur et a reçus une balle en argent dans la tête\n@${wolfjid.split('@')[0]} a été tué par le HUNTER`, [wolfjid])
                         } else {
                             victim.isDead = true
@@ -899,7 +899,7 @@ export class WereWolvesManager {
                 }
             }
 
-            this.saveGames(this.games)
+            this.saveGame(this.games)
             if (wasHunter) {
                 return;
             } if (!wasVictim) {
@@ -970,7 +970,7 @@ export class WereWolvesManager {
             }
 
             delete this.games[groupId]
-            this.saveGames(this.games)
+            this.saveGame(this.games)
             return
         }
 
@@ -983,7 +983,7 @@ export class WereWolvesManager {
         game.state = "DAY"
         game.votes = {}
         game.playerChangeVoteCounts = {}
-        this.saveGames(this.games)
+        this.saveGame(this.games)
 
         const dayDuration = Math.min(7 * 60 * 1000, Math.max(3 * 30 * 1000, (game.players.filter(p => !p.isDead).length / 1.5) * 60 * 1000))
 
@@ -1139,7 +1139,7 @@ export class WereWolvesManager {
                 `` + nonVoters.map(_wv => `*${_wv.name}* (@${_wv.jid.split('@')[0]})`).join('\n')
                 , nonVoters.map(w => w.jid))
 
-        this.saveGames(this.games)
+        this.saveGame(this.games)
 
         if (TANNERWASVOTED) {
             const victim = game.players.find(p => p.jid === victimId)
@@ -1188,7 +1188,7 @@ export class WereWolvesManager {
 
 
             delete this.games[groupId]
-            this.saveGames(this.games)
+            this.saveGame(this.games)
             return
         }
 
@@ -1251,7 +1251,7 @@ export class WereWolvesManager {
 
 
             delete this.games[groupId]
-            this.saveGames(this.games)
+            this.saveGame(this.games)
             return
         }
 
@@ -1298,7 +1298,7 @@ export class WereWolvesManager {
         }
 
         game.wolfChoices[wolfJid] = targetJid
-        this.saveGames(this.games)
+        this.saveGame(this.games)
 
         game.players.filter(p => p.role.includes("WEREWOLF") && !p.isDead).forEach(async p => {
             const victimIndex = game.players.findIndex(pl => pl.jid === targetJid) + 1
@@ -1365,7 +1365,7 @@ export class WereWolvesManager {
         target.role = "WEREWOLF"
         target.fakeRole = null
         wolf.alphaWerewolfHasConverted = true
-        this.saveGames(this.games)
+        this.saveGame(this.games)
 
         await whatsapp.sendMessage(groupId, ([`🖤 Le Coeur d'un innocent à été corrompu en ce soir de pleine lune.`, `🖤 En ce soir funeste, vous voyez l'un des votre être ~Akumatisé~ euh.. transformé`, `🖤 Le ciel assombri, le vent qui souffle et les putes qui se réfugient... un homme bon à basculé`])[Math.floor(Math.random() * 3)])
         await whatsapp.sendMessage(wolfJid, `✅ Tu as transformé *${target.name}* (@${target.jid.split('@')[0]}) En loup.`, [target.jid])
@@ -1399,7 +1399,7 @@ export class WereWolvesManager {
         }
 
         game.seerChoice = targetJid
-        this.saveGames(this.games)
+        this.saveGame(this.games)
 
         const result = (target.role.includes("WEREWOLF") || (target.role.includes("TANNER") && Math.random() >= 0) || (target.role.includes("WITCH") && Math.random() >= 0) || target.role.includes("SERIAL") || target.role.includes("PYRO")) ?
             "😈 est un être maléfique!" : "😇 est une personne innocente.";
@@ -1433,7 +1433,7 @@ export class WereWolvesManager {
         }
 
         game.doctorChoice = targetJid
-        this.saveGames(this.games)
+        this.saveGame(this.games)
         await whatsapp.sendMessage(doctor.jid, `💉 Tu as choisi de protéger *${target.name}* (@${target.jid.split('@')[0]}) cette nuit.`, [target.jid])
     }
 
@@ -1462,7 +1462,7 @@ export class WereWolvesManager {
         game.prayingPlayersNight[prayingPlayer.jid] = game.nights
         prayingUser.prayers -= 1
         saveUser(prayingUser)
-        this.saveGames(this.games)
+        this.saveGame(this.games)
         await whatsapp.sendMessage(prayingPlayer.jid, `Le seigneur a entendu ta prière! Va en paix.`)
     }
 
@@ -1528,7 +1528,7 @@ export class WereWolvesManager {
                 }
 
             }
-            this.saveGames(this.games)
+            this.saveGame(this.games)
 
             ///////////////// MAKE A UNIVERSAL FUNCTION FOR THIS SHIT BC IT'S USED MULTIPLE TIMES IN THE CODE /////////////////
             ///////////////// FOR game.gameType == 2, use points to share mise
@@ -1590,7 +1590,7 @@ export class WereWolvesManager {
 
 
                 delete this.games[groupId]
-                this.saveGames(this.games)
+                this.saveGame(this.games)
                 return
             }
 
@@ -1601,7 +1601,7 @@ export class WereWolvesManager {
 
         }, 45 * 1000);
 
-        this.saveGames(this.games)
+        this.saveGame(this.games)
     }
 
     async hunterShoot(groupId, targetJid, whatsapp) {
@@ -1615,7 +1615,7 @@ export class WereWolvesManager {
         target.isDead = true
         game.pendingHunter = null
         game.hunterTarget = target
-        this.saveGames(this.games)
+        this.saveGame(this.games)
         await whatsapp.sendMessage(whatsapp.sender, "👍 Ta cible a été abattue avec succès.")
     }
 
@@ -1627,7 +1627,7 @@ export class WereWolvesManager {
         if (!witch || witch.role !== "WITCH" || !game.witchHealAvailable) return
         game.witchHeal = true
         game.witchHealAvailable = false
-        this.saveGames(this.games)
+        this.saveGame(this.games)
         await whatsapp.sendMessage(witch.jid, "🧪 Tu as choisi de soigner la victime de cette nuit.")
     }
 
@@ -1689,7 +1689,7 @@ export class WereWolvesManager {
                 }
             }
         }
-        this.saveGames(this.games)
+        this.saveGame(this.games)
     }
 
     async cupidPair(groupId, jid1, jid2, whatsapp) {
@@ -1710,7 +1710,7 @@ export class WereWolvesManager {
             await this.addUserPoints(cupid.jid, whatsapp, -5, "lier plus d'une fois", 0)
         }
         game.cupidHasLinked = true;
-        this.saveGames(this.games)
+        this.saveGame(this.games)
     }
 
     async prostituteVisit(groupId, prostituteJid, targetJid, whatsapp) {
@@ -1756,7 +1756,7 @@ export class WereWolvesManager {
             game.seerFakeWolves = game.seerFakeWolves || []
             game.seerFakeWolves.push(prostituteJid)
         }
-        this.saveGames(this.games)
+        this.saveGame(this.games)
 
     }
 
@@ -1779,11 +1779,11 @@ export class WereWolvesManager {
 
         if (!game.serialKillerChoice) {
             game.serialKillerChoice = targetJid
-            this.saveGames(this.games)
+            this.saveGame(this.games)
             await whatsapp.sendMessage(killerJid, `✅ Tu as choisi de tuer *${target.name}* (@${target.jid.split('@')[0]}) cette nuit.`, [target.jid])
         } else {
             game.serialKillerChoice = targetJid
-            this.saveGames(this.games)
+            this.saveGame(this.games)
             await whatsapp.sendMessage(killerJid, `✅ Tu as changer ta cible pour *${target.name}* (@${target.jid.split('@')[0]})`, [target.jid])
         }
 
@@ -1836,7 +1836,7 @@ export class WereWolvesManager {
             await whatsapp.sendMessage(pyroJid, "✅ Tu as choisi d'immoler tous les joueurs trempés.")
         }
 
-        this.saveGames(this.games)
+        this.saveGame(this.games)
     }
 
     // Gestion des actions du MadMan
@@ -1883,7 +1883,7 @@ export class WereWolvesManager {
             await whatsapp.sendMessage(madmanJid, "✋ Tu as arreté le vote pour aujourd'hui.\nIls ne le savent pas, mais leurs votes ne servent à rien 🤫")
         }
 
-        this.saveGames(this.games)
+        this.saveGame(this.games)
 
         // ... autres faux rôles ...
     }
@@ -1915,7 +1915,7 @@ export class WereWolvesManager {
         if (game.mayorPowerAvailable) {
             game.mayorPowerAvailable = false;
             game.votesStopped = true;
-            this.saveGames(this.games)
+            this.saveGame(this.games)
             await whatsapp.sendMessage(mayorJid, "✋ Tu as arreté le vote pour aujourd'hui.\nIls ne le savent pas, mais leurs votes ne servent à rien 🤫")
         }
     }
@@ -1960,7 +1960,7 @@ export class WereWolvesManager {
 
         game.votes[voterJid] = targetJid
         game.playerChangeVoteCounts[voterJid] = !game.playerChangeVoteCounts[voterJid] ? 1 : game.playerChangeVoteCounts[voterJid] + 1
-        this.saveGames(this.games)
+        this.saveGame(this.games)
 
         await whatsapp.sendMessage(groupId, `✅ *${voter.name}* (@${voter.jid.split('@')[0]}) a voté contre *${target.name}* (@${target.jid.split('@')[0]}).`, [voter.jid, target.jid])
     }
@@ -2016,7 +2016,7 @@ export class WereWolvesManager {
         const mentions = game.players.map((p, i) => p.jid)
         //game.lastPlayerList = Date.now()
         await whatsapp.sendMessage(groupId, "Joueurs :\n\n" + names, mentions)
-        //this.saveGames(this.games)
+        //this.saveGame(this.games)
     }
 
     async sendPlayerProfil(whatsapp) {
@@ -2122,7 +2122,7 @@ export class WereWolvesManager {
         await whatsapp.sendMessage(groupId, `🏆 Partie terminée!`)
         await whatsapp.sendMessage(groupId, `envoie *"!werewolve"* pour rejouer`)
         delete this.games[groupId]
-        this.saveGames(this.games)
+        this.saveGame(this.games)
         return
     }
 
@@ -2192,7 +2192,7 @@ export class WereWolvesManager {
 
             if (note)
                 notedPlayer.note = '*' + note.trim() + '*'
-            this.saveGames(this.games)
+            this.saveGame(this.games)
         }
 
         const names = game.players.map((_p, i) => `[${i + 1}] - @${_p.jid.split('@')[0]} ` + (!_p.isDead ? `😀 _${_p.note}_` : `☠️ [${_p.role}]`)).join("\n")

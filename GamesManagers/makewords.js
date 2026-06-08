@@ -38,7 +38,7 @@ export class WordGameManager {
                         if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
                             await whatsapp.sendMessage(groupId, "⏰ Temps écoulé pour choisir le type de partie! Partie annulée.\nEnvoyez *!mots* pour réessayer.")
                             delete this.games[groupId]
-                            this.saveGames(this.games)
+                            this.saveGame(this.games)
                         }
                     }, 30 * 1000)
                     timers[groupId][1] = setTimeout(async () => {
@@ -69,7 +69,7 @@ export class WordGameManager {
                 default:
                     whatsapp.sendMessage(groupId, 'Partie annulé, veillez envoyer *!mots* pour relancer une partie')
                     delete this.games[groupId]
-                    this.saveGames(this.games)
+                    this.saveGame(this.games)
                     break;
             }
         }
@@ -82,7 +82,7 @@ export class WordGameManager {
         return JSON.parse(fs.readFileSync(DATA_FILE))
     }
 
-    saveGames(games) {
+    saveGame(games) {
         let temp = { ...games }
         Object.entries(temp).forEach(arr => { temp[arr[0]].timer = null })
         fs.writeFileSync(DATA_FILE, JSON.stringify(temp, null, 2))
@@ -151,7 +151,7 @@ export class WordGameManager {
             mise: 0,
             misePerUser: 10,
         };
-        this.saveGames();
+        this.saveGame();
 
         await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points) (10 parties par chaque 24hrs)\n2. Partie avec mise en jeu (francs)\n\n_ps: Une partie normale coute 5 francs_")
 
@@ -159,7 +159,7 @@ export class WordGameManager {
             if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
                 await whatsapp.sendMessage(groupId, "⏰ Temps écoulé pour choisir le type de partie! Partie annulée.\nEnvoyez *!mots* pour réessayer.")
                 delete this.games[groupId]
-                this.saveGames(this.games)
+                this.saveGame(this.games)
             }
         }, 1 * 60 * 1000)
         timers[groupId][1] = setTimeout(async () => {
@@ -174,7 +174,7 @@ export class WordGameManager {
 
         const game = this.games[groupId]
         game.state = "WAITING_PLAYERS"
-        this.saveGames();
+        this.saveGame();
 
         let PlayingFee = 0
 
@@ -277,7 +277,7 @@ export class WordGameManager {
             name: pseudo || whatsapp.raw?.pushName || `Joueur-${game.players.length + 1}`
         });
         game.mise += game.gameType === 2 ? game.misePerUser : 0
-        this.saveGames();
+        this.saveGame();
 
         this.addUserPoints(playerJid, whatsapp, game.gameType === 2 ? -game.misePerUser : 0, "a rejoint une partie de mots", 0, game)
 
@@ -295,13 +295,13 @@ export class WordGameManager {
         if (playerCount <= 0) {
             await whatsapp.sendMessage(groupId, "❌ Pas assez de joueurs pour commencer la partie !");
             delete this.games[groupId];
-            this.saveGames();
+            this.saveGame();
             return;
         }
 
         game.state = "PLAYING";
         game.currentRound = 1;
-        this.saveGames();
+        this.saveGame();
 
         await whatsapp.sendMessage(
             groupId,
@@ -318,7 +318,7 @@ export class WordGameManager {
 
         const letters = this.generateLetters();
         game.letters = letters;
-        this.saveGames();
+        this.saveGame();
 
         await whatsapp.sendMessage(
             groupId,
@@ -331,7 +331,7 @@ export class WordGameManager {
             player.currentWord = null;
             player.currentScore = 0;
         });
-        this.saveGames();
+        this.saveGame();
 
         // Timer de la manche (30 secondes)
         game.roundTimer = setTimeout(async () => {
@@ -358,14 +358,14 @@ export class WordGameManager {
                 player.words.push(player.currentWord);
             }
         });
-        this.saveGames();
+        this.saveGame();
 
         // Vérifier si c'est la dernière manche
         if (game.currentRound >= game.totalRounds) {
             await this.endGame(groupId, whatsapp);
         } else {
             game.currentRound++;
-            this.saveGames();
+            this.saveGame();
             await this.startRound(groupId, whatsapp);
         }
     }
@@ -439,7 +439,7 @@ export class WordGameManager {
         // Remplacer le mot actuel du joueur
         player.currentWord = word;
         player.currentScore = score;
-        this.saveGames();
+        this.saveGame();
     }
 
     async endGame(groupId, whatsapp) {
@@ -537,7 +537,7 @@ export class WordGameManager {
             saveGroup(groupData)
         }
         delete this.games[groupId];
-        this.saveGames();
+        this.saveGame();
     }
 
     isPlaying(groupId) {
@@ -552,7 +552,7 @@ export class WordGameManager {
         await whatsapp.sendMessage(groupId, `*🏆 Partie annulé!*`)
         await whatsapp.sendMessage(groupId, `envoie *"!mots"* pour jouer à nouveau`)
         delete this.games[groupId]
-        this.saveGames(this.games)
+        this.saveGame(this.games)
         return
     }
 
