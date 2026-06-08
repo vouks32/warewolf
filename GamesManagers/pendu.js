@@ -137,7 +137,7 @@ export class PenduManager {
         return JSON.parse(fs.readFileSync(DATA_FILE))
     }
 
-    saveGames(games) {
+    saveGame(games) {
         let temp = { ...games }
         Object.entries(temp).forEach(arr => { temp[arr[0]].timer = null })
         fs.writeFileSync(DATA_FILE, JSON.stringify(temp, null, 2))
@@ -207,7 +207,7 @@ export class PenduManager {
             mise: 0,
             misePerUser: 10
         }
-        saveGames(this.games)
+        this.saveGame(this.games)
         timers[groupId] = [null, null, null, null, null, null, null]
 
 
@@ -255,7 +255,7 @@ export class PenduManager {
 
         this.games[groupId].state = "SET_WORD"
 
-        saveGames(this.games)
+        this.saveGame(this.games)
         const game = this.games[groupId]
 
         let PlayingFee = 0
@@ -274,7 +274,7 @@ export class PenduManager {
                             const nextCreationDate = new Date(nextCreationTime);
                             await whatsapp.reply("🧩 Tu as déjà créé trop de parties du pendu ! Tu dois attendre jusqu'au *" + nextCreationDate.toLocaleString() + "* avant d'en créer une autre.");
                             delete this.games[groupId]
-                            saveGames(this.games)
+                            this.saveGame(this.games)
                             return;
                         }
                     } else {
@@ -286,12 +286,12 @@ export class PenduManager {
             } else if (hostUser && hostUser.francs < 5) {
                 await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de francs pour lancer une partie points. Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
                 delete this.games[groupId]
-                saveGames(this.games)
+                this.saveGame(this.games)
                 return
             } else {
                 await whatsapp.sendMessage(groupId, "Une érreur est survenue lors de la vérification des francs du créateur de la partie. Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
                 delete this.games[groupId]
-                saveGames(this.games)
+                this.saveGame(this.games)
                 return
             }
         } else {
@@ -442,7 +442,7 @@ export class PenduManager {
             return
         }
 
-        saveGames(this.games)
+        this.saveGames(this.games)
 
     }
 

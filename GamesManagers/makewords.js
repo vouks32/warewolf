@@ -192,7 +192,7 @@ export class WordGameManager {
                             const nextCreationDate = new Date(nextCreationTime);
                             await whatsapp.reply("🧩 Tu as déjà créé trop de parties de mots ! Tu dois attendre jusqu'au " + nextCreationDate.toLocaleString() + " avant d'en créer une autre.");
                             delete this.games[groupId]
-                            saveGames(this.games)
+                            this.saveGame(this.games)
                             return;
                         }
                     } else {
@@ -205,12 +205,12 @@ export class WordGameManager {
             } else if (hostUser && hostUser.francs < 5) {
                 await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de francs pour lancer une partie avec mise en jeu. Partie annulée.\nEnvoyez *!mots* pour réessayer.")
                 delete this.games[groupId]
-                saveGames(this.games)
+                this.saveGame(this.games)
                 return
             } else {
                 await whatsapp.sendMessage(groupId, "❌ Une érreur est survenue lors de la vérification des francs du créateur de la partie. Partie annulée.\nEnvoyez *!mots* pour réessayer.")
                 delete this.games[groupId]
-                saveGames(this.games)
+                this.saveGame(this.games)
                 return
             }
         } else {
