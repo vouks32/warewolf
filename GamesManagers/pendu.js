@@ -103,7 +103,7 @@ export class PenduManager {
                         if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
                             await whatsapp.sendMessage(groupId, "⏰ Temps écoulé pour choisir le type de partie! Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
                             delete this.games[groupId]
-                            this.saveGames(this.games)
+                            this.saveGame(this.games)
                         }
                     }, 30 * 1000)
                     timers[groupId][1] = setTimeout(async () => {
@@ -126,7 +126,7 @@ export class PenduManager {
                 default:
                     whatsapp.sendMessage(groupId, 'Partie annulé, veillez envoyer *!pendu* pour relancer une partie')
                     delete this.games[groupId]
-                    this.saveGames(this.games)
+                    this.saveGame(this.games)
                     break;
             }
         }
@@ -218,7 +218,7 @@ export class PenduManager {
             if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
                 await whatsapp.sendMessage(groupId, "⏰ Temps écoulé pour choisir le type de partie! Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
                 delete this.games[groupId]
-                this.saveGames(this.games)
+                this.saveGame(this.games)
                 return
             }
         }, 1 * 60 * 1000)
@@ -371,7 +371,7 @@ export class PenduManager {
 
         await whatsapp.sendMessage(groupId, `envoie *"!pendu"* Pour jouer à nouveau`)
         delete this.games[groupId]
-        this.saveGames(this.games)
+        this.saveGame(this.games)
         return
 
     }
@@ -442,7 +442,7 @@ export class PenduManager {
             return
         }
 
-        this.saveGames(this.games)
+        this.saveGame(this.games)
 
     }
 
@@ -453,7 +453,7 @@ export class PenduManager {
         await whatsapp.sendMessage(groupId, `*🏆 Partie annulé!*`)
         await whatsapp.sendMessage(groupId, `envoie *"!pendu"* pour jouer à nouveau`)
         delete this.games[groupId]
-        this.saveGames(this.games)
+        this.saveGame(this.games)
         return
     }
 
