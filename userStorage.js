@@ -140,6 +140,8 @@ export function SaveUsersPoints(playerJid, whatsapp, points, reason, gameType, g
             user.groups.push(whatsapp.groupJid)
         }
 
+        if (!user.points) user.points = 0;
+
         user.points += points
         user.games[gameType] = (user.games[gameType] || 0) + gamescount
         user.pointsTransactions.push(arr)
@@ -169,6 +171,7 @@ export function SaveUsersfrancs(playerJid, whatsapp, points, reason, gameType, g
             user.groups.push(whatsapp.groupJid)
         }
 
+        if (!user.francs) user.francs = 0;
         user.francs += points
         user.francs = Math.round(user.francs)
         user.games[gameType] = (user.games[gameType] || 0) + gamescount
@@ -181,7 +184,7 @@ export function SaveUsersfrancs(playerJid, whatsapp, points, reason, gameType, g
     const Player = game?.players?.find(p => p.jid === playerJid)
     if (Player)
         Player.points?.push({ points, reason })
-    console.log("  --> RETURNINBG GAME") 
+    console.log("  --> RETURNINBG GAME")
 
     return game
 }
