@@ -60,6 +60,8 @@ export function saveUser(user) {
         ...SavedUser,
         ...user,
     }, null, 2))
+    console.log("  --> IN FUNCTION SAVE USER")
+
     return JSON.parse(fs.readFileSync(path.join(USER_FOLDER, user.jid + '.json')))
 }
 
@@ -76,7 +78,7 @@ export function getUser(jid) {
 
 export function saveGroup(group) {
 
-     const thisDate = new Date()    
+    const thisDate = new Date()
     const Day = `${thisDate.getDate()}-${thisDate.getMonth() + 1}-${thisDate.getFullYear()}`
 
     if (!fs.existsSync(GROUP_FOLDER)) fs.mkdirSync(GROUP_FOLDER, { recursive: true })
@@ -98,7 +100,7 @@ export function saveGroup(group) {
 }
 
 export function getGroup(jid) {
-    const thisDate = new Date()    
+    const thisDate = new Date()
     const Day = `${thisDate.getDate()}-${thisDate.getMonth() + 1}-${thisDate.getFullYear()}`
     if (!fs.existsSync(GROUP_FOLDER)) fs.mkdirSync(GROUP_FOLDER, { recursive: true })
     if (!fs.existsSync(path.join(GROUP_FOLDER, jid))) fs.mkdirSync(path.join(GROUP_FOLDER, jid), { recursive: true })
@@ -163,21 +165,23 @@ export function SaveUsersfrancs(playerJid, whatsapp, points, reason, gameType, g
         saveUser({ jid: playerJid, lid: whatsapp.ids?.lid || null, groups: [whatsapp.groupJid], dateCreated: Date.now(), pushName: whatsapp.raw?.pushName || ' ', games: { [gameType]: gamescount }, points: 50, francs: 0, pointsTransactions: [arr] })
 
     } else {
-        if (whatsapp.groupJid && !user.groups.some(g => g === whatsapp.groupJid) ) {
+        if (whatsapp.groupJid && !user.groups.some(g => g === whatsapp.groupJid)) {
             user.groups.push(whatsapp.groupJid)
         }
-        
+
         user.francs += points
         user.francs = Math.round(user.francs)
         user.games[gameType] = (user.games[gameType] || 0) + gamescount
         user.pointsTransactions.push(arr)
         user = saveUser(user)
+        console.log("  --> USER SAVED")
     }
 
     if (!game) return null
     const Player = game?.players?.find(p => p.jid === playerJid)
     if (Player)
         Player.points?.push({ points, reason })
+    console.log("  --> RETURNINBG GAME") 
 
     return game
 }
