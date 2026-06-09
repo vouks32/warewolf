@@ -144,7 +144,7 @@ export class PenduManager {
     }
 
     async addUserPoints(playerJid, whatsapp, points, reason, gamescount = 0, game = null) {
-        if (game?.gameType === 2) {
+        if (this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)].gameType === 2) {
             const c = SaveUsersfrancs(playerJid, whatsapp, points, reason, "PENDU", gamescount, game)
             if (c && this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)])
                 this.games[whatsapp.isGroup ? whatsapp.groupJid : this.getPlayerGroupJid(playerJid)] = c
@@ -399,7 +399,7 @@ export class PenduManager {
             await whatsapp.sendMessage(groupId, `Youpiii @${voterJid.split('@')[0]} a rejoin la partie`, [voterJid])
             game.players.push({ jid: voterJid, answers: [{ letter, correct: game.word.includes(letter) }], points: [] })
             game.mise += game.gameType === 2 ? game.misePerUser : 0
-            await this.addUserPoints(voterJid, whatsapp, game.gameType === 2 ? -game.misePerUser : 0, "a rejoint une partie de pendu en cours", 0, game)
+            await this.addUserPoints(voterJid, whatsapp, game.gameType === 2 ? -game.misePerUser : 0, "rejoint partie pendu", 0, game)
 
             if (user) {
                 user.lid = whatsapp.ids.lid || user.lid || null
