@@ -344,7 +344,7 @@ export class WereWolvesManager {
             prayingPlayersNight: {}, // Liste des joueurs qui ont utilisé la prière pour la nuit en cours
 
             mise: 0, // Montant total misé pour les parties avec mise en jeu
-            misePerUser: 10,
+            misePerUser: 30,
         }
 
         this.saveGame(this.games)
