@@ -189,7 +189,7 @@ export class PenduManager {
         const word = words[Math.floor(Math.random() * words.length)].label
 
 
-        console.log("\n\n"+ word + "\n\n");
+        console.log("\n\n" + word + "\n\n");
         if (!word) {
             await whatsapp.sendMessage(groupId, "❌ Une erreur est survenue lors de la création du mot. Veuillez réessayer.")
             return
@@ -391,7 +391,6 @@ export class PenduManager {
         const player = game.players.find(p => p.jid === voterJid)
 
         if (!player) {
-            const user = getUser(voterJid)
             if (game.gameType === 2 && user.francs < game.misePerUser) {
                 await whatsapp.sendMessage(groupId, "⚠️ Tu n'as pas assez de francs pour rejoindre une partie avec mise en jeu.");
                 return;
@@ -401,6 +400,8 @@ export class PenduManager {
             game.mise += game.gameType === 2 ? game.misePerUser : 0
             await this.addUserPoints(voterJid, whatsapp, game.gameType === 2 ? -game.misePerUser : 0, "rejoint partie pendu", 0, game)
 
+
+            const user = getUser(voterJid)
             if (user) {
                 user.lid = whatsapp.ids.lid || user.lid || null
                 saveUser(user)
