@@ -399,7 +399,7 @@ export class PenduManager {
             await whatsapp.sendMessage(groupId, `Youpiii @${voterJid.split('@')[0]} a rejoin la partie`, [voterJid])
             game.players.push({ jid: voterJid, answers: [{ letter, correct: game.word.includes(letter) }], points: [] })
             game.mise += game.gameType === 2 ? game.misePerUser : 0
-            this.addUserPoints(voterJid, whatsapp, game.gameType === 2 ? -game.misePerUser : 0, "a rejoint une partie de pendu en cours", 0, game)
+            await this.addUserPoints(voterJid, whatsapp, game.gameType === 2 ? -game.misePerUser : 0, "a rejoint une partie de pendu en cours", 0, game)
 
             if (user) {
                 user.lid = whatsapp.ids.lid || user.lid || null
