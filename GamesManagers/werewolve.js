@@ -458,7 +458,7 @@ export class WereWolvesManager {
                     }
                 } else {
                     user.LastWerewolveGame = Date.now();
-                    user.WerewolveGameCreated = 3;
+                    user.WerewolveGameCreated = 9;
                 }
                 saveUser(user);
             }
@@ -2050,15 +2050,15 @@ export class WereWolvesManager {
         let user = getUser(whatsapp.sender)
 
         if (user && user.LastHangGame && Date.now() - user.LastHangGame > 24 * 60 * 60 * 1000) {
-            user.hangGameCreated = 4
+            user.hangGameCreated = 10
             user.LastHangGame = Date.now();
         }
         if (user && user.LastWordGame && Date.now() - user.LastWordGame > 24 * 60 * 60 * 1000) {
-            user.wordGameCreated = 4
+            user.wordGameCreated = 10
             user.LastWordGame = Date.now();
         }
         if (user && user.LastWerewolveGame && Date.now() - user.LastWerewolveGame > 24 * 60 * 60 * 1000) {
-            user.WerewolveGameCreated = 4
+            user.WerewolveGameCreated = 10
             user.LastWerewolveGame = Date.now();
         }
 
@@ -2078,11 +2078,11 @@ export class WereWolvesManager {
                 "pointsTransactions": [],
                 "roleHistory": {},
                 "LastWordGame": Date.now(),
-                "wordGameCreated": 4,
+                "wordGameCreated": 10,
                 "LastHangGame": Date.now(),
-                "hangGameCreated": 4,
+                "hangGameCreated": 10,
                 "LastWerewolveGame": Date.now(),
-                "WerewolveGameCreated": 4,
+                "WerewolveGameCreated": 10,
                 "francs": 250,
                 "clairvoyance": 0,
                 "incidence ": 0,

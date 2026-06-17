@@ -284,7 +284,7 @@ export class PenduManager {
                             }
                         } else {
                             user.LastHangGame = Date.now();
-                            user.hangGameCreated = 3;
+                            user.hangGameCreated = 9;
                         }
                         saveUser(user);
                     }

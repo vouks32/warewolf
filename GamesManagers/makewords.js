@@ -203,7 +203,7 @@ export class WordGameManager {
                             }
                         } else {
                             user.LastWordGame = Date.now();
-                            user.wordGameCreated = 3;
+                            user.wordGameCreated = 9;
                         }
                         saveUser(user);
                     }
