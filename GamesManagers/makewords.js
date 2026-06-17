@@ -153,20 +153,25 @@ export class WordGameManager {
         };
         this.saveGame();
 
-        await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points) (10 parties par chaque 24hrs)\n2. Partie avec mise en jeu (francs)\n\n_ps: Une partie normale coute 5 francs_")
+        if (whatsapp.isMonetized) {
+            await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points) (10 parties par chaque 24hrs)\n2. Partie avec mise en jeu (francs)\n\n_ps: Une partie normale coute 5 francs_")
+            timers[groupId][0] = setTimeout(async () => {
+                if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
+                    await whatsapp.sendMessage(groupId, "⏰ Temps écoulé pour choisir le type de partie! Partie annulée.\nEnvoyez *!mots* pour réessayer.")
+                    delete this.games[groupId]
+                    this.saveGame(this.games)
+                }
+            }, 1 * 60 * 1000)
+            timers[groupId][1] = setTimeout(async () => {
+                if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
+                    await whatsapp.sendMessage(groupId, "⏰ 30 secondes restantes pour choisir le type de partie!")
+                }
+            }, 30 * 1000)
+        } else {
+            this.games[groupId].gameType = 1
+            await this.createGame(groupId, whatsapp)
+        }
 
-        timers[groupId][0] = setTimeout(async () => {
-            if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
-                await whatsapp.sendMessage(groupId, "⏰ Temps écoulé pour choisir le type de partie! Partie annulée.\nEnvoyez *!mots* pour réessayer.")
-                delete this.games[groupId]
-                this.saveGame(this.games)
-            }
-        }, 1 * 60 * 1000)
-        timers[groupId][1] = setTimeout(async () => {
-            if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
-                await whatsapp.sendMessage(groupId, "⏰ 30 secondes restantes pour choisir le type de partie!")
-            }
-        }, 30 * 1000)
 
     }
 
@@ -178,47 +183,70 @@ export class WordGameManager {
 
         let PlayingFee = 0
 
-        if (this.games[groupId].gameType === 1) {
-            const hostUser = this.games[groupId].hostjid ? getUser(this.games[groupId].hostjid) : null
-            if (hostUser && hostUser.francs >= 5) {
-                await SaveUsersfrancs(this.games[groupId].hostjid, whatsapp, -5, "a lancé une partie de loup avec mise en jeu", "WORDGAME", 0, this.games[groupId])
-                let user = getUser(whatsapp.senderJid);
-                if (user) {
-                    if (user.LastWordGame && Date.now() - user.LastWordGame < 24 * 60 * 60 * 1000) {
-                        if (user.wordGameCreated > 0) {
-                            user.wordGameCreated = (user.wordGameCreated) - 1;
+        if (whatsapp.isMonetized)
+            if (this.games[groupId].gameType === 1) {
+                const hostUser = this.games[groupId].hostjid ? getUser(this.games[groupId].hostjid) : null
+                if (hostUser && hostUser.francs >= 5) {
+                    await SaveUsersfrancs(this.games[groupId].hostjid, whatsapp, -5, "a lancé une partie de loup avec mise en jeu", "WORDGAME", 0, this.games[groupId])
+                    let user = getUser(whatsapp.senderJid);
+                    if (user) {
+                        if (user.LastWordGame && Date.now() - user.LastWordGame < 24 * 60 * 60 * 1000) {
+                            if (user.wordGameCreated > 0) {
+                                user.wordGameCreated = (user.wordGameCreated) - 1;
+                            } else {
+                                const nextCreationTime = user.LastWordGame + 24 * 60 * 60 * 1000;
+                                const nextCreationDate = new Date(nextCreationTime);
+                                await whatsapp.sendMessage(groupId, "🧩 Tu as déjà créé trop de parties de mots ! Tu dois attendre jusqu'au " + nextCreationDate.toLocaleString() + " avant d'en créer une autre.");
+                                delete this.games[groupId]
+                                this.saveGame(this.games)
+                                return;
+                            }
                         } else {
-                            const nextCreationTime = user.LastWordGame + 24 * 60 * 60 * 1000;
-                            const nextCreationDate = new Date(nextCreationTime);
-                            await whatsapp.sendMessage(groupId, "🧩 Tu as déjà créé trop de parties de mots ! Tu dois attendre jusqu'au " + nextCreationDate.toLocaleString() + " avant d'en créer une autre.");
-                            delete this.games[groupId]
-                            this.saveGame(this.games)
-                            return;
+                            user.LastWordGame = Date.now();
+                            user.wordGameCreated = 3;
                         }
-                    } else {
-                        user.LastWordGame = Date.now();
-                        user.wordGameCreated = 3;
+                        saveUser(user);
                     }
-                    saveUser(user);
-                }
 
-            } else if (hostUser && hostUser.francs < 5) {
-                await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de francs pour lancer une partie avec mise en jeu. Partie annulée.\nEnvoyez *!mots* pour réessayer.")
-                delete this.games[groupId]
-                this.saveGame(this.games)
-                return
+                } else if (hostUser && hostUser.francs < 5) {
+                    await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de francs pour lancer une partie avec mise en jeu. Partie annulée.\nEnvoyez *!mots* pour réessayer.")
+                    delete this.games[groupId]
+                    this.saveGame(this.games)
+                    return
+                } else {
+                    await whatsapp.sendMessage(groupId, "❌ Une érreur est survenue lors de la vérification des francs du créateur de la partie. Partie annulée.\nEnvoyez *!mots* pour réessayer.")
+                    delete this.games[groupId]
+                    this.saveGame(this.games)
+                    return
+                }
             } else {
-                await whatsapp.sendMessage(groupId, "❌ Une érreur est survenue lors de la vérification des francs du créateur de la partie. Partie annulée.\nEnvoyez *!mots* pour réessayer.")
-                delete this.games[groupId]
-                this.saveGame(this.games)
-                return
+                const allUsers = getAllUsers()
+                const averagefrancsPerUser = Object.values(allUsers).reduce((sum, user) => sum + (user.francs || 0), 0) / allUsers.length
+                console.log(`Average francs per user: ${averagefrancsPerUser}`)
+                if (averagefrancsPerUser / 5 > 10)
+                    PlayingFee = Math.floor(Math.ceil(averagefrancsPerUser / 5) / 10) * 10
             }
-        } else {
-            const allUsers = getAllUsers()
-            const averagefrancsPerUser = Object.values(allUsers).reduce((sum, user) => sum + (user.francs || 0), 0) / allUsers.length
-            console.log(`Average francs per user: ${averagefrancsPerUser}`)
-            if (averagefrancsPerUser / 5 > 10)
-                PlayingFee = Math.floor(Math.ceil(averagefrancsPerUser / 5) / 10) * 10
+        else {
+            let user = getUser(whatsapp.senderJid);
+            if (user) {
+                if (user.LastWordGame && Date.now() - user.LastWordGame < 24 * 60 * 60 * 1000) {
+                    if (user.wordGameCreated > 0) {
+                        user.wordGameCreated = (user.wordGameCreated) - 1;
+                    } else {
+                        const nextCreationTime = user.LastWordGame + 24 * 60 * 60 * 1000;
+                        const nextCreationDate = new Date(nextCreationTime);
+                        await whatsapp.sendMessage(groupId, "🧩 Tu as déjà créé trop de parties de mots ! Tu dois attendre jusqu'au " + nextCreationDate.toLocaleString() + " avant d'en créer une autre.");
+                        delete this.games[groupId]
+                        this.saveGame(this.games)
+                        return;
+                    }
+                } else {
+                    user.LastWordGame = Date.now();
+                    user.wordGameCreated = 3;
+                }
+                saveUser(user);
+            }
+
         }
 
 

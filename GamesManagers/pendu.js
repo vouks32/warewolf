@@ -211,22 +211,26 @@ export class PenduManager {
         timers[groupId] = [null, null, null, null, null, null, null]
 
 
+        if (whatsapp.isMonetized) {
+            await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points) (10 parties par chaque 24hrs)\n2. Partie avec mise en jeu (francs)\n\n_ps: Une partie normale coute 5 francs_")
 
-        await whatsapp.sendMessage(groupId, "🎮 Choisis le type de partie que tu veux jouer!\n\n1. Partie normale (points) (10 parties par chaque 24hrs)\n2. Partie avec mise en jeu (francs)\n\n_ps: Une partie normale coute 5 francs_")
-
-        timers[groupId][0] = setTimeout(async () => {
-            if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
-                await whatsapp.sendMessage(groupId, "⏰ Temps écoulé pour choisir le type de partie! Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
-                delete this.games[groupId]
-                this.saveGame(this.games)
-                return
-            }
-        }, 1 * 60 * 1000)
-        timers[groupId][1] = setTimeout(async () => {
-            if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
-                await whatsapp.sendMessage(groupId, "⏰ 30 secondes restantes pour choisir le type de partie!")
-            }
-        }, 30 * 1000)
+            timers[groupId][0] = setTimeout(async () => {
+                if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
+                    await whatsapp.sendMessage(groupId, "⏰ Temps écoulé pour choisir le type de partie! Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
+                    delete this.games[groupId]
+                    this.saveGame(this.games)
+                    return
+                }
+            }, 1 * 60 * 1000)
+            timers[groupId][1] = setTimeout(async () => {
+                if (this.games[groupId] && this.games[groupId].state === "CHOOSING_GAME_TYPE") {
+                    await whatsapp.sendMessage(groupId, "⏰ 30 secondes restantes pour choisir le type de partie!")
+                }
+            }, 30 * 1000)
+        } else {
+            this.games[groupId].gameType = 1
+            await this.createGame(groupId, whatsapp)
+        }
 
     }
 
@@ -260,42 +264,64 @@ export class PenduManager {
 
         let PlayingFee = 0
 
-        if (this.games[groupId].gameType === 1) {
-            const hostUser = this.games[groupId].hostjid ? getUser(this.games[groupId].hostjid) : null
-            if (hostUser && hostUser.francs >= 5) {
-                await SaveUsersfrancs(this.games[groupId].hostjid, whatsapp, -5, "a lancé une partie de loup avec points", "PENDU", 0, this.games[groupId])
-                let user = getUser(whatsapp.senderJid);
-                if (user) {
-                    if ((user.LastHangGame && Date.now() - user.LastHangGame < 24 * 60 * 60 * 1000)) {
-                        if (user.hangGameCreated > 0) {
-                            user.hangGameCreated = (user.hangGameCreated) - 1;
+        if (whatsapp.isMonetized)
+            if (this.games[groupId].gameType === 1) {
+                const hostUser = this.games[groupId].hostjid ? getUser(this.games[groupId].hostjid) : null
+                if (hostUser && hostUser.francs >= 5) {
+                    await SaveUsersfrancs(this.games[groupId].hostjid, whatsapp, -5, "a lancé une partie de loup avec points", "PENDU", 0, this.games[groupId])
+                    let user = getUser(whatsapp.senderJid);
+                    if (user) {
+                        if ((user.LastHangGame && Date.now() - user.LastHangGame < 24 * 60 * 60 * 1000)) {
+                            if (user.hangGameCreated > 0) {
+                                user.hangGameCreated = (user.hangGameCreated) - 1;
+                            } else {
+                                const nextCreationTime = user.LastHangGame + 24 * 60 * 60 * 1000;
+                                const nextCreationDate = new Date(nextCreationTime);
+                                await whatsapp.sendMessage(groupId, "🧩 Tu as déjà créé trop de parties du pendu ! Tu dois attendre jusqu'au *" + nextCreationDate.toLocaleString() + "* avant d'en créer une autre.");
+                                delete this.games[groupId]
+                                this.saveGame(this.games)
+                                return;
+                            }
                         } else {
-                            const nextCreationTime = user.LastHangGame + 24 * 60 * 60 * 1000;
-                            const nextCreationDate = new Date(nextCreationTime);
-                            await whatsapp.sendMessage(groupId, "🧩 Tu as déjà créé trop de parties du pendu ! Tu dois attendre jusqu'au *" + nextCreationDate.toLocaleString() + "* avant d'en créer une autre.");
-                            delete this.games[groupId]
-                            this.saveGame(this.games)
-                            return;
+                            user.LastHangGame = Date.now();
+                            user.hangGameCreated = 3;
                         }
-                    } else {
-                        user.LastHangGame = Date.now();
-                        user.hangGameCreated = 3;
+                        saveUser(user);
                     }
-                    saveUser(user);
+                } else if (hostUser && hostUser.francs < 5) {
+                    await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de francs pour lancer une partie points. Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
+                    delete this.games[groupId]
+                    this.saveGame(this.games)
+                    return
+                } else {
+                    await whatsapp.sendMessage(groupId, "Une érreur est survenue lors de la vérification des francs du créateur de la partie. Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
+                    delete this.games[groupId]
+                    this.saveGame(this.games)
+                    return
                 }
-            } else if (hostUser && hostUser.francs < 5) {
-                await whatsapp.sendMessage(groupId, "⚠️ Le créateur de la partie n'a pas assez de francs pour lancer une partie points. Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
-                delete this.games[groupId]
-                this.saveGame(this.games)
-                return
             } else {
-                await whatsapp.sendMessage(groupId, "Une érreur est survenue lors de la vérification des francs du créateur de la partie. Partie annulée.\nEnvoyez *!pendu* pour réessayer.")
-                delete this.games[groupId]
-                this.saveGame(this.games)
-                return
-            }
-        } else {
 
+            }
+        else {
+            let user = getUser(whatsapp.senderJid);
+            if (user) {
+                if ((user.LastHangGame && Date.now() - user.LastHangGame < 24 * 60 * 60 * 1000)) {
+                    if (user.hangGameCreated > 0) {
+                        user.hangGameCreated = (user.hangGameCreated) - 1;
+                    } else {
+                        const nextCreationTime = user.LastHangGame + 24 * 60 * 60 * 1000;
+                        const nextCreationDate = new Date(nextCreationTime);
+                        await whatsapp.sendMessage(groupId, "🧩 Tu as déjà créé trop de parties du pendu ! Tu dois attendre jusqu'au *" + nextCreationDate.toLocaleString() + "* avant d'en créer une autre.");
+                        delete this.games[groupId]
+                        this.saveGame(this.games)
+                        return;
+                    }
+                } else {
+                    user.LastHangGame = Date.now();
+                    user.hangGameCreated = 3;
+                }
+                saveUser(user);
+            }
         }
 
         await whatsapp.sendMessage(groupId, "🪢 Nouvelle partie du Pendu" + (game.gameType == 2 ? "\n\n Une partie de pendu coutera *" + this.games[groupId].misePerUser + " francs* et vous remportez le totale des francs misé" : ""))
@@ -391,7 +417,7 @@ export class PenduManager {
         const player = game.players.find(p => p.jid === voterJid)
 
         if (!player) {
-            
+
             let user = getUser(voterJid)
             if (game.gameType === 2 && user.francs < game.misePerUser) {
                 await whatsapp.sendMessage(groupId, "⚠️ Tu n'as pas assez de francs pour rejoindre une partie avec mise en jeu.");

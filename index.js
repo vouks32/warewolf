@@ -123,8 +123,8 @@ async function startBot() {
         } else if (connection === "open") {
             console.log("✅ Bot is online!")
             messagesCount = MAX_MESSAGES
-           /* if (lastGroupJid)*
-                await sock.sendMessage(lastGroupJid, { text: fancyTransform(' --- BOT de nouveau actif --- \nJe suis de nouveau opérationnel'), }).then(handler.addMessage)*/
+            /* if (lastGroupJid)*
+                 await sock.sendMessage(lastGroupJid, { text: fancyTransform(' --- BOT de nouveau actif --- \nJe suis de nouveau opérationnel'), }).then(handler.addMessage)*/
             lastGroupJid = null
 
             // init games
@@ -233,7 +233,7 @@ async function startBot() {
                 msg.message?.videoMessage?.contextInfo?.mentionedJid ||
                 [];
 
-
+            const isMonetized = false;
             // Build reusable whatsapp object with proper JID information
             const game = !isGroup ? null : qmfr.isPlaying(remoteJid) ? "QUIZFR" : qm.isPlaying(remoteJid) ? "QUIZ" : wwm.isPlaying(remoteJid) ? "WEREWOLVE" : pendum.isPlaying(remoteJid) ? "PENDU" : word.isPlaying(remoteJid) ? "WORD" : null
 
@@ -246,7 +246,7 @@ async function startBot() {
                 lastGroupJid = remoteJid
             }
             if (text.startsWith('!') && !game && messagesCount <= 0 && isGroup) {
-               // await sock.sendMessage(lastGroupJid, { text: fancyTransform(' *--- Redémarrage de sécurité ---* \n\nLa relation toxique que j\'ai avec whatsapp m\'oblige à me redémarrer \n Patiente un peu'), }, { quoted: msg }).then(handler.addMessage)
+                // await sock.sendMessage(lastGroupJid, { text: fancyTransform(' *--- Redémarrage de sécurité ---* \n\nLa relation toxique que j\'ai avec whatsapp m\'oblige à me redémarrer \n Patiente un peu'), }, { quoted: msg }).then(handler.addMessage)
                 await startBot()
                 continue
             }
@@ -268,6 +268,7 @@ async function startBot() {
                 messageType: getContentType(msg.message) || "",
                 isViewOnce,
                 GamblingDay,
+                isMonetized,
                 isForward: (content?.contextInfo?.isForwarded || content?.contextInfo?.forwardingScore > 0),
                 isReaction: (msg.message?.reactionMessage),
                 raw: msg,
@@ -280,7 +281,7 @@ async function startBot() {
                 },
 
                 sendMessage: async (jid, message, mentions = undefined) => {
-                    await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(!GamblingDay ? message : message) ), mentions: mentions }).then(handler.addMessage)
+                    await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(!GamblingDay ? message : message)), mentions: mentions }).then(handler.addMessage)
                 },
 
                 sendImage: async (jid, img, caption = "", mentions = []) => {
