@@ -8778,5 +8778,155 @@
         "type": "verbe",
         "frequency": 505,
         "label": "C'est la crise"
+    },
+    {
+        "type": "expression",
+        "frequency": 1250,
+        "label": "On est ensemble"
+    },
+    {
+        "type": "expression",
+        "frequency": 980,
+        "label": "Ça va aller"
+    },
+    {
+        "type": "verbe",
+        "frequency": 920,
+        "label": "On go falla le wé"
+    },
+    {
+        "type": "expression",
+        "frequency": 850,
+        "label": "Easy man"
+    },
+    {
+        "type": "subst.",
+        "frequency": 780,
+        "label": "Aller en mbeng"
+    },
+    {
+        "type": "expression",
+        "frequency": 740,
+        "label": "Tu connais la story"
+    },
+    {
+        "type": "verbe",
+        "frequency": 710,
+        "label": "Je vais te taper"
+    },
+    {
+        "type": "expression",
+        "frequency": 680,
+        "label": "Le cul de la poule"
+    },
+    {
+        "type": "subst.",
+        "frequency": 650,
+        "label": "Le ndem"
+    },
+    {
+        "type": "expression",
+        "frequency": 620,
+        "label": "Je suis dedans"
+    },
+    {
+        "type": "verbe",
+        "frequency": 590,
+        "label": "Chop money"
+    },
+    {
+        "type": "expression",
+        "frequency": 570,
+        "label": "No wahala"
+    },
+    {
+        "type": "subst.",
+        "frequency": 550,
+        "label": "Le tchoronko"
+    },
+    {
+        "type": "expression",
+        "frequency": 530,
+        "label": "Tu vas voir"
+    },
+    {
+        "type": "verbe",
+        "frequency": 510,
+        "label": "On va fom"
+    },
+    {
+        "type": "expression",
+        "frequency": 490,
+        "label": "Ça se passe comment"
+    },
+    {
+        "type": "subst.",
+        "frequency": 470,
+        "label": "La go du boy"
+    },
+    {
+        "type": "expression",
+        "frequency": 450,
+        "label": "Je suis chaud"
+    },
+    {
+        "type": "verbe",
+        "frequency": 430,
+        "label": "Faut pas me vex"
+    },
+    {
+        "type": "expression",
+        "frequency": 410,
+        "label": "Merci beaucoup mon chaud"
+    },
+    {
+        "type": "expression",
+        "frequency": 410,
+        "label": "Le porteur est debout"
+    },
+    {
+        "type": "expression",
+        "frequency": 410,
+        "label": "La sanza n'est jamais inondé"
+    },
+    {
+        "type": "expression",
+        "frequency": 410,
+        "label": "Le chien est debout"
+    },
+    {
+        "type": "expression",
+        "frequency": 410,
+        "label": "On se capte morro"
+    },
+    {
+        "type": "expression",
+        "frequency": 410,
+        "label": "Le bangala est tendu comme la canne à sucre"
+    },
+    {
+        "type": "expression",
+        "frequency": 410,
+        "label": "si elle ne mouille pas tu crashe"
+    },
+    {
+        "type": "expression",
+        "frequency": 410,
+        "label": "si mon eru disparait du frigo"
+    },
+    {
+        "type": "expression",
+        "frequency": 410,
+        "label": "on attend que les petites du quartier grandisse"
+    },
+    {
+        "type": "expression",
+        "frequency": 410,
+        "label": "asseh, shoua moi son number nor"
+    },
+    {
+        "type": "expression",
+        "frequency": 410,
+        "label": "elle a les fesses comme le derrière de la marmite du deuil"
     }
 ]
