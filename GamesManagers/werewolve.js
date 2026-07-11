@@ -419,7 +419,7 @@ export class WereWolvesManager {
                             }
                         } else {
                             user.LastWerewolveGame = Date.now();
-                            user.WerewolveGameCreated = 3;
+                            user.WerewolveGameCreated = 9;
                         }
                         saveUser(user);
                     }
