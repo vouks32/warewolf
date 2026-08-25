@@ -1,8 +1,0 @@
-dns : ec2-16-171-236-222.eu-north-1.compute.amazonaws.com
-user name : Administrator
-mail : latotravelfr@gmail.com
-mdp : R)Bqko*%Y!HRddmsTQD*MyJLwd)-51aZ
-
-
-ec2-13-49-240-79.eu-north-1.compute.amazonaws.com
-mdp: %!Qd.2.Jx5Ma.;dw$uZ2vpJnLJmjugVv

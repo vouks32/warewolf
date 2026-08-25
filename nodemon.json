@@ -1,0 +1,6 @@
+{
+  "ignore": ["*.json"],
+  "events": {
+    "crash": "touch index.js"
+  }
+}
