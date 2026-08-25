@@ -68,7 +68,7 @@ for (const groupJid in groupRanks) {
 
 
 async function startBot() {
-    const { state, saveCreds } = await useMultiFileAuthState("../auth_info")
+    const { state, saveCreds } = await useMultiFileAuthState("../auth_info2")
     const { version } = await fetchLatestBaileysVersion();
     // Handlers storage
     const handlers = {
