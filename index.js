@@ -69,7 +69,7 @@ for (const groupJid in groupRanks) {
 }
 
 // 1. Fetch your Railway Environment Variable
-const mongoUrl = "mongodb+srv://vouks:password@cluster0.mongodb.net/myDatabase"; 
+const mongoUrl = "mongodb://mongo:AGKMnZNbfAKODXYmWtPDesrWqojwSdON@mongodb.railway.internal:27017"; 
 
 async function startBot() {
     const client = new MongoClient(mongoUrl);
