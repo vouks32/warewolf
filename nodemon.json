@@ -1,6 +1,8 @@
 {
-  "ignore": ["*.json"],
+  "watch": ["index.js", "nodemon-restart.js"],
+  "ext": "js,json",
+  "delay": "1",
   "events": {
-    "crash": "touch index.js"
+    "crash": "touch nodemon-restart.js"
   }
 }
