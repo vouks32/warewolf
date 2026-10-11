@@ -13,6 +13,8 @@ import { fancyTransform } from './TextConverter.js'
 import { PenduManager } from "./GamesManagers/pendu.js";
 import { WordGameManager } from "./GamesManagers/makewords.js";
 import { GroupManager } from "./GroupManager/groupManager.js";
+import { MongoClient } from 'mongodb';
+import { useMongoDBAuthState } from 'mongo-baileys';
 
 process.env.TZ = 'Africa/Douala';
 
@@ -66,9 +68,19 @@ for (const groupJid in groupRanks) {
     groupRanks[groupJid] = group
 }
 
+// 1. Fetch your Railway Environment Variable
+const mongoUrl = "mongodb+srv://vouks:password@cluster0.mongodb.net/myDatabase"; 
 
 async function startBot() {
-    const { state, saveCreds } = await useMultiFileAuthState("../auth_info2")
+    const client = new MongoClient(mongoUrl);
+    await client.connect();
+    
+    const db = client.db("whatsapp_bot");
+    const collection = db.collection("auth_state");
+
+    // 3. Initialize the MongoDB Auth State Adapter
+    const { state, saveCreds } = await useMongoDBAuthState(collection);
+
     const { version } = await fetchLatestBaileysVersion();
     // Handlers storage
     const handlers = {
