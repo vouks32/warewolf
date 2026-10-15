@@ -74,12 +74,7 @@ const mongoUrl = process.env.MONGO_URL;
 console.log("URL de la base de données :", mongoUrl)
 
 async function startBot() {
-    const client = new MongoClient(mongoUrl, {
-        // Force l'utilisation d'IPv4 si le DNS de Railway a des ratés
-        family: 4,
-        // Donne plus de temps pour la première connexion
-        serverSelectionTimeoutMS: 5000
-    });
+    const client = new MongoClient(mongoUrl);
     await client.connect();
 
     const db = client.db("whatsapp_bot");
