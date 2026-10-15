@@ -69,13 +69,18 @@ for (const groupJid in groupRanks) {
 }
 
 // 1. Fetch your Railway Environment Variable
-const mongoUrl = "mongodb://mongo:AGKMnZNbfAKODXYmWtPDesrWqojwSdON@mongodb.railway.internal:27017"; 
+const mongoUrl = process.env.MONGO_URL || "mongodb://mongo:AGKMnZNbfAKODXYmWtPDesrWqojwSdON@mongodb.railway.internal:27017";
 
 
 async function startBot() {
-    const client = new MongoClient(mongoUrl);
+    const client = new MongoClient(mongoUrl, {
+        // Force l'utilisation d'IPv4 si le DNS de Railway a des ratés
+        family: 4,
+        // Donne plus de temps pour la première connexion
+        serverSelectionTimeoutMS: 5000
+    });
     await client.connect();
-    
+
     const db = client.db("whatsapp_bot");
     const collection = db.collection("auth_state");
 
