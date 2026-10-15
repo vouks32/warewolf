@@ -71,6 +71,7 @@ for (const groupJid in groupRanks) {
 // 1. Fetch your Railway Environment Variable
 const mongoUrl = `mongodb://mongo:${process.env.MONGO_INITDB_ROOT_PASSWORD}@${process.env.MONGOHOST}:${process.env.MONGOPORT}` || "mongodb://mongo:AGKMnZNbfAKODXYmWtPDesrWqojwSdON@mongodb.railway.internal:27017";
 
+console.log("URL de la base de données :", mongoUrl)
 
 async function startBot() {
     const client = new MongoClient(mongoUrl, {
