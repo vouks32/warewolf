@@ -69,19 +69,20 @@ for (const groupJid in groupRanks) {
 }
 
 // 1. Fetch your Railway Environment Variable
-const mongoUrl = process.env.MONGO_URL;
+//const mongoUrl = process.env.MONGO_URL;
 
 console.log("URL de la base de données :", mongoUrl)
 
 async function startBot() {
-    const client = new MongoClient(mongoUrl);
+    /*const client = new MongoClient(mongoUrl);
     await client.connect();
 
     const db = client.db("whatsapp_bot");
-    const collection = db.collection("auth_state");
+    const collection = db.collection("auth_state");*/
 
     // 3. Initialize the MongoDB Auth State Adapter
-    const { state, saveCreds } = await useMongoDBAuthState(collection);
+    // const { state, saveCreds } = await useMongoDBAuthState(collection);
+    const { state, saveCreds } = await useMultiFileAuthState("../auth_info")
 
     const { version } = await fetchLatestBaileysVersion();
     // Handlers storage
