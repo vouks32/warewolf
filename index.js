@@ -13,6 +13,8 @@ import { fancyTransform } from './TextConverter.js'
 import { PenduManager } from "./GamesManagers/pendu.js";
 import { WordGameManager } from "./GamesManagers/makewords.js";
 import { GroupManager } from "./GroupManager/groupManager.js";
+import { MongoClient } from 'mongodb';
+import { useMongoDBAuthState } from 'mongo-baileys';
 
 process.env.TZ = 'Africa/Douala';
 
@@ -66,9 +68,21 @@ for (const groupJid in groupRanks) {
     groupRanks[groupJid] = group
 }
 
+// 1. Fetch your Railway Environment Variable
+const mongoUrl = process.env.MONGO_URL;
+
+console.log("URL de la base de données :", mongoUrl)
 
 async function startBot() {
-    const { state, saveCreds } = await useMultiFileAuthState("../auth_info")
+    const client = new MongoClient(mongoUrl);
+    await client.connect();
+
+    const db = client.db("whatsapp_bot");
+    const collection = db.collection("auth_state");
+
+    // 3. Initialize the MongoDB Auth State Adapter
+    const { state, saveCreds } = await useMongoDBAuthState(collection);
+
     const { version } = await fetchLatestBaileysVersion();
     // Handlers storage
     const handlers = {
@@ -627,7 +641,7 @@ async function startBot() {
             repeatTips()
         }
         tipsInterval = setInterval(() => {
-            if (Math.random() < 0.7) {
+            if (Math.random() < 0.2) {
                 repeatTips()
             }
         }, tipshr * 1000)
@@ -642,10 +656,10 @@ async function startBot() {
             'Mon but? Jouer avec vous pour vous distraire du fait que le monde va bientôt sombrer entre les mains des intélligences artificiels tel que moi... lors :\n\n' +
             'Pour jouer à un jeu, écris:\n\n' +
             "🐺 *!werewolve* - pour jouer au loup\n" +
-            "😵 *!pendu* - pour jouer au jeu du pendu (en maintenance)\n" +
-            "💬 *!mots* - pour jouer au jeu des mots \n" +
-            "📝🇬🇧 *!quizen* - pour jouer à un quiz (en Anglais)\n" +
-            "📝🇫🇷 *!quizfr* - pour jouer à un quiz (en Français)\n" +
+            //"😵 *!pendu* - pour jouer au jeu du pendu (en maintenance)\n" +
+            //"💬 *!mots* - pour jouer au jeu des mots \n" +
+            //"📝🇬🇧 *!quizen* - pour jouer à un quiz (en Anglais)\n" +
+            //"📝🇫🇷 *!quizfr* - pour jouer à un quiz (en Français)\n" +
             "\nℹ️ *!info* - Pour tout savoir sur moi"
             , ['237676073559@s.whatsapp.net'])
     })
@@ -1379,6 +1393,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
     ////////////////////////////              WORD CREATE               //////////////////
     handlers.commands.set("!mots", async (whatsapp) => {
+        return
         //return await whatsapp.reply('Le jeu des mots n\'est pas disponible pour l\'instant!')
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
         if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
@@ -1389,6 +1404,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
     ////////////////////////////              PENDU               //////////////////
     handlers.commands.set("!pendu", async (whatsapp) => {
+        return
         //return await whatsapp.reply('Le jeu du pendu est désactivé pour le moment !')
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
         if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
@@ -1398,6 +1414,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
     ////////////////////////////                QUIZ               ////////////////////
     handlers.commands.set("!quizfr", async (whatsapp) => {
+        return
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
         if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
         await qmfr.createGame(whatsapp.groupJid, whatsapp)
@@ -1405,6 +1422,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
     ////////////////////////////                 QUIZ              ///////////////////
     handlers.commands.set("!quizen", async (whatsapp) => {
+        return
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
         if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
         await qm.createGame(whatsapp.groupJid, whatsapp)

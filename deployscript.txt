@@ -1,0 +1,28 @@
+Railway nodemon crash-restart setup
+===================================
+
+Create a file named nodemon.json in the project root with this configuration:
+
+{
+  "watch": ["index.js", "nodemon-restart.js"],
+  "ext": "js,json",
+  "delay": "1",
+  "events": {
+    "crash": "touch nodemon-restart.js"
+  }
+}
+
+Create an empty nodemon-restart.js file in the project root and commit both
+files. Set the Railway service's Start Command to:
+
+  npx nodemon index.js
+
+When index.js crashes, nodemon runs the configured crash event. The touch
+command updates the watched nodemon-restart.js file, which triggers nodemon to
+start index.js again. The one-second delay lets the file watcher register the
+timestamp change before restarting.
+
+This uses Railway's Linux shell, where touch is available. Nodemon is already
+listed in package.json, so it will be installed during deployment. Do not use
+--exitcrash with this setup; nodemon must remain alive to observe the trigger
+file change.
