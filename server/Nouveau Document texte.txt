@@ -2,3 +2,5 @@ i-022530f2a17ae953c
 172.31.20.210
 Administrator
 %r)*a5ENu?$HQ8B62NUX@WPKeYTRAXTK
+
+nodemon --delay 2 --ignore "*.json" --exec "node index.js || touch index.js"

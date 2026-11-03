@@ -71,7 +71,7 @@ for (const groupJid in groupRanks) {
 // 1. Fetch your Railway Environment Variable
 //const mongoUrl = process.env.MONGO_URL;
 
-console.log("URL de la base de données :", mongoUrl)
+//console.log("URL de la base de données :", mongoUrl)
 
 async function startBot() {
     /*const client = new MongoClient(mongoUrl);
