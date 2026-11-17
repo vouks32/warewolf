@@ -9,6 +9,8 @@ const VOWELS = ["A", "E", "I", "O", "U", "Y", "A", "E", "I", "O", "U", "Y", "È"
 const CONSONANTS = "BCÇDFGHJKLMNPQRSTVWXZBCDFGHJKLMNPQRSTVWXZÇ".split("");
 let timers = {}
 
+export const MAXNUMBEROFWORDSPERPLAYER = 2
+
 export class WordGameManager {
     constructor() {
         this.games = this.loadGames();
@@ -190,6 +192,8 @@ export class WordGameManager {
                     await SaveUsersfrancs(this.games[groupId].hostjid, whatsapp, -5, "a lancé une partie de loup avec mise en jeu", "WORDGAME", 0, this.games[groupId])
                     let user = getUser(whatsapp.senderJid);
                     if (user) {
+                        user.wordGameCreated = user.wordGameCreated > MAXNUMBEROFWORDSPERPLAYER ? MAXNUMBEROFWORDSPERPLAYER : user.wordGameCreated;
+                        
                         if (user.LastWordGame && Date.now() - user.LastWordGame < 24 * 60 * 60 * 1000) {
                             if (user.wordGameCreated > 0) {
                                 user.wordGameCreated = (user.wordGameCreated) - 1;
@@ -203,7 +207,7 @@ export class WordGameManager {
                             }
                         } else {
                             user.LastWordGame = Date.now();
-                            user.wordGameCreated = 9;
+                            user.wordGameCreated = MAXNUMBEROFWORDSPERPLAYER;
                         }
                         saveUser(user);
                     }
@@ -228,7 +232,9 @@ export class WordGameManager {
             }
         else {
             let user = getUser(whatsapp.senderJid);
+
             if (user) {
+                user.wordGameCreated = user.wordGameCreated > MAXNUMBEROFWORDSPERPLAYER ? MAXNUMBEROFWORDSPERPLAYER : user.wordGameCreated;
                 if (user.LastWordGame && Date.now() - user.LastWordGame < 24 * 60 * 60 * 1000) {
                     if (user.wordGameCreated > 0) {
                         user.wordGameCreated = (user.wordGameCreated) - 1;
@@ -242,7 +248,7 @@ export class WordGameManager {
                     }
                 } else {
                     user.LastWordGame = Date.now();
-                    user.wordGameCreated = 9;
+                    user.wordGameCreated = MAXNUMBEROFWORDSPERPLAYER;
                 }
                 saveUser(user);
             }

@@ -149,27 +149,13 @@ async function startBot() {
                     sendMessage: async (jid, message, mentions = undefined) => {
                         await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(message)), mentions: mentions }).then(handler.addMessage)
                     },
-                    sendImage: async (jid, img, caption = "", mentions = []) => {
-
+                    sendSticker: async (jid, img, caption = "", mentions = []) => {
                         await sock.sendMessage(jid, {
                             sticker: fs.readFileSync(img),
                         });
                         await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(caption)), mentions: mentions }).then(handler.addMessage)
-
                         return
-                        if (img.includes('http')) {
-                            await sock.sendMessage(jid, { image: { url: img }, caption: fancyTransform(htmlDecode(caption)), mentions }).then(handler.addMessage)
-                            return
-                        }
-
-                        await sock.sendMessage(jid, {
-                            image: {
-                                url: img
-                            },
-                            caption: caption,
-                            mentions: mentions
-                        }).then(handler.addMessage)
-                    }
+                       }
                 }
 
                 await wwm.init(iniWha)
@@ -304,34 +290,12 @@ async function startBot() {
                     await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(!GamblingDay ? message : message)), mentions: mentions }).then(handler.addMessage)
                 },
 
-                sendImage: async (jid, img, caption = "", mentions = []) => {
+                sendSticker: async (jid, img, caption = "", mentions = []) => {
                     await sock.sendMessage(jid, {
                         sticker: fs.readFileSync(img),
                     });
                     await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(caption)), mentions: mentions }).then(handler.addMessage)
                     return
-
-                    try {
-                        if (img.includes('http')) {
-                            await sock.sendMessage(jid, { image: fs.readFileSync(img), caption: fancyTransform(htmlDecode(!GamblingDay ? caption : caption)), mentions }).then(handler.addMessage)
-                            return
-                        }
-                        await sock.sendMessage(jid, {
-                            image: fs.readFileSync(img),
-                            caption: fancyTransform(htmlDecode(!GamblingDay ? caption : caption)),
-                            mentions: mentions
-                        }).then(handler.addMessage)
-
-                    } catch (error) {
-                        console.log("Error sending image, maybe try to optimize it ? ", error)
-                        await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(caption)), mentions: mentions }).then(handler.addMessage)
-                    }
-
-                    /*const text = "======================\n\n" +
-                        htmlDecode(caption) +
-                        "\n\n======================"
-                    await sock.sendMessage(jid, { text: fancyTransform(text), mentions: mentions }).then(handler.addMessage)*/
-
                 },
 
                 sendSticker: async (jid, img, caption = "", mentions = []) => {
@@ -618,13 +582,8 @@ async function startBot() {
             groupRanks[groupJid] = group
 
             const tips = [
-                "*Astuce:*\n\n Consultez régulièrement votre profil avec *!profil* pour suivre votre progression!",
-                "*Astuce:*\n\n En lançant une partie, vous avez 2 options !\n\n1. *jouer pour gagner des points*. Ici vous jouez pour gagner des points et avancer dans le classement. les 3 premiers du classement sont promus admin et obtiennent de nombreux avatages\n2. *jouer pour gagner de l'argent via les mises*. Ici chaque jouer mise une somme lorsqu'il participe et cette somme est repartager aux gagnants à la fin de la partie (en fonction de leur points).\n\nEssayez les 2 modes pour voir celui que vous préférez !",
-                "*Astuce:*\n\n N'hésitez pas à inviter vos amis à rejoindre le groupe et jouer avec vous ! Plus on est de fous, plus on rit !",
-                "*Astuce:*\n\n Vous pouvez acheter des packs pour obtenir des francs et des pouvoir spéciaux!\n\nEnvoyez *!packs* pour voir les packs disponibles et leurs avantages !",
-                "*Astuce:*\n\n Si vous envoyez *!werewolve*, puis choisissez *2*, vous pouvez lancer une partie avec mise d'argent.\n\nVous misez *10 francs* et les gagnants se partagent la cagnotte à la fin de la partie en fonction de leurs points !\n\nPlus vous avez de points, plus vous gagnez de francs !",
-                "*Astuce:*\n\n Jouez avec d'autres joueurs à *!werewolve*, *!mots*, et *!pendu* avec mises de francs pour gagner de l'argent\n\nVous pouvez retirer vos francs à tout moment (2000 francs minimum) !",
-                "*Astuce:*\n\n Gagnez des points en jouant à *!werewolve*, *!mots*, et *!pendu* puis en choisissant *1* !",
+               "*Astuce:*\n\n N'hésitez pas à inviter vos amis à rejoindre le groupe et jouer avec vous ! Plus on est de fous, plus on rit !",
+               "*Astuce:*\n\n Gagnez des points en jouant à *!werewolve*, et *!mots* !",
             ]
 
             await sock.sendMessage(groupJid, {
@@ -1273,7 +1232,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
     })
 
     handlers.commands.set("!image", async (whatsapp) => {
-        return //await whatsapp.sendImage(whatsapp.remoteJid, './images/creategame.jpg')
+        return //await whatsapp.sendSticker(whatsapp.remoteJid, './images/creategame.webp')
     })
 
     handlers.commands.set("!profil", async (whatsapp) => {
@@ -1401,11 +1360,12 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
 
     ////////////////////////////              WORD CREATE               //////////////////
     handlers.commands.set("!mots", async (whatsapp) => {
-        return
+        
         //return await whatsapp.reply('Le jeu des mots n\'est pas disponible pour l\'instant!')
         if (!whatsapp.isGroup) return await whatsapp.reply('Ne peut être appelé que dans un groupe!')
         if (whatsapp.game !== null) return await whatsapp.reply('Un jeu est en cours dans ce groupe')
         await word.chooseGameType(whatsapp.groupJid, whatsapp)
+        return
     })
 
 

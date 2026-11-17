@@ -4,6 +4,7 @@ import path from "path"
 import RoleManager from "./werewolve-utils/roleManager.js"
 import { getUser, saveUser, POINTS_LIST, SaveUsersPoints, FRANCS_LIST, SaveUsersfrancs, getAllUsers, getGroup, saveGroup } from "../userStorage.js"
 import { get } from "http";
+import { MAXNUMBEROFWORDSPERPLAYER } from "./makewords.js";
 
 let pointsList = (game) => {
     if (game && game.gameType === 2) {
@@ -464,7 +465,7 @@ export class WereWolvesManager {
             }
         }
 
-        await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "startgame.webp"), "🎮 Nouvelle partie de loup garou, *Awoooo!😭*.")
+        await whatsapp.sendSticker(groupId, path.join(IMAGE_FILE, "startgame.webp"), "🎮 Nouvelle partie de loup garou, *Awoooo!😭*.")
         await whatsapp.sendMessage(groupId, "🎮 Envoie *!play _pseudo_* pour rejoindre (3 minutes restantes)" + (game.gameType == 2 ? "\n\n Une partie de loup coutera *" + game.misePerUser + " francs* et vous remportez le totale des francs misé" : ""))
 
         timers[groupId][0] = setTimeout(async () => {
@@ -717,7 +718,7 @@ export class WereWolvesManager {
             "🌙 La nuit est tombée... \n👿 Seule les agents du mal sont encore debout, et Les bordelles aussi..., \n\nVous avez *2 minutes*",
         ]
         console.log('sending night msg')
-        await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "nightfall.webp"), nightText[Math.floor(Math.random() * nightText.length)] + (game.gameType === 2 ? "\n\nPartie avec mise de *" + game.mise + " francs*" : "Partie normale, pas de mise en jeu"))
+        await whatsapp.sendSticker(groupId, path.join(IMAGE_FILE, "nightfall.webp"), nightText[Math.floor(Math.random() * nightText.length)] + (game.gameType === 2 ? "\n\nPartie avec mise de *" + game.mise + " francs*" : "Partie normale, pas de mise en jeu"))
         const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
         const mentions = game.players.map((p, i) => p.jid)
         await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
@@ -756,7 +757,7 @@ export class WereWolvesManager {
 
             let wasVictim = false
             let wasHunter = false
-            await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "sunrise.webp"), "☀️ Le jour se lève...")
+            await whatsapp.sendSticker(groupId, path.join(IMAGE_FILE, "sunrise.webp"), "☀️ Le jour se lève...")
 
 
             // Résolution Serial Killer
@@ -1094,7 +1095,7 @@ export class WereWolvesManager {
         // At start of resolveVotes:
         if (game.votesStopped) {
             const mayor = game.players.find(p => p.role === "MAYOR")
-            await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "mayor.webp"), "⚖️ Le vote a été annulé par le Maire @" + mayor.jid.split('@')[0], [mayor.jid])
+            await whatsapp.sendSticker(groupId, path.join(IMAGE_FILE, "mayor.webp"), "⚖️ Le vote a été annulé par le Maire @" + mayor.jid.split('@')[0], [mayor.jid])
             game.votesStopped = false
             // Then proceed to night
             await this.startNight(groupId, whatsapp)
@@ -1553,7 +1554,7 @@ export class WereWolvesManager {
         timers[groupId][0] = setTimeout(async () => {
             game.pendingHunter = null;
 
-            await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "sunrise.webp"), "☀️ Le jour se lève...")
+            await whatsapp.sendSticker(groupId, path.join(IMAGE_FILE, "sunrise.webp"), "☀️ Le jour se lève...")
             await whatsapp.sendMessage(groupId, `@${hunter.jid.split('@')[0]} a été tué pendant la nuit!\n\nMais... c'était un Chasseur 🏹`, [hunter.jid])
 
             if (!game.hunterTarget) {
@@ -1815,7 +1816,7 @@ export class WereWolvesManager {
         if (target.role.includes("WEREWOLF") || target.role.includes("SERIAL") || target.role.includes("PYRO") || (target.role.includes("HUNTER") && Math.random() > 0.5)) {
             prostitute.isDead = true
             await whatsapp.sendMessage(prostituteJid, "⚠️ Vous avez visité un client dangereux et êtes morte!")
-            await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "death.webp"), ([`💀 Un Cadavre à été retrouvé en plein carrefour!`, `💀 Un corps sans vie à été retrouvé`])[Math.floor(Math.random() * 2)])
+            await whatsapp.sendSticker(groupId, path.join(IMAGE_FILE, "death.webp"), ([`💀 Un Cadavre à été retrouvé en plein carrefour!`, `💀 Un corps sans vie à été retrouvé`])[Math.floor(Math.random() * 2)])
 
         } else {
             // Mark both as protected from wolf attack
@@ -2119,7 +2120,7 @@ export class WereWolvesManager {
                 "pointsTransactions": [],
                 "roleHistory": {},
                 "LastWordGame": Date.now(),
-                "wordGameCreated": 10,
+                "wordGameCreated": MAXNUMBEROFWORDSPERPLAYER,
                 "LastHangGame": Date.now(),
                 "hangGameCreated": 10,
                 "LastWerewolveGame": Date.now(),
@@ -2136,6 +2137,8 @@ export class WereWolvesManager {
         }
 
         user.lid = whatsapp.ids.lid || user.lid || null
+        user.wordGameCreated = user.wordGameCreated > MAXNUMBEROFWORDSPERPLAYER ? MAXNUMBEROFWORDSPERPLAYER : user.wordGameCreated;
+
         saveUser(user)
 
         await whatsapp.sendMessage(whatsapp.remoteJid, `Profil de @${user.jid.split('@')[0]}\n\n` +
@@ -2148,9 +2151,10 @@ export class WereWolvesManager {
             `\n*Parties joués* :\n${Object.entries(user.games).filter(([gameName, number]) => gameName.length > 2).map(([gameName, number]) => '- ' + gameName + ' : *' + number + ' Parties joués*').join('\n')}` +
             '\n\n*Pouvoirs disponibles* :' +
             '\n- Prières disponibles : *' + (user.prayers || 0) + ' Prières*' +
-            '\n- Clairvoyance disponibles : *' + (user.clairvoyance || 0) + ' Clairvoyances*' +
-            '\n- Incidence disponibles : *' + (user.incidence || 0) + ' Incidences*' +
-            '\n- Âme du Vol disponibles : *' + (user.ameDuVol || 0) + ' Âmes du Vol*'
+            //'\n- Clairvoyance disponibles : *' + (user.clairvoyance || 0) + ' Clairvoyances*' +
+            //'\n- Incidence disponibles : *' + (user.incidence || 0) + ' Incidences*' +
+            //'\n- Âme du Vol disponibles : *' + (user.ameDuVol || 0) + ' Âmes du Vol*'+
+            ''
             , [user.jid])
 
     }
