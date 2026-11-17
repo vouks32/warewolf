@@ -16,6 +16,8 @@ import { GroupManager } from "./GroupManager/groupManager.js";
 import { MongoClient } from 'mongodb';
 import { useMongoDBAuthState } from 'mongo-baileys';
 
+import { MAXNUMBEROFWORDSPERPLAYER } from "./GamesManagers/makewords.js";
+
 process.env.TZ = 'Africa/Douala';
 
 const MAX_MESSAGES = 1000
@@ -624,7 +626,7 @@ async function startBot() {
             'Pour jouer à un jeu, écris:\n\n' +
             "🐺 *!werewolve* - pour jouer au loup\n" +
             //"😵 *!pendu* - pour jouer au jeu du pendu (en maintenance)\n" +
-            //"💬 *!mots* - pour jouer au jeu des mots \n" +
+            "💬 *!mots* - pour jouer au jeu des mots \n" +
             //"📝🇬🇧 *!quizen* - pour jouer à un quiz (en Anglais)\n" +
             //"📝🇫🇷 *!quizfr* - pour jouer à un quiz (en Français)\n" +
             "\nℹ️ *!info* - Pour tout savoir sur moi"
@@ -819,9 +821,9 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                     "pointsTransactions": [],
                     "roleHistory": {},
                     "LastWordGame": Date.now(),
-                    "wordGameCreated": 10,
+                    "wordGameCreated": MAXNUMBEROFWORDSPERPLAYER,
                     "LastHangGame": Date.now(),
-                    "hangGameCreated": 10,
+                    "hangGameCreated": 5,
                     "LastWerewolveGame": Date.now(),
                     "WerewolveGameCreated": 10,
                     "francs": 250,
@@ -914,8 +916,8 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
             let group = []
             for (const playerJid in allPlayers) {
                 const player = allPlayers[playerJid];
-                player.wordGameCreated = 10
-                player.hangGameCreated = 10
+                player.wordGameCreated = MAXNUMBEROFWORDSPERPLAYER
+                player.hangGameCreated = 5
                 player.WerewolveGameCreated = 10
                 saveUser(player)
                 group.push(player)
