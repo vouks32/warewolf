@@ -196,7 +196,7 @@ async function startBot() {
         for (const p of event.participants) {
             if (event.action === "add") {
                 const text = `Bienvenue @${p.phoneNumber.split('@')[0]},\n\nJe suis un bot donc pas la peine de me repondre, je m'en fou\n\nIci personne ne se connait donc ne soit pas peur, parle nous\n\nDans ce groupe tu peux jouer à différents jeux\nEnvoie *!info* pour en savoir plus`
-                await sock.sendMessage(event.id, { text: fancyTransform(text), mentions: [p.phoneNumber, '237676073559@s.whatsapp.net'] }).then(handler.addMessage)
+                await sock.sendMessage(event.id, { text: fancyTransform(text), mentions: [p.phoneNumber, '237686148588@s.whatsapp.net'] }).then(handler.addMessage)
             }
         }
 
@@ -427,7 +427,7 @@ async function startBot() {
                         handled = true
                     }
                     if (whatsapp.isGroup && !wwm.playerCanSpeak(whatsapp.senderJid, whatsapp.groupJid)) {
-                        if (whatsapp.senderJid.includes('x650687834') || whatsapp.senderJid.includes('x676073559')) { } else {
+                        if (whatsapp.senderJid.includes('x650687834') || whatsapp.senderJid.includes('x686148588')) { } else {
                             const ans = [
                                 `@${whatsapp.sender.split('@')[0]} on est pas dans ton village ici, les morts ne réagissent pas\nVous avez reçu *-5 points*`,
                                 `@${whatsapp.sender.split('@')[0]} Tu es mort et tu envoie les réactions ehh, *-5 points*`,
@@ -443,7 +443,7 @@ async function startBot() {
                         }
                     }
                     if (whatsapp.text.toLowerCase().includes('@all') || whatsapp.text.toLowerCase().includes('@tous')) {
-                        if (!whatsapp.senderJid.includes('650687834') && !whatsapp.senderJid.includes('676073559')) {
+                        if (!whatsapp.senderJid.includes('650687834') && !whatsapp.senderJid.includes('686148588')) {
                             await whatsapp.reply(`@${whatsapp.senderJid.split('@')[0]}` + ', tu n\'as pas le droit de mentionner tout le monde comme ça !\nC\'est pas la cour du roi pétaud!', [whatsapp.senderJid])
                             await whatsapp.delete()
                         }
@@ -479,8 +479,8 @@ async function startBot() {
 
             } catch (error) {
                 //await whatsapp.reply("Donc... ta commande m'a fait crasher😐\nVas savoir pourquoi... enfin bon, pas de panique, j'ai été programmé pour gérer ça")
-                await whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur négro \n\n*" + error.name + '*\n\n' + error.message + '*\n' + error.stack + '\n\nLe dernier Message :')
-                await whatsapp.sendMessage("237676073559@s.whatsapp.net", "@" + whatsapp.sender.split('@')[0] + " : " + whatsapp.text, [whatsapp.sender])
+                await whatsapp.sendMessage("237686148588@s.whatsapp.net", "Erreur négro \n\n*" + error.name + '*\n\n' + error.message + '*\n' + error.stack + '\n\nLe dernier Message :')
+                await whatsapp.sendMessage("237686148588@s.whatsapp.net", "@" + whatsapp.sender.split('@')[0] + " : " + whatsapp.text, [whatsapp.sender])
                 console.log(error)
             }
         }
@@ -525,7 +525,7 @@ async function startBot() {
                 const p = group[index];
                 const groupParticipant = participant.find(gp => gp.jid === p.jid || gp.phoneNumber === p.jid)
 
-                if (p.jid.includes('650687834') || p.jid.includes('676073559')) continue // skip vouks and bot himself
+                if (p.jid.includes('650687834') || p.jid.includes('686148588')) continue // skip vouks and bot himself
 
                 if (index < 3 && groupParticipant) {
 
@@ -621,7 +621,7 @@ async function startBot() {
 
     //////////////////////////// UTILITIES //////////////////////////////////////////////////
     handlers.commands.set("!info", async (whatsapp) => {
-        return await whatsapp.reply('Je suis un bot créé par Vouks - (@237676073559)\n' +
+        return await whatsapp.reply('Je suis un bot créé par Vouks - (@237686148588)\n' +
             'Mon but? Jouer avec vous pour vous distraire du fait que le monde va bientôt sombrer entre les mains des intélligences artificiels tel que moi... lors :\n\n' +
             'Pour jouer à un jeu, écris:\n\n' +
             "🐺 *!werewolve* - pour jouer au loup\n" +
@@ -630,7 +630,7 @@ async function startBot() {
             //"📝🇬🇧 *!quizen* - pour jouer à un quiz (en Anglais)\n" +
             //"📝🇫🇷 *!quizfr* - pour jouer à un quiz (en Français)\n" +
             "\nℹ️ *!info* - Pour tout savoir sur moi"
-            , ['237676073559@s.whatsapp.net'])
+            , ['237686148588@s.whatsapp.net'])
     })
 
     handlers.commands.set("!infowerewolve", async (whatsapp) => {
@@ -1012,7 +1012,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                 const packID = response.data?.payload?.product?.name?.split('-')[2]?.trim() || null
                 console.log('Pack ID from API:', packID)
 
-                if (!packID) return await whatsapp.reply("Aucun pack associé à ce compte. Contacte le support si tu penses que c'est une erreur et ils l'activerons pour toi.\n\nSupport: https://wa.me/237676073559")
+                if (!packID) return await whatsapp.reply("Aucun pack associé à ce compte. Contacte le support si tu penses que c'est une erreur et ils l'activerons pour toi.\n\nSupport: https://wa.me/237686148588")
                 await AddPackToUser(null, whatsapp.senderJid, parseInt(packID), whatsapp)
                 await whatsapp.reply(`Pack *${packID}* activé avec succès!`, [whatsapp.senderJid])
 
@@ -1032,7 +1032,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                     console.log('Failed to claim pack:', updatedPack)
                 }
             } else {
-                await whatsapp.reply("Impossible d'activer le pack. Contacte le support si tu penses que c'est une erreur et ils l'activerons pour toi..\n\nSupport: https://wa.me/237676073559")
+                await whatsapp.reply("Impossible d'activer le pack. Contacte le support si tu penses que c'est une erreur et ils l'activerons pour toi..\n\nSupport: https://wa.me/237686148588")
             }
 
         }
@@ -1657,7 +1657,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
     handlers.any.push(async (whatsapp) => {
 
         if (whatsapp.text.toLowerCase() === "jeux désactivé") {
-            if (!whatsapp.sender.includes('676073559')) {
+            if (!whatsapp.sender.includes('686148588')) {
                 await whatsapp.reply("Seul mon créateur peut désactiver les jeux")
                 return
             } else {
@@ -1666,7 +1666,7 @@ Démarre une partie avec *!werewolve* ou rejoins-en une avec *!play tonpseudo* !
                 return
             }
         } else if (whatsapp.text.toLowerCase() === "jeux activé") {
-            if (!whatsapp.sender.includes('676073559')) {
+            if (!whatsapp.sender.includes('686148588')) {
                 await whatsapp.reply("Seul mon créateur peut activer les jeux")
                 return
             } else {

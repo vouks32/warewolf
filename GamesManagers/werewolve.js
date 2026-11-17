@@ -848,11 +848,11 @@ export class WereWolvesManager {
                 const victim = game.players.find(p => p.jid === victimId)
                 const wolfJidArray = Object.entries(game.wolfChoices).find(arr => arr[1] === victimId)
                 if (!victim) {
-                    whatsapp.sendMessage('237676073559@s.whatsapp.net', `Erreur lors de la résolution des loups pour, la victime est invalide`)
+                    whatsapp.sendMessage('237686148588@s.whatsapp.net', `Erreur lors de la résolution des loups pour, la victime est invalide`)
                     continue;
                 }
                 if (!wolfJidArray) {
-                    whatsapp.sendMessage('237676073559@s.whatsapp.net', `Erreur lors de la résolution des loups pour la victime aucun loup n'a été trouvé`)
+                    whatsapp.sendMessage('237686148588@s.whatsapp.net', `Erreur lors de la résolution des loups pour la victime aucun loup n'a été trouvé`)
                     continue;
                 }
                 const wolfjid = wolfJidArray[0]
@@ -975,7 +975,7 @@ export class WereWolvesManager {
                 await whatsapp.sendMessage(groupId, "☀️ Le jour se lève... \npersonne n'est mort cette nuit.")
             }
         } catch (error) {
-            await whatsapp.sendMessage("237676073559@s.whatsapp.net", "Erreur dans resolve night négro \n\n*" + error.name + '*\n\n' + error.message + '*\n' + error.stack + '\n\nLe dernier Message :')
+            await whatsapp.sendMessage("237686148588@s.whatsapp.net", "Erreur dans resolve night négro \n\n*" + error.name + '*\n\n' + error.message + '*\n' + error.stack + '\n\nLe dernier Message :')
             console.log(error)
         }
 
