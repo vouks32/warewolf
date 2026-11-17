@@ -464,7 +464,7 @@ export class WereWolvesManager {
             }
         }
 
-        await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "startgame.jpg"), "🎮 Nouvelle partie de loup garou, *Awoooo!😭*.")
+        await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "startgame.webp"), "🎮 Nouvelle partie de loup garou, *Awoooo!😭*.")
         await whatsapp.sendMessage(groupId, "🎮 Envoie *!play _pseudo_* pour rejoindre (3 minutes restantes)" + (game.gameType == 2 ? "\n\n Une partie de loup coutera *" + game.misePerUser + " francs* et vous remportez le totale des francs misé" : ""))
 
         timers[groupId][0] = setTimeout(async () => {
@@ -717,7 +717,7 @@ export class WereWolvesManager {
             "🌙 La nuit est tombée... \n👿 Seule les agents du mal sont encore debout, et Les bordelles aussi..., \n\nVous avez *2 minutes*",
         ]
         console.log('sending night msg')
-        await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "nightfall.jpg"), nightText[Math.floor(Math.random() * nightText.length)] + (game.gameType === 2 ? "\n\nPartie avec mise de *" + game.mise + " francs*" : "Partie normale, pas de mise en jeu"))
+        await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "nightfall.webp"), nightText[Math.floor(Math.random() * nightText.length)] + (game.gameType === 2 ? "\n\nPartie avec mise de *" + game.mise + " francs*" : "Partie normale, pas de mise en jeu"))
         const names = game.players.map((p, i) => `[${i + 1}] - *${p.name}* (@${p.jid.split('@')[0]}) ` + (!p.isDead ? `😀` : `☠️ [${p.role}]`)).join("\n")
         const mentions = game.players.map((p, i) => p.jid)
         await whatsapp.sendMessage(groupId, "Joueurs :\n\n " + names, mentions)
@@ -756,7 +756,7 @@ export class WereWolvesManager {
 
             let wasVictim = false
             let wasHunter = false
-            await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "sunrise.jpg"), "☀️ Le jour se lève...")
+            await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "sunrise.webp"), "☀️ Le jour se lève...")
 
 
             // Résolution Serial Killer
@@ -1094,7 +1094,7 @@ export class WereWolvesManager {
         // At start of resolveVotes:
         if (game.votesStopped) {
             const mayor = game.players.find(p => p.role === "MAYOR")
-            await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "mayor.jpg"), "⚖️ Le vote a été annulé par le Maire @" + mayor.jid.split('@')[0], [mayor.jid])
+            await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "mayor.webp"), "⚖️ Le vote a été annulé par le Maire @" + mayor.jid.split('@')[0], [mayor.jid])
             game.votesStopped = false
             // Then proceed to night
             await this.startNight(groupId, whatsapp)
@@ -1553,7 +1553,7 @@ export class WereWolvesManager {
         timers[groupId][0] = setTimeout(async () => {
             game.pendingHunter = null;
 
-            await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "sunrise.jpg"), "☀️ Le jour se lève...")
+            await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "sunrise.webp"), "☀️ Le jour se lève...")
             await whatsapp.sendMessage(groupId, `@${hunter.jid.split('@')[0]} a été tué pendant la nuit!\n\nMais... c'était un Chasseur 🏹`, [hunter.jid])
 
             if (!game.hunterTarget) {
@@ -1815,7 +1815,7 @@ export class WereWolvesManager {
         if (target.role.includes("WEREWOLF") || target.role.includes("SERIAL") || target.role.includes("PYRO") || (target.role.includes("HUNTER") && Math.random() > 0.5)) {
             prostitute.isDead = true
             await whatsapp.sendMessage(prostituteJid, "⚠️ Vous avez visité un client dangereux et êtes morte!")
-            await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "death2.jpg"), ([`💀 Un Cadavre à été retrouvé en plein carrefour!`, `💀 Un corps sans vie à été retrouvé`])[Math.floor(Math.random() * 2)])
+            await whatsapp.sendImage(groupId, path.join(IMAGE_FILE, "death.webp"), ([`💀 Un Cadavre à été retrouvé en plein carrefour!`, `💀 Un corps sans vie à été retrouvé`])[Math.floor(Math.random() * 2)])
 
         } else {
             // Mark both as protected from wolf attack

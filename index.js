@@ -150,7 +150,12 @@ async function startBot() {
                         await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(message)), mentions: mentions }).then(handler.addMessage)
                     },
                     sendImage: async (jid, img, caption = "", mentions = []) => {
+
+                        await sock.sendMessage(jid, {
+                            sticker: fs.readFileSync(img),
+                        });
                         await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(caption)), mentions: mentions }).then(handler.addMessage)
+
                         return
                         if (img.includes('http')) {
                             await sock.sendMessage(jid, { image: { url: img }, caption: fancyTransform(htmlDecode(caption)), mentions }).then(handler.addMessage)
@@ -300,7 +305,9 @@ async function startBot() {
                 },
 
                 sendImage: async (jid, img, caption = "", mentions = []) => {
-
+                    await sock.sendMessage(jid, {
+                        sticker: fs.readFileSync(img),
+                    });
                     await sock.sendMessage(jid, { text: fancyTransform(htmlDecode(caption)), mentions: mentions }).then(handler.addMessage)
                     return
 
