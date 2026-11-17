@@ -194,11 +194,11 @@ export class WordGameManager {
                     if (user) {
                         user.wordGameCreated = user.wordGameCreated > MAXNUMBEROFWORDSPERPLAYER ? MAXNUMBEROFWORDSPERPLAYER : user.wordGameCreated;
                         
-                        if (user.LastWordGame && Date.now() - user.LastWordGame < 24 * 60 * 60 * 1000) {
+                        if (user.LastWordGame && Date.now() - user.LastWordGame < 4 * 60 * 60 * 1000) {
                             if (user.wordGameCreated > 0) {
                                 user.wordGameCreated = (user.wordGameCreated) - 1;
                             } else {
-                                const nextCreationTime = user.LastWordGame + 24 * 60 * 60 * 1000;
+                                const nextCreationTime = user.LastWordGame + 4 * 60 * 60 * 1000;
                                 const nextCreationDate = new Date(nextCreationTime);
                                 await whatsapp.sendMessage(groupId, "🧩 Tu as déjà créé trop de parties de mots ! Tu dois attendre jusqu'au " + nextCreationDate.toLocaleString() + " avant d'en créer une autre.");
                                 delete this.games[groupId]
@@ -235,11 +235,11 @@ export class WordGameManager {
 
             if (user) {
                 user.wordGameCreated = user.wordGameCreated > MAXNUMBEROFWORDSPERPLAYER ? MAXNUMBEROFWORDSPERPLAYER : user.wordGameCreated;
-                if (user.LastWordGame && Date.now() - user.LastWordGame < 24 * 60 * 60 * 1000) {
+                if (user.LastWordGame && Date.now() - user.LastWordGame < 4 * 60 * 60 * 1000) {
                     if (user.wordGameCreated > 0) {
                         user.wordGameCreated = (user.wordGameCreated) - 1;
                     } else {
-                        const nextCreationTime = user.LastWordGame + 24 * 60 * 60 * 1000;
+                        const nextCreationTime = user.LastWordGame + 4 * 60 * 60 * 1000;
                         const nextCreationDate = new Date(nextCreationTime);
                         await whatsapp.sendMessage(groupId, "🧩 Tu as déjà créé trop de parties de mots ! Tu dois attendre jusqu'au " + nextCreationDate.toLocaleString() + " avant d'en créer une autre.");
                         delete this.games[groupId]

@@ -271,11 +271,11 @@ export class PenduManager {
                     await SaveUsersfrancs(this.games[groupId].hostjid, whatsapp, -5, "a lancé une partie de loup avec points", "PENDU", 0, this.games[groupId])
                     let user = getUser(whatsapp.senderJid);
                     if (user) {
-                        if ((user.LastHangGame && Date.now() - user.LastHangGame < 24 * 60 * 60 * 1000)) {
+                        if ((user.LastHangGame && Date.now() - user.LastHangGame < 4 * 60 * 60 * 1000)) {
                             if (user.hangGameCreated > 0) {
                                 user.hangGameCreated = (user.hangGameCreated) - 1;
                             } else {
-                                const nextCreationTime = user.LastHangGame + 24 * 60 * 60 * 1000;
+                                const nextCreationTime = user.LastHangGame + 4 * 60 * 60 * 1000;
                                 const nextCreationDate = new Date(nextCreationTime);
                                 await whatsapp.sendMessage(groupId, "🧩 Tu as déjà créé trop de parties du pendu ! Tu dois attendre jusqu'au *" + nextCreationDate.toLocaleString() + "* avant d'en créer une autre.");
                                 delete this.games[groupId]
@@ -305,11 +305,11 @@ export class PenduManager {
         else {
             let user = getUser(whatsapp.senderJid);
             if (user) {
-                if ((user.LastHangGame && Date.now() - user.LastHangGame < 24 * 60 * 60 * 1000)) {
+                if ((user.LastHangGame && Date.now() - user.LastHangGame < 4 * 60 * 60 * 1000)) {
                     if (user.hangGameCreated > 0) {
                         user.hangGameCreated = (user.hangGameCreated) - 1;
                     } else {
-                        const nextCreationTime = user.LastHangGame + 24 * 60 * 60 * 1000;
+                        const nextCreationTime = user.LastHangGame + 4 * 60 * 60 * 1000;
                         const nextCreationDate = new Date(nextCreationTime);
                         await whatsapp.sendMessage(groupId, "🧩 Tu as déjà créé trop de parties du pendu ! Tu dois attendre jusqu'au *" + nextCreationDate.toLocaleString() + "* avant d'en créer une autre.");
                         delete this.games[groupId]

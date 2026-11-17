@@ -2091,12 +2091,12 @@ export class WereWolvesManager {
     async sendPlayerProfil(whatsapp) {
         let user = getUser(whatsapp.sender)
 
-        if (user && user.LastHangGame && Date.now() - user.LastHangGame > 24 * 60 * 60 * 1000) {
+        if (user && user.LastHangGame && Date.now() - user.LastHangGame > 4 * 60 * 60 * 1000) {
             user.hangGameCreated = 10
             user.LastHangGame = Date.now();
         }
-        if (user && user.LastWordGame && Date.now() - user.LastWordGame > 24 * 60 * 60 * 1000) {
-            user.wordGameCreated = 10
+        if (user && user.LastWordGame && Date.now() - user.LastWordGame > 4 * 60 * 60 * 1000) {
+            user.wordGameCreated = MAXNUMBEROFWORDSPERPLAYER
             user.LastWordGame = Date.now();
         }
         if (user && user.LastWerewolveGame && Date.now() - user.LastWerewolveGame > 24 * 60 * 60 * 1000) {
