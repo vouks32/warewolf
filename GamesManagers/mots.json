@@ -8928,5 +8928,492 @@
         "type": "expression",
         "frequency": 410,
         "label": "elle a les fesses comme le derrière de la marmite du deuil"
-    }
+    },
+     {
+        "type": "expression",
+        "frequency": 980,
+        "label": "Wesh"
+    },
+    {
+        "type": "expression",
+        "frequency": 995,
+        "label": "Du coup"
+    },
+    {
+        "type": "expression",
+        "frequency": 950,
+        "label": "En vrai"
+    },
+    {
+        "type": "expression",
+        "frequency": 920,
+        "label": "Grave"
+    },
+    {
+        "type": "expression",
+        "frequency": 890,
+        "label": "Chaud"
+    },
+    {
+        "type": "expression",
+        "frequency": 880,
+        "label": "C'est carré"
+    },
+    {
+        "type": "expression",
+        "frequency": 850,
+        "label": "Bref"
+    },
+    {
+        "type": "expression",
+        "frequency": 870,
+        "label": "Frérot"
+    },
+    {
+        "type": "expression",
+        "frequency": 840,
+        "label": "Ça passe"
+    },
+    {
+        "type": "expression",
+        "frequency": 910,
+        "label": "J'avoue"
+    },
+    {
+        "type": "expression",
+        "frequency": 780,
+        "label": "Le sang"
+    },
+    {
+        "type": "expression",
+        "frequency": 750,
+        "label": "Ma gueule"
+    },
+    {
+        "type": "expression",
+        "frequency": 450,
+        "label": "C'est l'Afrique"
+    },
+    {
+        "type": "expression",
+        "frequency": 860,
+        "label": "On est ensemble"
+    },
+    {
+        "type": "expression",
+        "frequency": 830,
+        "label": "La famille"
+    },
+    {
+        "type": "expression",
+        "frequency": 790,
+        "label": "Ça dit quoi"
+    },
+    {
+        "type": "expression",
+        "frequency": 880,
+        "label": "Tranquille"
+    },
+    {
+        "type": "expression",
+        "frequency": 620,
+        "label": "Crari"
+    },
+    {
+        "type": "expression",
+        "frequency": 940,
+        "label": "Genre"
+    },
+    {
+        "type": "expression",
+        "frequency": 710,
+        "label": "Miskine"
+    },
+    {
+        "type": "expression",
+        "frequency": 680,
+        "label": "Starfoullah"
+    },
+    {
+        "type": "expression",
+        "frequency": 790,
+        "label": "Wallah"
+    },
+    {
+        "type": "expression",
+        "frequency": 810,
+        "label": "Force à toi"
+    },
+    {
+        "type": "expression",
+        "frequency": 830,
+        "label": "Lourd"
+    },
+    {
+        "type": "expression",
+        "frequency": 720,
+        "label": "C'est de l'eau"
+    },
+    {
+        "type": "expression",
+        "frequency": 650,
+        "label": "Pas de cap"
+    },
+    {
+        "type": "expression",
+        "frequency": 840,
+        "label": "Masterclass"
+    },
+    {
+        "type": "expression",
+        "frequency": 860,
+        "label": "Banger"
+    },
+    {
+        "type": "expression",
+        "frequency": 820,
+        "label": "Flop"
+    },
+    {
+        "type": "expression",
+        "frequency": 810,
+        "label": "Hype"
+    },
+    {
+        "type": "expression",
+        "frequency": 850,
+        "label": "Chill"
+    },
+    {
+        "type": "expression",
+        "frequency": 510,
+        "label": "Skeu skeu"
+    },
+    {
+        "type": "expression",
+        "frequency": 480,
+        "label": "Quoicoubeh"
+    },
+    {
+        "type": "expression",
+        "frequency": 460,
+        "label": "Apagnan"
+    },
+    {
+        "type": "expression",
+        "frequency": 890,
+        "label": "C'est une dinguerie"
+    },
+    {
+        "type": "expression",
+        "frequency": 760,
+        "label": "Un bail"
+    },
+    {
+        "type": "expression",
+        "frequency": 740,
+        "label": "Un plan"
+    },
+    {
+        "type": "expression",
+        "frequency": 690,
+        "label": "En deuspi"
+    },
+    {
+        "type": "expression",
+        "frequency": 680,
+        "label": "En scred"
+    },
+    {
+        "type": "expression",
+        "frequency": 670,
+        "label": "C'est la hass"
+    },
+    {
+        "type": "expression",
+        "frequency": 890,
+        "label": "J'ai le seum"
+    },
+    {
+        "type": "expression",
+        "frequency": 780,
+        "label": "Tu dead ça"
+    },
+    {
+        "type": "expression",
+        "frequency": 850,
+        "label": "C'est le feu"
+    },
+    {
+        "type": "expression",
+        "frequency": 810,
+        "label": "Cheh"
+    },
+    {
+        "type": "expression",
+        "frequency": 730,
+        "label": "Boloss"
+    },
+    {
+        "type": "expression",
+        "frequency": 710,
+        "label": "Gow"
+    },
+    {
+        "type": "expression",
+        "frequency": 890,
+        "label": "Gars"
+    },
+    {
+        "type": "expression",
+        "frequency": 610,
+        "label": "Gadji"
+    },
+    {
+        "type": "expression",
+        "frequency": 610,
+        "label": "Gadjo"
+    },
+    {
+        "type": "expression",
+        "frequency": 790,
+        "label": "Chiller"
+    },
+    {
+        "type": "expression",
+        "frequency": 760,
+        "label": "Ghoster"
+    },
+    {
+        "type": "expression",
+        "frequency": 580,
+        "label": "Zonard"
+    },
+    {
+        "type": "expression",
+        "frequency": 690,
+        "label": "La hess"
+    },
+    {
+        "type": "expression",
+        "frequency": 850,
+        "label": "Askip"
+    },
+    {
+        "type": "expression",
+        "frequency": 820,
+        "label": "OkLM"
+    },
+    {
+        "type": "expression",
+        "frequency": 520,
+        "label": "Swag"
+    },
+    {
+        "type": "expression",
+        "frequency": 640,
+        "label": "Ken"
+    },
+    {
+        "type": "expression",
+        "frequency": 710,
+        "label": "C'est dar"
+    },
+    {
+        "type": "expression",
+        "frequency": 590,
+        "label": "Goumer"
+    },
+    {
+        "type": "expression",
+        "frequency": 780,
+        "label": "Choper"
+    },
+    {
+        "type": "expression",
+        "frequency": 870,
+        "label": "Kiffer"
+    },
+    {
+        "type": "expression",
+        "frequency": 740,
+        "label": "S'enjailler"
+    },
+    {
+        "type": "expression",
+        "frequency": 810,
+        "label": "Posé"
+    },
+    {
+        "type": "expression",
+        "frequency": 730,
+        "label": "Frappe"
+    },
+    {
+        "type": "expression",
+        "frequency": 790,
+        "label": "Pépite"
+    },
+    {
+        "type": "expression",
+        "frequency": 830,
+        "label": "Faire genre"
+    },
+    {
+        "type": "expression",
+        "frequency": 780,
+        "label": "Mytho"
+    },
+    {
+        "type": "expression",
+        "frequency": 820,
+        "label": "Grave chaud"
+    },
+    {
+        "type": "expression",
+        "frequency": 740,
+        "label": "Prendre un vent"
+    },
+    {
+        "type": "expression",
+        "frequency": 730,
+        "label": "Mettre un râteau"
+    },
+    {
+        "type": "expression",
+        "frequency": 760,
+        "label": "C'est de la frappe"
+    },
+    {
+        "type": "expression",
+        "frequency": 790,
+        "label": "C'est lourd"
+    },
+    {
+        "type": "expression",
+        "frequency": 610,
+        "label": "Faire crari"
+    },
+    {
+        "type": "expression",
+        "frequency": 720,
+        "label": "Charo"
+    },
+    {
+        "type": "expression",
+        "frequency": 640,
+        "label": "Michto"
+    },
+    {
+        "type": "expression",
+        "frequency": 590,
+        "label": "Pouki"
+    },
+    {
+        "type": "expression",
+        "frequency": 710,
+        "label": "Balance"
+    },
+    {
+        "type": "expression",
+        "frequency": 630,
+        "label": "Caner"
+    },
+    {
+        "type": "expression",
+        "frequency": 770,
+        "label": "La mif"
+    },
+    {
+        "type": "expression",
+        "frequency": 840,
+        "label": "Mon reuf"
+    },
+    {
+        "type": "expression",
+        "frequency": 790,
+        "label": "Ma soeur"
+    },
+    {
+        "type": "expression",
+        "frequency": 760,
+        "label": "S'ambiancer"
+    },
+    {
+        "type": "expression",
+        "frequency": 830,
+        "label": "Le boss"
+    },
+    {
+        "type": "expression",
+        "frequency": 850,
+        "label": "Le goat"
+    },
+    {
+        "type": "expression",
+        "frequency": 620,
+        "label": "Cracher du feu"
+    },
+    {
+        "type": "expression",
+        "frequency": 880,
+        "label": "Avoir le seum"
+    },
+    {
+        "type": "expression",
+        "frequency": 760,
+        "label": "C'est cheaté"
+    },
+    {
+        "type": "expression",
+        "frequency": 710,
+        "label": "Tryharder"
+    },
+    {
+        "type": "expression",
+        "frequency": 780,
+        "label": "Rager"
+    },
+    {
+        "type": "expression",
+        "frequency": 730,
+        "label": "Se faire carotte"
+    },
+    {
+        "type": "expression",
+        "frequency": 770,
+        "label": "Pigeon"
+    },
+    {
+        "type": "expression",
+        "frequency": 790,
+        "label": "Darron"
+    },
+    {
+        "type": "expression",
+        "frequency": 790,
+        "label": "Darronne"
+    },
+    {
+        "type": "expression",
+        "frequency": 810,
+        "label": "Fréro"
+    },
+    {
+        "type": "expression",
+        "frequency": 620,
+        "label": "Gazer"
+    },
+    {
+        "type": "expression",
+        "frequency": 680,
+        "label": "C'est chanmé"
+    },
+    {
+        "type": "expression",
+        "frequency": 640,
+        "label": "Zarbi"
+    },
+    
+
 ]
